@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Upload Product</title>
+</head>
+<body>
+  <h2>Upload Product</h2>
+
+  <form
+    action="http://localhost:5000/api/products"
+    method="POST"
+    enctype="multipart/form-data"
+  >
+    <input type="text" name="title" placeholder="Title" /><br /><br />
+    <input type="text" name="slug" placeholder="Slug" /><br /><br />
+    <input type="text" name="shortDescription" placeholder="Short Description" /><br /><br />
+    <textarea name="fullDescription" placeholder="Full Description"></textarea><br /><br />
+    <input type="number" name="price" placeholder="Price" /><br /><br />
+
+    <input type="file" name="images" multiple /><br /><br />
+
+    <button type="submit">Upload</button>
+  </form>
+</body>
+</html>

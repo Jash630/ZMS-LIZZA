@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-white text-slate-900 antialiased;
+}
+/* Prevent layout shift due to fixed header */
+body {
+  padding-top: 5rem; /* matches header height (h-20) */
+}

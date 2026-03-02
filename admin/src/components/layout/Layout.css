@@ -1,0 +1,19 @@
+.layout {
+  display: flex;
+  min-height: 100vh;
+}
+.layout-main {
+  flex: 1;
+  margin-left: var(--sidebar-width);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  transition: margin-left var(--transition-slow);
+  min-width: 0;
+}
+.layout.sidebar-collapsed .layout-main { margin-left: 68px; }
+.layout-content { flex: 1; background: var(--bg-primary); }
+
+@media (max-width: 768px) {
+  .layout-main { margin-left: 0; }
+}
