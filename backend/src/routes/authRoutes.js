@@ -1,32 +1,12 @@
-const express = require("express");
-const router = express.Router();
-const { protect } = require("../middleware/authMiddleware");
-const { authorize } = require("../middleware/roleMiddleware");
-const authController = require("../controllers/authController");
+const express = require('express')
+const router  = express.Router()
+const { login, getMe, updatePassword, updateMe, logout } = require('../controllers/authController')
+const { protect } = require('../middleware/auth')
 
-router.post("/register", authController.registerAdmin);
+router.post('/login',           login)
+router.get('/me',               protect, getMe)
+router.put('/update-password',  protect, updatePassword)
+router.put('/update-me',        protect, updateMe)
+router.post('/logout',          protect, logout)
 
-router.post(
-    "/register",
-    protect,
-    authorize("superadmin"),
-    authController.registerAdmin
-);
-
-router.post("/login", authController.loginAdmin);
-
-router.get(
-  "/admins",
-  protect,
-  authorize("superadmin"),
-  authController.getAdmins
-);
-
-router.delete(
-  "/admins/:id",
-  protect,
-  authorize("superadmin"),
-  authController.deleteAdmin
-);
-
-module.exports = router;
+module.exports = router

@@ -1,100 +1,92 @@
-const Admin = require("../models/Admin");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
+const User      = require('../models/User')
+const AppError  = require('../utils/AppError')
+const { sendSuccess } = require('../utils/apiResponse')
+const logger    = require('../utils/logger')
 
-const getAdmins = async (req, res) => {
-  try {
-    const admins = await Admin.find().select("-password");
-    res.json(admins);
-  } catch (error) {
-    res.status(500).json({ message: "Error fetching admins" });
+const sendTokenResponse = (user, statusCode, res, message = 'Success') => {
+  const token    = user.getSignedJwtToken()
+  const userData = {
+    id:        user._id,
+    name:      user.name,
+    email:     user.email,
+    role:      user.role,
+    status:    user.status,
+    avatar:    user.avatar,
+    lastLogin: user.lastLogin,
+    createdAt: user.createdAt,
   }
-};
+  return res.status(statusCode).json({ success: true, message, token, data: userData })
+}
 
-// // ================= REGISTER ADMIN =================
-// const registerAdmin = async (req, res) => {
-//   try {
-//     const { name, email, password, role } = req.body;
-
-//     const existingAdmin = await Admin.findOne({ email });
-//     if (existingAdmin) {
-//       return res.status(400).json({ message: "Admin already exists" });
-//     }
-
-//     const hashedPassword = await bcrypt.hash(password, 10);
-
-//     const newAdmin = new Admin({
-//       name,
-//       email,
-//       password: hashedPassword,
-//       role: role || "editor",
-//     });
-
-//     await newAdmin.save();
-
-//     res.status(201).json({ message: "Admin created successfully" });
-//   } catch (error) {
-//     res.status(500).json({ message: "Error creating admin" });
-//   }
-// };
-
-// ================= LOGIN ADMIN =================
-const loginAdmin = async (req, res) => {
+// POST /api/v1/auth/login
+exports.login = async (req, res, next) => {
   try {
-    const { email, password } = req.body;
-    if ( !email || !password){
-        return res.status(400).json({message: "Anyone Field Is Missing"});
-    }
-    const admin = await Admin.findOne({ email });
-    if (!admin) {
-      return res.status(400).json({ message: "Invalid credentials" });
-    }
+    const { email, password } = req.body
+    if (!email || !password) return next(new AppError('Please provide email and password', 400))
 
-    const isMatch = await bcrypt.compare(password, admin.password);
-    if (!isMatch) {
-      return res.status(400).json({ message: "Invalid credentials" });
+    const user = await User.findOne({ email }).select('+password')
+    if (!user || !(await user.matchPassword(password))) {
+      return next(new AppError('Invalid email or password', 401))
+    }
+    if (user.status !== 'active') {
+      return next(new AppError('Your account has been deactivated', 401))
     }
 
-    const token = jwt.sign(
-      {
-        id: admin._id,
-        role: admin.role,
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES_IN }
-    );
+    user.lastLogin = new Date()
+    await user.save({ validateBeforeSave: false })
 
-    res.json({
-      token,
-      admin: {
-        id: admin._id,
-        name: admin.name,
-        email: admin.email,
-        role: admin.role,
-      },
-    });
-  } catch (error) {
-    res.status(500).json({ message: "Login failed" });
+    logger.info(`User logged in: ${user.email} (${user.role})`)
+    sendTokenResponse(user, 200, res, 'Logged in successfully')
+  } catch (err) {
+    next(err)
   }
-};
+}
 
-// const deleteAdmin = async (req, res) => {
-//   try {
-//     if (req.admin.id === req.params.id) {
-//       return res.status(400).json({ message: "Cannot delete yourself" });
-//     }
+// GET /api/v1/auth/me
+exports.getMe = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id).populate('postCount')
+    sendSuccess(res, { data: user, message: 'Profile fetched' })
+  } catch (err) {
+    next(err)
+  }
+}
 
-//     const admin = await Admin.findById(req.params.id);
-//     if (!admin) {
-//       return res.status(404).json({ message: "Admin not found" });
-//     }
+// PUT /api/v1/auth/update-password
+exports.updatePassword = async (req, res, next) => {
+  try {
+    const { currentPassword, newPassword } = req.body
+    const user = await User.findById(req.user.id).select('+password')
 
-//     await admin.deleteOne();
+    if (!(await user.matchPassword(currentPassword))) {
+      return next(new AppError('Current password is incorrect', 400))
+    }
 
-//     res.json({ message: "Admin deleted successfully" });
-//   } catch (error) {
-//     res.status(500).json({ message: "Error deleting admin" });
-//   }
-// };
+    user.password          = newPassword
+    user.passwordChangedAt = new Date()
+    await user.save()
 
-module.exports = {getAdmins, loginAdmin}
+    logger.info(`Password updated for user: ${user.email}`)
+    sendTokenResponse(user, 200, res, 'Password updated successfully')
+  } catch (err) {
+    next(err)
+  }
+}
+
+// PUT /api/v1/auth/update-me
+exports.updateMe = async (req, res, next) => {
+  try {
+    const { password, role, ...allowedFields } = req.body
+    const user = await User.findByIdAndUpdate(req.user.id, allowedFields, {
+      new: true, runValidators: true,
+    })
+    sendSuccess(res, { data: user, message: 'Profile updated successfully' })
+  } catch (err) {
+    next(err)
+  }
+}
+
+// POST /api/v1/auth/logout
+exports.logout = (req, res) => {
+  sendSuccess(res, { message: 'Logged out successfully' })
+}
