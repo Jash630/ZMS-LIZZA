@@ -1,0 +1,72 @@
+# -------------------------------
+# Global / OS / Editor
+# -------------------------------
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# -------------------------------
+# Logs
+# -------------------------------
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# -------------------------------
+# Environment / secrets
+# -------------------------------
+.env
+.env.*
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env.*.example
+
+# -------------------------------
+# Dependencies / package managers
+# -------------------------------
+node_modules/
+**/node_modules/
+
+# -------------------------------
+# Build outputs / caches
+# -------------------------------
+dist/
+build/
+coverage/
+.cache/
+.turbo/
+.parcel-cache/
+*.tsbuildinfo
+
+admin/dist/
+frontend/dist/
+backend/dist/
+backend/coverage/
+
+# -------------------------------
+# Runtime uploads / temp data
+# -------------------------------
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+backend/logs/*
+!backend/logs/.gitkeep
+
+# -------------------------------
+# Misc
+# -------------------------------
+*.local
