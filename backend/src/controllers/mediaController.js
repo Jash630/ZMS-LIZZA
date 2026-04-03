@@ -1,9 +1,55 @@
-const path     = require('path')
-const fs       = require('fs')
-const Media    = require('../models/Media')
+const fs = require('fs')
+const Media = require('../models/Media')
+const cloudinary = require('../config/cloudinary')
 const AppError = require('../utils/AppError')
 const { sendSuccess, sendPaginated } = require('../utils/apiResponse')
 const { formatFileSize } = require('../middleware/upload')
+
+const resolveMediaType = (mimetype = '') => {
+  if (mimetype.startsWith('image/')) return 'image'
+  if (mimetype === 'application/pdf') return 'pdf'
+  if (mimetype.startsWith('video/')) return 'video'
+  return 'other'
+}
+
+const cloudinaryResourceTypeFor = (type) => {
+  if (type === 'image') return 'image'
+  if (type === 'video') return 'video'
+  if (type === 'pdf') return 'raw'
+  return 'auto'
+}
+
+const cloudinaryFolderFor = (type) => {
+  if (type === 'video') return 'zms-lizza/videos'
+  if (type === 'pdf') return 'zms-lizza/documents'
+  return 'zms-lizza/images'
+}
+
+const uploadBufferToCloudinary = (file, type) => {
+  const resourceType = cloudinaryResourceTypeFor(type)
+  const folder = cloudinaryFolderFor(type)
+
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      {
+        folder,
+        resource_type: resourceType,
+        use_filename: true,
+        unique_filename: true,
+        overwrite: false,
+      },
+      (error, result) => {
+        if (error) return reject(error)
+        resolve(result)
+      }
+    )
+
+    stream.end(file.buffer)
+  })
+}
+
+const hasCloudinaryConfig = () =>
+  Boolean(process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET)
 
 // GET /api/v1/media
 exports.getMedia = async (req, res, next) => {
@@ -34,25 +80,45 @@ exports.uploadMedia = async (req, res, next) => {
     if (!req.file) return next(new AppError('Please upload a file', 400))
 
     const file = req.file
-    let type   = 'other'
-    if (file.mimetype.startsWith('image/'))        type = 'image'
-    else if (file.mimetype === 'application/pdf')  type = 'pdf'
-    else if (file.mimetype.startsWith('video/'))   type = 'video'
+    const type = resolveMediaType(file.mimetype)
 
-    const subfolder = type === 'pdf' ? 'documents' : type === 'video' ? 'videos' : 'images'
-    const url       = `${req.protocol}://${req.get('host')}/uploads/${subfolder}/${file.filename}`
-
-    const media = await Media.create({
-      name:          file.filename,
-      originalName:  file.originalname,
+    let mediaPayload = {
+      name: file.filename || file.originalname,
+      originalName: file.originalname,
       type,
-      mimeType:      file.mimetype,
-      size:          file.size,
+      mimeType: file.mimetype,
+      size: file.size,
       sizeFormatted: formatFileSize(file.size),
-      url,
-      path:          file.path,
-      uploadedBy:    req.user.id,
-    })
+      uploadedBy: req.user.id,
+    }
+
+    if (file.buffer) {
+      if (!hasCloudinaryConfig()) {
+        return next(new AppError('Cloudinary is not configured. Please set Cloudinary environment variables.', 500))
+      }
+
+      const uploaded = await uploadBufferToCloudinary(file, type)
+      mediaPayload = {
+        ...mediaPayload,
+        name: uploaded.public_id?.split('/').pop() || mediaPayload.name,
+        url: uploaded.secure_url || uploaded.url,
+        provider: 'cloudinary',
+        publicId: uploaded.public_id,
+        resourceType: uploaded.resource_type,
+        path: null,
+      }
+    } else {
+      const subfolder = type === 'pdf' ? 'documents' : type === 'video' ? 'videos' : 'images'
+      const localUrl = `${req.protocol}://${req.get('host')}/uploads/${subfolder}/${file.filename}`
+      mediaPayload = {
+        ...mediaPayload,
+        url: localUrl,
+        provider: 'local',
+        path: file.path,
+      }
+    }
+
+    const media = await Media.create(mediaPayload)
 
     sendSuccess(res, { data: media, statusCode: 201, message: 'File uploaded successfully' })
   } catch (err) {
@@ -65,6 +131,13 @@ exports.deleteMedia = async (req, res, next) => {
   try {
     const media = await Media.findById(req.params.id)
     if (!media) return next(new AppError('Media not found', 404))
+
+    if (media.provider === 'cloudinary' && media.publicId) {
+      await cloudinary.uploader.destroy(media.publicId, {
+        resource_type: media.resourceType || 'image',
+        invalidate: true,
+      })
+    }
 
     if (media.path && fs.existsSync(media.path)) {
       fs.unlinkSync(media.path)

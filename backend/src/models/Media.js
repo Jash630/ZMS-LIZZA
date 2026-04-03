@@ -13,6 +13,9 @@ const MediaSchema = new mongoose.Schema(
     size:          { type: Number },
     sizeFormatted: { type: String },
     url:           { type: String, required: true },
+    provider:      { type: String, enum: ['local', 'cloudinary'], default: 'local' },
+    publicId:      { type: String },
+    resourceType:  { type: String },
     path:          { type: String },
     alt:           { type: String, trim: true },
     uploadedBy:    { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
@@ -28,5 +31,6 @@ const MediaSchema = new mongoose.Schema(
 
 MediaSchema.index({ type: 1 })
 MediaSchema.index({ uploadedBy: 1 })
+MediaSchema.index({ provider: 1, publicId: 1 })
 
 module.exports = mongoose.model('Media', MediaSchema)

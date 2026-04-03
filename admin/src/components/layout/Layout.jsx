@@ -10,7 +10,7 @@ export default function Layout() {
     <div className={`layout ${collapsed ? 'sidebar-collapsed' : ''}`}>
       <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
       <div className="layout-main">
-        <Header collapsed={collapsed} setCollapsed={setCollapsed} />
+        <Header setCollapsed={setCollapsed} />
         <main className="layout-content">
           <Outlet />
         </main>

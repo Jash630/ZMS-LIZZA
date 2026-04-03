@@ -1,41 +1,34 @@
-import { Routes, Route } from "react-router-dom";
+import { NavigationProvider, useNavigation } from './context/NavigationContext.jsx'
+import { HomePage }          from './pages/HomePage.jsx'
+import { AboutPage }         from './pages/AboutPage.jsx'
+import { ProductsPage }      from './pages/ProductsPage.jsx'
+import { ProductDetailPage } from './pages/ProductDetailPage.jsx'
+import { GalleryPage }       from './pages/GalleryPage.jsx'
+import { ServicesPage }      from './pages/ServicesPage.jsx'
+import { BlogPage }          from './pages/BlogPage.jsx'
+import { BlogPostPage }      from './pages/BlogPostPage.jsx'
+import { ContactPage }       from './pages/ContactPage.jsx'
 
-import Header from "./components/Header";
-import Footer from "./components/Footer";
-import WhatsAppButton from "./components/WhatsAppButton";
+function AppRoutes() {
+  const { currentPage, productId, blogSlug } = useNavigation()
 
-import HomePage from "./pages/HomePage";
-import ProductsPage from "./pages/ProductsPage";
-import ProductDetailPage from "./pages/ProductDetailPage";
-import AboutPage from "./pages/AboutPage";
-import ServicesPage from "./pages/ServicesPage";
-import BlogPage from "./pages/BlogPage";
-import GalleryPage from "./pages/GalleryPage";
-import ContactPage from "./pages/ContactPage";
-
-function App() {
-  return (
-    <div className="flex min-h-screen flex-col bg-white text-slate-900">
-      <Header />
-
-      <main className="flex-1">
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/products" element={<ProductsPage />} />
-          <Route path="/products/:id" element={<ProductDetailPage />} />
-          <Route path="/gallery" element={<GalleryPage />} />
-          <Route path="/services" element={<ServicesPage />} />
-          <Route path="/blog" element={<BlogPage />} />
-          <Route path="/contact" element={<ContactPage />} />
-
-        </Routes>
-      </main>
-
-      <Footer />
-      <WhatsAppButton />
-    </div>
-  );
+  switch (currentPage) {
+    case 'about':          return <AboutPage />
+    case 'products':       return <ProductsPage />
+    case 'product-detail': return <ProductDetailPage productId={productId} />
+    case 'gallery':        return <GalleryPage />
+    case 'services':       return <ServicesPage />
+    case 'blog':           return <BlogPage />
+    case 'blog-detail':    return <BlogPostPage slug={blogSlug} />
+    case 'contact':        return <ContactPage />
+    default:               return <HomePage />
+  }
 }
 
-export default App;
+export default function App() {
+  return (
+    <NavigationProvider>
+      <AppRoutes />
+    </NavigationProvider>
+  )
+}

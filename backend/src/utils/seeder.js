@@ -3,10 +3,13 @@ const mongoose     = require('mongoose')
 const connectDB    = require('../config/db')
 const User         = require('../models/User')
 const Post         = require('../models/Post')
+const Product      = require('../models/Product')
 const Comment      = require('../models/Comment')
 const Lead         = require('../models/Lead')
 const Notification = require('../models/Notification')
 const SeoSettings  = require('../models/SeoSettings')
+const Settings     = require('../models/Settings')
+const ContentView  = require('../models/ContentView')
 
 // ── Sample Users ──────────────────────────────────────
 const users = [
@@ -85,6 +88,64 @@ const leads = [
   { name: 'Patil Enterprises', contact: '+91 32109 87654', city: 'Pune',       state: 'Maharashtra', source: 'WhatsApp', status: 'cold', machines: '2 heads',  notes: 'Will reconsider in Q2.' },
 ]
 
+const getProducts = (authorIds) => [
+  {
+    name: 'Multi-Function Pro Series',
+    tagline: 'Sequins, beads, and coding in one powerful machine',
+    badge: 'Best Seller',
+    image: 'https://images.unsplash.com/photo-1663888673897-f8bc14482f17?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800',
+    description: 'Flagship embroidery machine with integrated multi-function capabilities for high-output manufacturing.',
+    keySpecs: ['1200 SPM', '12 Heads', '9 Needles/Head', 'Servo Motor'],
+    keyFeatures: ['Sequins + beads + coding support', 'European control panel', '2-year warranty'],
+    galleryImages: [
+      'https://images.unsplash.com/photo-1663888673897-f8bc14482f17?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800',
+      'https://images.unsplash.com/photo-1614624532983-4ce03382d63d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800',
+    ],
+    specifications: [
+      {
+        category: 'Performance',
+        items: [
+          { label: 'Machine Speed', value: '1200 stitches/minute' },
+          { label: 'Heads', value: '12' },
+        ],
+      },
+      {
+        category: 'Functionality',
+        items: [
+          { label: 'Sequin Capacity', value: '1-8 sequins' },
+          { label: 'Bead Size', value: '2mm - 8mm' },
+        ],
+      },
+    ],
+    features: [
+      {
+        title: 'High-Speed Performance',
+        description: 'Up to 1200 stitches per minute for faster production.',
+        benefit: 'Increase output while maintaining consistent quality.',
+      },
+    ],
+    applications: ['Garment Embroidery', 'Boutique Production', 'Export Units'],
+    packageIncludes: [
+      {
+        title: 'Machine Package',
+        items: ['Machine unit', 'Control panel', 'Standard accessories'],
+      },
+    ],
+    faqs: [
+      {
+        q: 'What support is included?',
+        a: 'Installation, training, and 24/7 technical support are included.',
+      },
+    ],
+    status: 'published',
+    publishedAt: new Date('2024-03-05'),
+    views: 620,
+    author: authorIds[1],
+    seoTitle: 'Multi-Function Pro Series Embroidery Machine',
+    seoDescription: 'Powerful all-in-one embroidery machine for industrial production.',
+  },
+]
+
 const seoSettings = {
   siteTitle:       'ZMS LIZZA – Best Embroidery Machine Manufacturer in India | ZJ Series',
   siteDescription: 'ZMS LIZZA European Technology offers premium multi-head embroidery machines for Indian textile factories.',
@@ -99,6 +160,29 @@ const seoSettings = {
   ],
 }
 
+const dashboardSettings = {
+  general: {
+    siteName: 'ZMS LIZZA',
+    tagline: 'European Technology - Embroidery Machine Manufacturer',
+    siteUrl: 'https://zmslizza.com',
+    phone: '+91 98765 43210',
+    whatsapp: '+91 98765 43210',
+    email: 'info@zmslizza.com',
+    address: 'Mumbai, Maharashtra, India',
+  },
+  appearance: {
+    defaultTheme: 'light',
+    brandAccent: '#E63946',
+  },
+  notifications: {
+    newLeadEnquiries: true,
+    commentModeration: true,
+    postPublished: true,
+    systemUpdates: true,
+    weeklyPerformanceReport: true,
+  },
+}
+
 // ── Seed ─────────────────────────────────────────────
 const importData = async () => {
   try {
@@ -108,10 +192,13 @@ const importData = async () => {
     await Promise.all([
       User.deleteMany(),
       Post.deleteMany(),
+      Product.deleteMany(),
       Comment.deleteMany(),
       Lead.deleteMany(),
       Notification.deleteMany(),
       SeoSettings.deleteMany(),
+      Settings.deleteMany(),
+      ContentView.deleteMany(),
     ])
     console.log('🗑️  Cleared existing data')
 
@@ -122,9 +209,13 @@ const importData = async () => {
     const admin      = createdUsers.find(u => u.role === 'admin')
     const editor     = createdUsers.find(u => u.role === 'editor')
 
-    const postData     = getPosts([superAdmin._id, admin._id, editor._id])
+    const postData = getPosts([superAdmin._id, admin._id, editor._id])
     const createdPosts = await Post.create(postData)
     console.log(`✅ Created ${createdPosts.length} posts`)
+
+    const productData = getProducts([superAdmin._id, admin._id, editor._id])
+    const createdProducts = await Product.create(productData)
+    console.log(`✅ Created ${createdProducts.length} products`)
 
     const comments = [
       { post: createdPosts[0]._id, author: 'Ramesh Patel',   email: 'ramesh@example.com', content: 'Excellent machine quality! Using ZJ-Series for 2 years.',        status: 'approved' },
@@ -141,6 +232,9 @@ const importData = async () => {
 
     await SeoSettings.create(seoSettings)
     console.log('✅ SEO settings created')
+
+    await Settings.create(dashboardSettings)
+    console.log('✅ Dashboard settings created')
 
     await Notification.create([
       { type: 'lead',    message: 'New hot lead: Star Garments (20 heads) from Delhi',           read: false },
@@ -167,8 +261,8 @@ const destroyData = async () => {
   try {
     await connectDB()
     await Promise.all([
-      User.deleteMany(), Post.deleteMany(), Comment.deleteMany(),
-      Lead.deleteMany(), Notification.deleteMany(), SeoSettings.deleteMany(),
+      User.deleteMany(), Post.deleteMany(), Product.deleteMany(), Comment.deleteMany(),
+      Lead.deleteMany(), Notification.deleteMany(), SeoSettings.deleteMany(), Settings.deleteMany(), ContentView.deleteMany(),
     ])
     console.log('💥 All data destroyed')
     process.exit(0)

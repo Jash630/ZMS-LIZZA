@@ -2,7 +2,7 @@ import React from 'react'
 import { TrendingUp, TrendingDown } from 'lucide-react'
 import './StatCard.css'
 
-export default function StatCard({ label, value, change, icon: Icon, gradient }) {
+export default function StatCard({ label, value, change, icon, gradient }) {
   const isPositive     = change >= 0
   const formattedValue = value >= 1000 ? `${(value / 1000).toFixed(1)}K` : value
 
@@ -10,7 +10,7 @@ export default function StatCard({ label, value, change, icon: Icon, gradient })
     <div className="stat-card card animate-fade-in">
       <div className="stat-card-top">
         <div className="stat-icon" style={{ background: gradient }}>
-          <Icon size={20} color="white" />
+          {icon ? React.createElement(icon, { size: 20, color: 'white' }) : null}
         </div>
         <div className={`stat-change ${isPositive ? 'positive' : 'negative'}`}>
           {isPositive ? <TrendingUp size={13} /> : <TrendingDown size={13} />}

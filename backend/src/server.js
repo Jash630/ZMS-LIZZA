@@ -14,15 +14,9 @@ const errorHandler  = require('./middleware/errorHandler')
 const AppError      = require('./utils/AppError')
 
 // ── Import Routes ─────────────────────────────────────
-const authRoutes         = require('./routes/authRoutes')
-const postRoutes         = require('./routes/postRoutes')
-const commentRoutes      = require('./routes/commentRoutes')
-const leadRoutes         = require('./routes/leadRoutes')
-const userRoutes         = require('./routes/userRoutes')
-const mediaRoutes        = require('./routes/mediaRoutes')
-const analyticsRoutes    = require('./routes/analyticsRoutes')
-const notificationRoutes = require('./routes/notificationRoutes')
-const seoRoutes          = require('./routes/seoRoutes')
+const authRoutes   = require('./routes/authRoutes')
+const adminRoutes  = require('./routes/admin')
+const publicRoutes = require('./routes/public')
 
 // ── Connect Database ──────────────────────────────────
 connectDB()
@@ -34,10 +28,37 @@ app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' },
 }))
 
+const defaultLocalOrigins = [
+  'http://localhost:5173',
+  'http://localhost:5174',
+  'http://127.0.0.1:5173',
+  'http://127.0.0.1:5174',
+]
+
+const normalizeOrigin = (origin) => origin.trim().replace(/\/+$/, '')
+
+const envOrigins = process.env.CORS_ORIGINS
+  ? process.env.CORS_ORIGINS.split(',').map(normalizeOrigin).filter(Boolean)
+  : process.env.CLIENT_URL
+    ? [normalizeOrigin(process.env.CLIENT_URL)]
+    : []
+
+const corsOrigins = Array.from(
+  new Set([
+    ...envOrigins,
+    ...(process.env.NODE_ENV === 'production' ? [] : defaultLocalOrigins.map(normalizeOrigin)),
+  ])
+)
+
 app.use(cors({
-  origin:      process.env.CLIENT_URL || 'http://localhost:5173',
+  origin: (origin, cb) => {
+    if (!origin) return cb(null, true)
+    const normalized = normalizeOrigin(origin)
+    if (corsOrigins.includes(normalized)) return cb(null, true)
+    return cb(new AppError(`CORS blocked for origin: ${origin}`, 403))
+  },
   credentials: true,
-  methods:     ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }))
 
@@ -88,15 +109,9 @@ app.get('/api/v1/health', (req, res) => {
 
 // ── API Routes ────────────────────────────────────────
 const API = '/api/v1'
-app.use(`${API}/auth`,          authRoutes)
-app.use(`${API}/posts`,         postRoutes)
-app.use(`${API}/comments`,      commentRoutes)
-app.use(`${API}/leads`,         leadRoutes)
-app.use(`${API}/users`,         userRoutes)
-app.use(`${API}/media`,         mediaRoutes)
-app.use(`${API}/analytics`,     analyticsRoutes)
-app.use(`${API}/notifications`, notificationRoutes)
-app.use(`${API}/seo`,           seoRoutes)
+app.use(`${API}/auth`, authRoutes)
+app.use(`${API}/public`, publicRoutes)
+app.use(API, adminRoutes)
 
 // ── 404 Handler ───────────────────────────────────────
 app.all('*', (req, res, next) => {

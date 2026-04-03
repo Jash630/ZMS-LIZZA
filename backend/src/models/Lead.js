@@ -13,6 +13,7 @@ const LeadSchema = new mongoose.Schema(
       trim:     true,
     },
     email:    { type: String, trim: true, lowercase: true },
+    businessName: { type: String, trim: true },
     city:     { type: String, trim: true },
     state:    { type: String, trim: true },
     source: {
@@ -26,6 +27,12 @@ const LeadSchema = new mongoose.Schema(
       default: 'warm',
     },
     machines:     { type: String, trim: true },
+    helpType: {
+      type: String,
+      enum: ['quote', 'demo', 'support', 'service', 'inquiry', 'emi', 'other'],
+      default: 'inquiry',
+    },
+    message:      { type: String, trim: true, maxlength: [2000, 'Message cannot exceed 2000 characters'] },
     notes:        { type: String, trim: true },
     assignedTo:   { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     followUpDate: { type: Date },

@@ -1,75 +1,153 @@
-export default function AboutPage() {
-  return (
-    <div className="w-full">
+import { Header }         from '../components/layout/Header.jsx'
+import { Footer }         from '../components/layout/Footer.jsx'
+import { WhatsAppButton } from '../components/shared/WhatsAppButton.jsx'
+import { useNavigation }  from '../context/NavigationContext.jsx'
+import { ChevronRight, Calendar, Download, Crosshair, Shield, Cpu, TrendingUp, Award, MapPin } from 'lucide-react'
 
-      {/* HEADER */}
-      <section className="py-20 bg-slate-50">
-        <div className="max-w-7xl mx-auto px-6 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">
-            About ZMS LIZZA
-          </h1>
-          <p className="max-w-2xl mx-auto text-slate-600">
-            European technology. Indian manufacturing excellence.
+export function AboutPage() {
+  const { navigateTo } = useNavigation()
+
+  const milestones = [
+    { year: '2019', text: 'Company founded in Surat' },
+    { year: '2020', text: 'First 50 installations completed' },
+    { year: '2022', text: 'Expanded to Mumbai & Ahmedabad' },
+    { year: '2024', text: '100+ happy customers across India' },
+  ]
+
+  const advantages = [
+    { Icon: Crosshair,  title: 'Higher Precision',       desc: 'Stitch accuracy down to 0.1mm for flawless designs' },
+    { Icon: Shield,     title: 'Superior Durability',    desc: 'Premium materials for 10+ years of heavy-duty operation' },
+    { Icon: Cpu,        title: 'Advanced Control',       desc: 'Intelligent software for automated adjustments' },
+    { Icon: TrendingUp, title: 'Consistent Performance', desc: 'High-speed without quality degradation' },
+    { Icon: Award,      title: 'Better Components',      desc: 'European-grade parts for lower maintenance costs' },
+  ]
+
+  const locations = [
+    { city: 'Surat (HQ)', detail: 'Ring Road, Surat 395002', radius: '< 4 Hours Response' },
+    { city: 'Ahmedabad',  detail: 'Serving Gujarat',          radius: 'Same-Day Service'  },
+    { city: 'Mumbai',     detail: 'Serving Maharashtra',      radius: 'Next-Day Service'  },
+    { city: 'Pan-India',  detail: 'Extended network',         radius: '2-3 Days Support'  },
+  ]
+
+  return (
+    <div className="min-h-screen">
+      <Header />
+      <WhatsAppButton />
+
+      {/* Hero */}
+      <section className="relative h-[500px] flex items-center justify-center text-center">
+        <div className="absolute inset-0 z-0">
+          <img src="https://images.unsplash.com/photo-1663888673897-f8bc14482f17?w=1200" alt="Factory" className="w-full h-full object-cover" />
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, rgba(0,0,0,0.7), rgba(0,0,0,0.6))' }} />
+        </div>
+        <div className="relative z-10 max-w-5xl mx-auto px-6">
+          <div className="flex items-center justify-center gap-2 text-white/80 text-sm mb-6">
+            <span className="cursor-pointer hover:text-white" onClick={() => navigateTo('home')}>Home</span>
+            <ChevronRight size={14} />
+            <span>About Us</span>
+          </div>
+          <h1 style={{ color: 'white' }}>European Technology,<br />Built for Indian Excellence</h1>
+          <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '20px', maxWidth: '700px', margin: '24px auto 0' }}>
+            5+ years of delivering high-performance embroidery machines to leading textile manufacturers
           </p>
         </div>
       </section>
 
-      {/* CONTENT */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-12">
-
-          <div>
-            <p className="text-slate-600 mb-6">
-              ZMS LIZZA European Technology is focused on delivering advanced embroidery
-              solutions that combine European engineering standards with the practical
-              requirements of Indian textile manufacturing.
-            </p>
-
-            <p className="text-slate-600 mb-6">
-              Our machines are designed for high-speed production, long operational life,
-              and consistent embroidery quality — helping factories scale efficiently
-              without compromising precision.
-            </p>
-
-            <p className="text-slate-600">
-              From multi-function embroidery systems to specialized sequin and coding
-              machines, ZMS LIZZA supports manufacturers at every stage of their growth
-              journey.
-            </p>
-          </div>
-
-          <div className="bg-slate-100 rounded-xl flex items-center justify-center text-slate-400">
-            Company Image
-          </div>
-
-        </div>
-      </section>
-
-      {/* VALUES */}
-      <section className="py-20 bg-slate-50">
-        <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-3 gap-8 text-center">
-
-          {[
-            "European Engineering",
-            "Customer-Centric Support",
-            "Long-Term Reliability",
-          ].map((item, i) => (
-            <div
-              key={i}
-              className="bg-white rounded-xl p-6 shadow-sm"
-            >
-              <h3 className="font-semibold text-lg mb-2">
-                {item}
-              </h3>
-              <p className="text-slate-600 text-sm">
-                Built to deliver consistent performance and dependable results.
-              </p>
+      {/* Story */}
+      <section className="py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid lg:grid-cols-5 gap-16">
+            <div className="lg:col-span-3">
+              <h2 className="mb-8">Who We Are</h2>
+              <div className="space-y-6" style={{ color: 'var(--dark-gray)', fontSize: '17px', lineHeight: '1.8' }}>
+                <p>ZMS LIZZA European Technology was founded with a singular vision: to bring the precision and reliability of European embroidery machinery to India's thriving textile industry.</p>
+                <p>Over 5+ years, we've grown from a small startup to a trusted partner for textile businesses across India.</p>
+                <p><strong style={{ color: 'var(--charcoal)' }}>Our Mission:</strong> To empower textile businesses with world-class European technology that drives productivity, quality, and profitability.</p>
+                <p><strong style={{ color: 'var(--charcoal)' }}>Our Vision:</strong> To be India's most trusted embroidery machinery partner, known for exceptional products, unmatched support, and lasting relationships.</p>
+                <p><strong style={{ color: 'var(--charcoal)' }}>Our Values:</strong> Quality in every machine. Reliability in our products and promises. Innovation in solving customer challenges.</p>
+              </div>
             </div>
-          ))}
-
+            <div className="lg:col-span-2">
+              <h3 className="mb-8">Our Journey</h3>
+              <div className="space-y-6 mb-10">
+                {milestones.map((m, i) => (
+                  <div key={i} className="flex items-start gap-4">
+                    <div className="flex-shrink-0 w-16 h-16 rounded-full flex items-center justify-center text-white font-bold" style={{ background: 'linear-gradient(135deg, var(--gradient-red), var(--gradient-purple), var(--gradient-blue))' }}>
+                      {m.year.slice(2)}
+                    </div>
+                    <div className="pt-2">
+                      <p style={{ fontWeight: 700, color: 'var(--charcoal)' }}>{m.year}</p>
+                      <p style={{ color: 'var(--dark-gray)', fontSize: '15px' }}>{m.text}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="rounded-2xl overflow-hidden shadow-lg">
+                <img src="https://images.unsplash.com/photo-1666558889375-798fa96b559a?w=600" alt="Our team" className="w-full h-64 object-cover" />
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
+      {/* European Advantage */}
+      <section className="py-24" style={{ backgroundColor: 'var(--light-gray)' }}>
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="mb-6">The European Difference</h2>
+          </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-8">
+            {advantages.map(({ Icon, title, desc }) => (
+              <div key={title} className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-xl transition-all hover:-translate-y-1 group text-center">
+                <div className="w-16 h-16 rounded-full flex items-center justify-center mb-6 mx-auto group-hover:scale-110 transition-transform" style={{ background: 'linear-gradient(135deg, var(--gradient-red), var(--gradient-blue))' }}>
+                  <Icon size={32} color="white" strokeWidth={2} />
+                </div>
+                <h3 className="mb-4" style={{ fontSize: '18px' }}>{title}</h3>
+                <p style={{ color: 'var(--dark-gray)', fontSize: '14px', lineHeight: '1.6' }}>{desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Locations */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-12">
+            <h2 className="mb-4">Where We Serve</h2>
+          </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {locations.map(({ city, detail, radius }) => (
+              <div key={city} className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 border-t-4" style={{ borderTopColor: 'var(--accent-orange)' }}>
+                <div className="flex items-center gap-3 mb-4">
+                  <MapPin size={24} style={{ color: 'var(--accent-orange)' }} />
+                  <h4 style={{ fontSize: '20px' }}>{city}</h4>
+                </div>
+                <p style={{ color: 'var(--dark-gray)', fontSize: '14px', marginBottom: '12px' }}>{detail}</p>
+                <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold" style={{ backgroundColor: 'rgba(255,107,53,0.1)', color: 'var(--accent-orange)' }}>{radius}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="py-24" style={{ background: 'linear-gradient(135deg, var(--gradient-red), var(--gradient-purple), var(--gradient-blue))' }}>
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <h2 style={{ color: 'white' }} className="mb-6">Want to Learn More?</h2>
+          <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '18px' }} className="mb-12">Visit our showroom or request a detailed presentation</p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button onClick={() => navigateTo('contact')} className="flex items-center justify-center gap-3 px-8 py-4 rounded-lg hover:shadow-xl transition-all" style={{ backgroundColor: 'var(--accent-orange)', color: 'white', fontWeight: 600 }}>
+              <Calendar size={20} /> Schedule Visit
+            </button>
+            <button className="flex items-center justify-center gap-3 px-8 py-4 rounded-lg border-2 transition-all" style={{ borderColor: 'white', color: 'white' }}>
+              <Download size={20} /> Download Brochure
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <Footer />
     </div>
-  );
+  )
 }

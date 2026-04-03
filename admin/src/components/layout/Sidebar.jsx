@@ -31,7 +31,10 @@ export default function Sidebar({ collapsed, setCollapsed }) {
   const { user, logout, hasPermission } = useAuth()
   const navigate = useNavigate()
 
-  const handleLogout = () => { logout(); navigate('/login', { replace: true }) }
+  const handleLogout = async () => {
+    await logout()
+    navigate('/login', { replace: true })
+  }
   const roleInfo = ROLE_COLORS[user?.role] || ROLE_COLORS.editor
   const initials = user?.name?.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase() || 'ZA'
 
@@ -39,10 +42,11 @@ export default function Sidebar({ collapsed, setCollapsed }) {
     <aside className={`sidebar ${collapsed ? 'collapsed' : ''}`}>
       {/* Logo */}
       <div className="sidebar-logo">
-        <div className="logo-mark">Z</div>
-        {!collapsed && (
+        {collapsed ? (
+          <div className="logo-mark">Z</div>
+        ) : (
           <div className="logo-text">
-            <span className="logo-name">ZMS LIZZA</span>
+            <img src="/bgr_logo.png" alt="ZMS LIZZA" className="sidebar-logo-image" />
             <span className="logo-sub">Admin Panel</span>
           </div>
         )}
