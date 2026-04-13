@@ -11,5 +11,10 @@ export const mediaService = {
       isFormData: true,
     })
   },
+  createFromUrl: (payload) =>
+    apiRequest('/media/url', {
+      method: 'POST',
+      body: payload,
+    }),
   remove: (id) => apiRequest(`/media/${id}`, { method: 'DELETE' }),
 }

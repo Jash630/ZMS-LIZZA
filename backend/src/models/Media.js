@@ -13,7 +13,7 @@ const MediaSchema = new mongoose.Schema(
     size:          { type: Number },
     sizeFormatted: { type: String },
     url:           { type: String, required: true },
-    provider:      { type: String, enum: ['local', 'cloudinary'], default: 'local' },
+    provider:      { type: String, enum: ['local', 'cloudinary', 'external'], default: 'local' },
     publicId:      { type: String },
     resourceType:  { type: String },
     path:          { type: String },

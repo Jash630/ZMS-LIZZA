@@ -1,11 +1,72 @@
+import { useEffect, useState } from 'react'
 import { Header }         from '../components/layout/Header.jsx'
 import { Footer }         from '../components/layout/Footer.jsx'
 import { WhatsAppButton } from '../components/shared/WhatsAppButton.jsx'
 import { useNavigation }  from '../context/NavigationContext.jsx'
 import { ChevronRight, Calendar, Download, Crosshair, Shield, Cpu, TrendingUp, Award, MapPin } from 'lucide-react'
+import { publicService } from '../services/publicService.js'
+
+const BROCHURE_MEDIA_KEYS = ['file_ony5he', 'file_cx6svd']
 
 export function AboutPage() {
   const { navigateTo } = useNavigation()
+  const [brochure, setBrochure] = useState(null)
+  const [downloading, setDownloading] = useState(false)
+
+  useEffect(() => {
+    let active = true
+
+    const loadBrochure = async () => {
+      try {
+        const response = await publicService.getMedia({ type: 'image', limit: 80 })
+        if (!active) return
+        const items = response.items || []
+        const preferred = items.find((item) => {
+          const name = String(item?.name || '').toLowerCase()
+          const originalName = String(item?.originalName || '').toLowerCase()
+          return BROCHURE_MEDIA_KEYS.some((key) => name === key.toLowerCase() || originalName === key.toLowerCase())
+        })
+        const match = preferred || items[0] || null
+        setBrochure(match)
+      } catch {
+        if (!active) return
+        setBrochure(null)
+      }
+    }
+
+    loadBrochure()
+    return () => {
+      active = false
+    }
+  }, [])
+
+  const downloadBrochure = async () => {
+    if (downloading) return
+    if (!brochure?.url) {
+      window.alert('Brochure image is not available yet. Please upload one in Media Library.')
+      return
+    }
+
+    try {
+      setDownloading(true)
+      const response = await fetch(brochure.url)
+      if (!response.ok) throw new Error('Unable to download brochure')
+
+      const blob = await response.blob()
+      const blobUrl = window.URL.createObjectURL(blob)
+      const anchor = document.createElement('a')
+      anchor.href = blobUrl
+      anchor.download = brochure.originalName || 'zms-lizza-brochure.jpg'
+      document.body.appendChild(anchor)
+      anchor.click()
+      anchor.remove()
+      window.URL.revokeObjectURL(blobUrl)
+    } catch {
+      window.open(brochure.url, '_blank', 'noopener,noreferrer')
+    } finally {
+      setDownloading(false)
+    }
+  }
 
   const milestones = [
     { year: '2019', text: 'Company founded in Surat' },
@@ -23,7 +84,7 @@ export function AboutPage() {
   ]
 
   const locations = [
-    { city: 'Surat (HQ)', detail: 'Ring Road, Surat 395002', radius: '< 4 Hours Response' },
+    { city: 'Surat (HQ)', detail: 'Katargam, Surat',          radius: '< 4 Hours Response' },
     { city: 'Ahmedabad',  detail: 'Serving Gujarat',          radius: 'Same-Day Service'  },
     { city: 'Mumbai',     detail: 'Serving Maharashtra',      radius: 'Next-Day Service'  },
     { city: 'Pan-India',  detail: 'Extended network',         radius: '2-3 Days Support'  },
@@ -34,13 +95,12 @@ export function AboutPage() {
       <Header />
       <WhatsAppButton />
 
-      {/* Hero */}
-      <section className="relative h-[500px] flex items-center justify-center text-center">
+      <section className="relative min-h-[420px] md:min-h-[500px] flex items-center justify-center text-center" style={{ paddingTop: 'var(--site-header-height)' }}>
         <div className="absolute inset-0 z-0">
           <img src="https://images.unsplash.com/photo-1663888673897-f8bc14482f17?w=1200" alt="Factory" className="w-full h-full object-cover" />
           <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, rgba(0,0,0,0.7), rgba(0,0,0,0.6))' }} />
         </div>
-        <div className="relative z-10 max-w-5xl mx-auto px-6">
+        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-center gap-2 text-white/80 text-sm mb-6">
             <span className="cursor-pointer hover:text-white" onClick={() => navigateTo('home')}>Home</span>
             <ChevronRight size={14} />
@@ -53,9 +113,8 @@ export function AboutPage() {
         </div>
       </section>
 
-      {/* Story */}
       <section className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="grid lg:grid-cols-5 gap-16">
             <div className="lg:col-span-3">
               <h2 className="mb-8">Who We Are</h2>
@@ -90,9 +149,8 @@ export function AboutPage() {
         </div>
       </section>
 
-      {/* European Advantage */}
       <section className="py-24" style={{ backgroundColor: 'var(--light-gray)' }}>
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-16">
             <h2 className="mb-6">The European Difference</h2>
           </div>
@@ -110,9 +168,8 @@ export function AboutPage() {
         </div>
       </section>
 
-      {/* Locations */}
       <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
             <h2 className="mb-4">Where We Serve</h2>
           </div>
@@ -131,17 +188,27 @@ export function AboutPage() {
         </div>
       </section>
 
-      {/* CTA */}
       <section className="py-24" style={{ background: 'linear-gradient(135deg, var(--gradient-red), var(--gradient-purple), var(--gradient-blue))' }}>
-        <div className="max-w-4xl mx-auto px-6 text-center">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
           <h2 style={{ color: 'white' }} className="mb-6">Want to Learn More?</h2>
           <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '18px' }} className="mb-12">Visit our showroom or request a detailed presentation</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button onClick={() => navigateTo('contact')} className="flex items-center justify-center gap-3 px-8 py-4 rounded-lg hover:shadow-xl transition-all" style={{ backgroundColor: 'var(--accent-orange)', color: 'white', fontWeight: 600 }}>
               <Calendar size={20} /> Schedule Visit
             </button>
-            <button className="flex items-center justify-center gap-3 px-8 py-4 rounded-lg border-2 transition-all" style={{ borderColor: 'white', color: 'white' }}>
-              <Download size={20} /> Download Brochure
+            <button
+              type="button"
+              onClick={downloadBrochure}
+              disabled={downloading}
+              className="flex items-center justify-center gap-3 px-8 py-4 rounded-lg border-2 transition-all"
+              style={{
+                borderColor: 'white',
+                color: 'white',
+                opacity: downloading ? 0.7 : 1,
+                cursor: downloading ? 'not-allowed' : 'pointer',
+              }}
+            >
+              <Download size={20} /> {downloading ? 'Downloading...' : 'Download Brochure'}
             </button>
           </div>
         </div>

@@ -1,4 +1,5 @@
 const trimTrailingSlashes = (value = '') => String(value).replace(/\/+$/, '')
+const REQUEST_TIMEOUT_MS = Number(import.meta.env.VITE_HTTP_TIMEOUT_MS || 15000)
 
 const API_V1_BASE = trimTrailingSlashes(import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/v1')
 
@@ -10,7 +11,7 @@ const ensurePublicBase = (base) => {
 const PUBLIC_API_BASE = ensurePublicBase(import.meta.env.VITE_PUBLIC_API_BASE_URL || API_V1_BASE)
 
 const DEFAULT_POST_IMAGE = 'https://images.unsplash.com/photo-1663888673897-f8bc14482f17?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=900'
-const DEFAULT_PRODUCT_IMAGE = 'https://images.unsplash.com/photo-1663888673897-f8bc14482f17?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=900'
+const DEFAULT_PRODUCT_IMAGE = '/bgr_logo.png'
 
 const toQueryString = (query = {}) => {
   const params = new URLSearchParams()
@@ -35,15 +36,31 @@ const parseResponse = async (response) => {
 const request = async (path, options = {}) => {
   const normalizedPath = path.startsWith('/') ? path : `/${path}`
   const url = `${PUBLIC_API_BASE}${normalizedPath}${toQueryString(options.query)}`
+  const controller = options.signal ? null : new AbortController()
+  const timeoutId = controller
+    ? window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
+    : null
 
-  const response = await fetch(url, {
-    method: options.method || 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(options.headers || {}),
-    },
-    body: options.body ? JSON.stringify(options.body) : undefined,
-  })
+  let response
+  try {
+    response = await fetch(url, {
+      method: options.method || 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(options.headers || {}),
+      },
+      body: options.body ? JSON.stringify(options.body) : undefined,
+      signal: options.signal || controller?.signal,
+    })
+  } catch (error) {
+    if (timeoutId) window.clearTimeout(timeoutId)
+    if (error?.name === 'AbortError') {
+      throw new Error('Request timed out. Please try again.')
+    }
+    throw error
+  }
+
+  if (timeoutId) window.clearTimeout(timeoutId)
 
   const payload = await parseResponse(response)
   if (!response.ok) {
@@ -88,12 +105,20 @@ const normalizeProductCard = (product) => ({
   id: product._id || product.slug,
   slug: product.slug,
   name: product.name || 'Untitled',
+  category: product.category || 'Embroidery Machine',
+  modelNo: product.modelNo || '',
+  priceDisplay: product.priceDisplay || '',
+  priceNote: product.priceNote || 'Get Latest Price',
   tagline: product.tagline || '',
   badge: product.badge || 'Product',
   description: product.description || '',
   keySpecs: Array.isArray(product.keySpecs) ? product.keySpecs : [],
+  keyFeatures: Array.isArray(product.keyFeatures) ? product.keyFeatures : [],
+  specifications: Array.isArray(product.specifications) ? product.specifications : [],
+  features: Array.isArray(product.features) ? product.features : [],
   image: product.image || product.galleryImages?.[0] || DEFAULT_PRODUCT_IMAGE,
   isPopular: Boolean(product.isPopular),
+  galleryImages: Array.isArray(product.galleryImages) ? product.galleryImages : [],
 })
 
 const normalizeProductDetail = (product) => {
@@ -111,6 +136,10 @@ const normalizeProductDetail = (product) => {
     id: product._id || product.slug,
     slug: product.slug,
     name: product.name || 'Untitled',
+    category: product.category || 'Embroidery Machine',
+    modelNo: product.modelNo || '',
+    priceDisplay: product.priceDisplay || '',
+    priceNote: product.priceNote || 'Get Latest Price',
     tagline: product.tagline || '',
     badge: product.badge || 'Product',
     description: product.description || '',
@@ -124,6 +153,16 @@ const normalizeProductDetail = (product) => {
   }
 }
 
+const normalizeMedia = (item) => ({
+  id: item._id || item.id || item.url,
+  name: item.name || item.originalName || 'Media',
+  originalName: item.originalName || '',
+  alt: item.alt || item.name || 'Gallery media',
+  type: item.type || 'other',
+  url: item.url || '',
+  createdAt: item.createdAt || null,
+})
+
 export const publicService = {
   async getPosts(query = {}) {
     const payload = await request('/posts', { query })
@@ -134,12 +173,12 @@ export const publicService = {
   },
 
   async getPostBySlug(slug) {
-    const payload = await request(`/posts/${slug}`)
+    const payload = await request(`/posts/${encodeURIComponent(slug)}`)
     return payload?.data ? normalizePost(payload.data) : null
   },
 
   async getPostComments(slug, query = {}) {
-    const payload = await request(`/posts/${slug}/comments`, { query })
+    const payload = await request(`/posts/${encodeURIComponent(slug)}/comments`, { query })
     return {
       items: Array.isArray(payload?.data)
         ? payload.data.map((comment) => ({
@@ -154,7 +193,7 @@ export const publicService = {
   },
 
   async submitPostComment(slug, data) {
-    const payload = await request(`/posts/${slug}/comments`, {
+    const payload = await request(`/posts/${encodeURIComponent(slug)}/comments`, {
       method: 'POST',
       body: data,
     })
@@ -170,7 +209,7 @@ export const publicService = {
   },
 
   async getProductBySlug(slug) {
-    const payload = await request(`/products/${slug}`)
+    const payload = await request(`/products/${encodeURIComponent(slug)}`)
     return payload?.data ? normalizeProductDetail(payload.data) : null
   },
 
@@ -184,6 +223,14 @@ export const publicService = {
     return payload?.data || null
   },
 
+  async getMedia(query = {}) {
+    const payload = await request('/media', { query })
+    return {
+      items: Array.isArray(payload?.data) ? payload.data.map(normalizeMedia) : [],
+      meta: payload?.meta || null,
+    }
+  },
+
   async subscribeNewsletter(email) {
     const payload = await request('/newsletter/subscribe', {
       method: 'POST',
@@ -195,6 +242,3 @@ export const publicService = {
     }
   },
 }
-
-
-

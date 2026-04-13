@@ -7,7 +7,6 @@ const SubscriberSchema = new mongoose.Schema(
       required: [true, 'Email is required'],
       trim: true,
       lowercase: true,
-      unique: true,
     },
     source: {
       type: String,
@@ -32,4 +31,3 @@ SubscriberSchema.index({ email: 1 }, { unique: true })
 SubscriberSchema.index({ status: 1, createdAt: -1 })
 
 module.exports = mongoose.model('Subscriber', SubscriberSchema)
-

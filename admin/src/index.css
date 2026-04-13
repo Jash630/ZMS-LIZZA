@@ -756,6 +756,62 @@ tbody td {
   }
 }
 
+@media (max-width: 1024px) {
+  :root {
+    --header-height: 60px;
+  }
+
+  .page {
+    padding: 20px;
+  }
+
+  .posts-toolbar {
+    padding: 10px 12px;
+    gap: 8px;
+  }
+
+  .toolbar-search {
+    min-width: 160px;
+  }
+
+  .table-container {
+    border-radius: 10px;
+  }
+}
+
+@media (max-width: 640px) {
+  :root {
+    --header-height: 56px;
+  }
+
+  .page {
+    padding: 12px;
+  }
+
+  .page-header {
+    margin-bottom: 18px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+
+  .table-container {
+    border-radius: 8px;
+  }
+
+  thead th,
+  tbody td {
+    padding: 10px 12px;
+  }
+
+  .chart-card {
+    padding: 14px;
+  }
+}
+
 .active-view {
   background: var(--bg-tertiary) !important;
   color: var(--text-primary) !important;

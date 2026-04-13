@@ -30,16 +30,16 @@ export function Header() {
         <header
             className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-white/95 backdrop-blur-lg shadow-md' : 'bg-transparent backdrop-blur-sm'
                 }`}
-            style={{ height: '90px' }}
+            style={{ height: 'var(--site-header-height)' }}
         >
-            <div className="max-w-[1400px] mx-auto px-6 h-full flex items-center justify-between">
+            <div className="max-w-[1400px] mx-auto px-4 sm:px-6 h-full flex items-center justify-between gap-3">
 
                 {/* Logo */}
                 <div className="cursor-pointer" onClick={() => go('home')}>
                     <img
                         src="/bgr_logo.png"
                         alt="ZMS LIZZA"
-                        style={{ height: '42px', width: 'auto', maxWidth: '240px', objectFit: 'contain' }}
+                        className="h-8 sm:h-10 w-auto max-w-[170px] sm:max-w-[240px] object-contain"
                     />
                 </div>
 
@@ -79,7 +79,13 @@ export function Header() {
                     >
                         <MessageCircle size={20} />
                     </a>
-                    <button className="lg:hidden p-2" onClick={() => setMobileOpen(!mobileOpen)} style={{ color: 'var(--charcoal)' }}>
+                    <button
+                        type="button"
+                        aria-label="Toggle menu"
+                        className="lg:hidden p-2"
+                        onClick={() => setMobileOpen(!mobileOpen)}
+                        style={{ color: 'var(--charcoal)' }}
+                    >
                         {mobileOpen ? <X size={28} /> : <Menu size={28} />}
                     </button>
                 </div>
@@ -87,8 +93,8 @@ export function Header() {
 
             {/* Mobile Menu */}
             {mobileOpen && (
-                <div className="lg:hidden bg-white border-t shadow-lg">
-                    <nav className="flex flex-col p-6 gap-4">
+                <div className="lg:hidden bg-white border-t shadow-lg max-h-[calc(100vh-var(--site-header-height))] overflow-auto">
+                    <nav className="flex flex-col p-5 gap-3">
                         {NAV_ITEMS.map(({ label, page }) => (
 
                             <a key={page}

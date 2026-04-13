@@ -1,37 +1,109 @@
-import { useEffect, useState } from 'react'
-import { Header }             from '../components/layout/Header.jsx'
-import { Footer }             from '../components/layout/Footer.jsx'
-import { WhatsAppButton }     from '../components/shared/WhatsAppButton.jsx'
-import { useNavigation }      from '../context/NavigationContext.jsx'
-import { ChevronRight, Plus, Minus, CheckCircle } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { Header } from '../components/layout/Header.jsx'
+import { Footer } from '../components/layout/Footer.jsx'
+import { WhatsAppButton } from '../components/shared/WhatsAppButton.jsx'
+import { buildProductCarouselImages } from '../components/shared/ProductImageCarousel.jsx'
+import { useNavigation } from '../context/NavigationContext.jsx'
+import { ChevronRight, PhoneCall, ArrowRight, PlayCircle } from 'lucide-react'
 import { publicService } from '../services/publicService.js'
+
+const PRODUCT_IMAGE_ALLOWLIST = new Set([
+  'IMG-20250408-WA0012.jpg',
+  'IMG-20250408-WA0013.jpg',
+  'IMG-20250408-WA0014.jpg',
+  'IMG-20250408-WA0015.jpg',
+  'IMG-20250408-WA0017.jpg',
+  'IMG-20250408-WA0018.jpg',
+  'IMG-20250408-WA0019.jpg',
+  '247.jpg',
+  'file_cx6svd',
+])
+
+const FALLBACK_IMAGE =
+  'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="900" height="600" viewBox="0 0 900 600"><rect width="900" height="600" fill="%23f3f4f6"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="28" fill="%236b7280">Machine image unavailable</text></svg>'
+
+const isAllowedProductMedia = (item) => PRODUCT_IMAGE_ALLOWLIST.has(String(item?.originalName || item?.name || '').trim())
+
+const flattenSpecs = (specSource = {}) => {
+  if (Array.isArray(specSource)) {
+    return specSource
+      .flatMap((group) => (Array.isArray(group?.items) ? group.items.map((item) => ({ ...item, group: group.category || 'Specifications' })) : []))
+      .filter((item) => item?.label && item?.value)
+  }
+
+  return Object.entries(specSource)
+    .flatMap(([group, items]) => (Array.isArray(items) ? items.map((item) => ({ ...item, group })) : []))
+    .filter((item) => item?.label && item?.value)
+}
+
+const withImageFallback = (event) => {
+  if (event.currentTarget.dataset.fallbackApplied === 'true') return
+  event.currentTarget.dataset.fallbackApplied = 'true'
+  event.currentTarget.src = FALLBACK_IMAGE
+}
+
+const getYoutubeVideoId = (rawUrl = '') => {
+  try {
+    const parsed = new URL(rawUrl)
+    const host = parsed.hostname.replace('www.', '')
+    if (host === 'youtu.be') {
+      return parsed.pathname.split('/').filter(Boolean)[0] || ''
+    }
+    if (['youtube.com', 'm.youtube.com', 'music.youtube.com'].includes(host)) {
+      if (parsed.pathname === '/watch') return parsed.searchParams.get('v') || ''
+      if (parsed.pathname.startsWith('/shorts/')) return parsed.pathname.split('/')[2] || ''
+      if (parsed.pathname.startsWith('/embed/')) return parsed.pathname.split('/')[2] || ''
+    }
+    return ''
+  } catch {
+    return ''
+  }
+}
 
 export function ProductDetailPage({ productId }) {
   const { navigateTo } = useNavigation()
-  const [activeTab, setActiveTab]   = useState('specs')
-  const [openFAQ, setOpenFAQ]       = useState(null)
-  const [activeImage, setActiveImage] = useState(0)
+  const [allProducts, setAllProducts] = useState([])
   const [product, setProduct] = useState(null)
+  const [mediaImages, setMediaImages] = useState([])
+  const [videos, setVideos] = useState([])
+  const [activeImageIndex, setActiveImageIndex] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const TABS = ['specs', 'features', 'applications', 'package', 'faqs']
 
   useEffect(() => {
     let active = true
-    const load = async () => {
-      if (!productId) {
-        setError('Please select a product first.')
-        setLoading(false)
-        return
-      }
 
+    const load = async () => {
       try {
         setLoading(true)
         setError('')
-        const next = await publicService.getProductBySlug(productId)
+
+        const [productsRes, mediaRes] = await Promise.all([
+          publicService.getProducts({ limit: 120 }),
+          publicService.getMedia({ limit: 160 }),
+        ])
+
         if (!active) return
-        setProduct(next)
-        setActiveImage(0)
+
+        const productItems = productsRes.items || []
+        const selectedFromList = productItems.find((item) => item.slug === productId || item.id === productId)
+        let selectedProduct = selectedFromList || productItems[0] || null
+
+        if (!selectedProduct && productId) {
+          selectedProduct = await publicService.getProductBySlug(productId)
+        }
+
+        const rawImages = (mediaRes.items || []).filter((item) => item.type === 'image')
+        const allowlisted = rawImages.filter(isAllowedProductMedia).map((item) => item.url).filter(Boolean)
+        const imagePool = allowlisted.length > 0 ? allowlisted : rawImages.map((item) => item.url).filter(Boolean)
+
+        const videoPool = (mediaRes.items || []).filter((item) => item.type === 'video' || getYoutubeVideoId(item.url)).slice(0, 6)
+
+        setAllProducts(productItems)
+        setProduct(selectedProduct)
+        setMediaImages(imagePool)
+        setVideos(videoPool)
+        setActiveImageIndex(0)
       } catch (err) {
         if (!active) return
         setError(err?.message || 'Failed to load product details.')
@@ -46,161 +118,239 @@ export function ProductDetailPage({ productId }) {
     }
   }, [productId])
 
-  const specEntries = Object.entries(product?.specifications || {})
+  const groupedCategories = useMemo(() => {
+    const groups = new Map()
+    allProducts.forEach((item) => {
+      const categoryName = item.category || 'Embroidery Machine'
+      if (!groups.has(categoryName)) groups.set(categoryName, [])
+      groups.get(categoryName).push(item)
+    })
+    return Array.from(groups.entries()).map(([category, items]) => ({ category, items }))
+  }, [allProducts])
+
+  const gallery = useMemo(() => {
+    if (!product) return [FALLBACK_IMAGE]
+    const merged = buildProductCarouselImages(product, mediaImages, { poolOnly: false })
+    return merged.length > 0 ? merged : [FALLBACK_IMAGE]
+  }, [product, mediaImages])
+
+  const activeImage = gallery[activeImageIndex] || gallery[0]
+  const flatSpecs = useMemo(() => flattenSpecs(product?.specifications || {}), [product?.specifications])
+
+  const featureBullets = useMemo(
+    () => [
+      ...(Array.isArray(product?.keyFeatures) ? product.keyFeatures : []),
+      ...(Array.isArray(product?.features)
+        ? product.features.map((item) => item?.title || item?.description).filter(Boolean)
+        : []),
+    ],
+    [product?.keyFeatures, product?.features]
+  )
 
   return (
     <div className="min-h-screen bg-white">
       <Header />
       <WhatsAppButton />
 
-      <div className="pt-28 pb-4 bg-white">
-        <div className="max-w-[1400px] mx-auto px-6 flex items-center gap-2 text-sm" style={{ color: 'var(--dark-gray)' }}>
-          <span className="cursor-pointer hover:text-[var(--accent-orange)]" onClick={() => navigateTo('home')}>Home</span>
-          <ChevronRight size={14} />
-          <span className="cursor-pointer hover:text-[var(--accent-orange)]" onClick={() => navigateTo('products')}>Products</span>
-          <ChevronRight size={14} />
-          <span style={{ fontWeight: 600, color: 'var(--charcoal)' }}>{product?.name || 'Details'}</span>
-        </div>
-      </div>
-
-      <section className="py-12 bg-white">
-        <div className="max-w-[1400px] mx-auto px-6">
-          {loading && <p style={{ color: 'var(--dark-gray)' }}>Loading product...</p>}
-          {!loading && error && <p style={{ color: '#EF4444' }}>{error}</p>}
-          {!loading && !error && !product && <p style={{ color: 'var(--dark-gray)' }}>Product not found.</p>}
-          {!loading && !error && product && (
-          <div className="grid lg:grid-cols-2 gap-12">
-            <div>
-              <div className="rounded-2xl overflow-hidden shadow-xl mb-4" style={{ height: '420px' }}>
-                <img src={product.galleryImages[activeImage]} alt={product.name} className="w-full h-full object-cover" />
-              </div>
-              <div className="grid grid-cols-4 gap-3">
-                {product.galleryImages.map((img, i) => (
-                  <div key={i} className={`rounded-xl overflow-hidden cursor-pointer border-2 transition-all ${activeImage === i ? 'border-[var(--accent-orange)]' : 'border-transparent hover:border-gray-300'}`} style={{ height: '80px' }} onClick={() => setActiveImage(i)}>
-                    <img src={img} alt="" className="w-full h-full object-cover" />
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div>
-              <span className="inline-block px-4 py-2 rounded-full text-sm font-bold mb-4" style={{ backgroundColor: 'var(--accent-orange)', color: 'white' }}>{product.badge}</span>
-              <h1 className="mb-2" style={{ fontSize: '36px' }}>{product.name}</h1>
-              <p className="mb-6" style={{ color: 'var(--accent-orange)', fontSize: '18px', fontWeight: 600 }}>{product.tagline}</p>
-              <p className="mb-8" style={{ color: 'var(--dark-gray)', fontSize: '16px', lineHeight: '1.7' }}>{product.description}</p>
-              <div className="mb-8 space-y-3">
-                {product.keyFeatures.map((f, i) => (
-                  <div key={i} className="flex items-center gap-3">
-                    <CheckCircle size={18} style={{ color: 'var(--accent-orange)', flexShrink: 0 }} />
-                    <span style={{ color: 'var(--charcoal)', fontSize: '15px' }}>{f}</span>
-                  </div>
-                ))}
-              </div>
-              <div className="flex gap-4">
-                <button onClick={() => navigateTo('contact')} className="flex-1 py-4 rounded-lg font-bold text-lg transition-all hover:scale-105 hover:shadow-xl" style={{ backgroundColor: 'var(--accent-orange)', color: 'white' }}>Request Quote</button>
-                <a href="https://wa.me/919876543210" target="_blank" rel="noreferrer" className="px-6 py-4 rounded-lg font-bold border-2 transition-all hover:scale-105 flex items-center gap-2" style={{ borderColor: 'var(--whatsapp-green)', color: 'var(--whatsapp-green)' }}>WhatsApp</a>
-              </div>
-            </div>
+      <section className="pb-8 bg-white" style={{ paddingTop: 'calc(var(--site-header-height) + 2rem)' }}>
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
+          <div className="flex items-center gap-2 mb-5 text-sm" style={{ color: 'var(--dark-gray)' }}>
+            <span className="cursor-pointer hover:text-[var(--accent-orange)]" onClick={() => navigateTo('home')}>Home</span>
+            <ChevronRight size={14} />
+            <span className="cursor-pointer hover:text-[var(--accent-orange)]" onClick={() => navigateTo('products')}>Products</span>
+            <ChevronRight size={14} />
+            <span style={{ fontWeight: 600, color: 'var(--charcoal)' }}>{product?.name || 'Details'}</span>
           </div>
-          )}
+          <h1>{product?.category || 'Embroidery Machine'}</h1>
+          <p style={{ fontSize: 17, color: 'var(--dark-gray)', marginTop: 8 }}>
+            ZMS LIZZA by LIZZA INDIA PVT. LTD. offers reliable machine solutions for every production scale.
+          </p>
         </div>
       </section>
 
-      <section className="py-12" style={{ backgroundColor: 'var(--light-gray)' }}>
-        <div className="max-w-[1400px] mx-auto px-6">
-          {product && (
-          <>
-          <div className="flex gap-2 mb-8 flex-wrap">
-            {TABS.map((tab) => (
-              <button key={tab} onClick={() => setActiveTab(tab)}
-                className="px-6 py-3 rounded-lg font-semibold capitalize transition-all"
-                style={{ backgroundColor: activeTab === tab ? 'var(--accent-orange)' : 'white', color: activeTab === tab ? 'white' : 'var(--dark-gray)', border: '1px solid rgba(0,0,0,0.1)' }}>
-                {tab === 'faqs' ? 'FAQs' : tab}
-              </button>
+      <section className="pb-20" style={{ backgroundColor: 'var(--light-gray)' }}>
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 grid lg:grid-cols-[280px_1fr] gap-6">
+          <aside className="bg-white rounded-xl shadow-sm border border-black/5 p-4 h-fit lg:sticky lg:top-[calc(var(--site-header-height)+16px)]">
+            {groupedCategories.map((group) => (
+              <div key={group.category} className="mb-4">
+                <p style={{ fontWeight: 800, color: 'var(--charcoal)', marginBottom: 8 }}>{group.category} ({group.items.length})</p>
+                <div className="space-y-1.5">
+                  {group.items.map((item) => (
+                    <button
+                      key={item.id || item.slug}
+                      type="button"
+                      onClick={() => navigateTo('product-detail', item.slug || item.id)}
+                      className="w-full text-left px-3 py-2 rounded-lg border text-sm"
+                      style={{
+                        borderColor: product?.slug === item.slug ? 'var(--accent-orange)' : 'rgba(0,0,0,0.08)',
+                        backgroundColor: product?.slug === item.slug ? 'rgba(255,107,53,0.08)' : 'white',
+                        color: '#111827',
+                        fontWeight: product?.slug === item.slug ? 700 : 500,
+                      }}
+                    >
+                      {item.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
             ))}
+          </aside>
+
+          <div className="space-y-6">
+            {loading && <p style={{ color: 'var(--dark-gray)' }}>Loading product...</p>}
+            {!loading && error && <p style={{ color: '#EF4444' }}>{error}</p>}
+            {!loading && !error && !product && <p style={{ color: 'var(--dark-gray)' }}>Product not found.</p>}
+
+            {!loading && !error && product && (
+              <>
+                <article className="bg-white rounded-xl shadow-sm border border-black/5 overflow-hidden">
+                  <div className="px-4 sm:px-5 py-3 border-b bg-[#f7f7f7] flex flex-wrap items-center justify-between gap-3">
+                    <h2 className="text-2xl sm:text-3xl lg:text-4xl" style={{ fontWeight: 800, color: 'var(--charcoal)', lineHeight: 1.08 }}>
+                      {product.name}
+                    </h2>
+                    <button
+                      type="button"
+                      onClick={() => navigateTo('contact')}
+                      className="px-4 py-2 rounded-full border text-sm font-semibold"
+                      style={{ borderColor: 'var(--accent-orange)', color: 'var(--accent-orange)', backgroundColor: 'white' }}
+                    >
+                      <PhoneCall size={14} style={{ display: 'inline-block', marginRight: 6 }} /> Request Callback
+                    </button>
+                  </div>
+
+                  <div className="p-4 sm:p-5 grid xl:grid-cols-[1.1fr_0.9fr] gap-5">
+                    <div>
+                      <div className="rounded-lg overflow-hidden border border-black/10 bg-[#f8fafc]">
+                        <img
+                          src={activeImage}
+                          alt={product.name}
+                          onError={withImageFallback}
+                          className="w-full h-full object-cover"
+                          style={{ maxHeight: 430 }}
+                        />
+                      </div>
+
+                      <div className="mt-4 flex gap-2 flex-wrap items-center">
+                        {gallery.slice(0, 8).map((imageUrl, index) => (
+                          <button
+                            key={`detail-thumb-${index}`}
+                            type="button"
+                            onClick={() => setActiveImageIndex(index)}
+                            className="w-[72px] h-[58px] rounded-md overflow-hidden border"
+                            style={{ borderColor: index === activeImageIndex ? 'var(--accent-orange)' : 'rgba(0,0,0,0.14)' }}
+                          >
+                            <img src={imageUrl} alt={`${product.name} ${index + 1}`} onError={withImageFallback} className="w-full h-full object-cover" />
+                          </button>
+                        ))}
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => navigateTo('contact')}
+                        className="mt-4 px-8 py-2.5 rounded-full font-semibold border"
+                        style={{ color: 'var(--accent-orange)', borderColor: 'var(--accent-orange)', backgroundColor: 'white' }}
+                      >
+                        Get Best Quote
+                      </button>
+                    </div>
+
+                    <div>
+                      <div className="flex flex-wrap items-baseline gap-2 mb-3">
+                        <p style={{ fontSize: 26, fontWeight: 800, color: 'var(--charcoal)' }}>{product.priceDisplay || 'Price On Request'}</p>
+                        <span style={{ color: 'var(--accent-orange)', fontWeight: 700 }}>{product.priceNote || 'Get Latest Price'}</span>
+                      </div>
+
+                      {product.modelNo && (
+                        <p style={{ color: '#374151', fontWeight: 600, marginBottom: 8 }}>Model: {product.modelNo}</p>
+                      )}
+
+                      <div className="space-y-2 mb-4">
+                        {flatSpecs.slice(0, 14).map((spec) => (
+                          <div key={`${spec.group}-${spec.label}`} className="grid grid-cols-1 sm:grid-cols-[1fr_1fr] gap-1 sm:gap-3 text-sm">
+                            <span style={{ color: '#111827', fontWeight: 700 }}>{spec.label}</span>
+                            <span style={{ color: '#111827' }}>{spec.value}</span>
+                          </div>
+                        ))}
+                      </div>
+
+                      <p style={{ color: '#111827', fontSize: 15, lineHeight: 1.7, marginBottom: 10 }}>{product.description}</p>
+
+                      {featureBullets.length > 0 && (
+                        <ul className="list-disc pl-5 space-y-1.5" style={{ color: '#111827', fontSize: 14 }}>
+                          {featureBullets.slice(0, 18).map((bullet, index) => (
+                            <li key={`${index}-${bullet}`}>{bullet}</li>
+                          ))}
+                        </ul>
+                      )}
+
+                      <div className="mt-5 flex gap-3 flex-wrap">
+                        <button
+                          type="button"
+                          onClick={() => navigateTo('contact')}
+                          className="px-5 py-3 rounded-lg text-white font-semibold"
+                          style={{ backgroundColor: 'var(--accent-orange)' }}
+                        >
+                          Yes! I am Interested
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => navigateTo('products')}
+                          className="px-5 py-3 rounded-lg font-semibold border"
+                          style={{ borderColor: 'var(--accent-orange)', color: 'var(--accent-orange)' }}
+                        >
+                          Back to All Products <ArrowRight size={16} style={{ display: 'inline-block', marginLeft: 4 }} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </article>
+
+                {videos.length > 0 && (
+                  <section className="bg-white rounded-xl shadow-sm border border-black/5 p-4 sm:p-5">
+                    <h3 className="mb-4">Product Videos</h3>
+                    <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
+                      {videos.slice(0, 3).map((video) => {
+                        const youtubeId = getYoutubeVideoId(video.url)
+                        const thumbnail = youtubeId ? `https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg` : null
+
+                        return (
+                          <article key={video.id} className="rounded-lg overflow-hidden border border-black/10 bg-white">
+                            <div className="relative" style={{ aspectRatio: '16 / 9', backgroundColor: '#111827' }}>
+                              {thumbnail ? (
+                                <img src={thumbnail} alt={video.name || 'Video'} className="w-full h-full object-cover" />
+                              ) : (
+                                <video src={video.url} className="w-full h-full object-cover" />
+                              )}
+                              <a
+                                href={youtubeId ? `https://www.youtube.com/watch?v=${youtubeId}` : video.url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="absolute inset-0 flex items-center justify-center"
+                                style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.45), rgba(0,0,0,0.12))' }}
+                              >
+                                <PlayCircle size={56} color="white" />
+                              </a>
+                            </div>
+                            <div className="p-3">
+                              <p style={{ fontWeight: 700, color: '#111827' }}>{video.name || 'Product Video'}</p>
+                              <button
+                                type="button"
+                                onClick={() => navigateTo('contact')}
+                                className="mt-3 px-4 py-2 rounded-lg text-sm font-semibold text-white"
+                                style={{ backgroundColor: 'var(--accent-orange)' }}
+                              >
+                                Get Quote
+                              </button>
+                            </div>
+                          </article>
+                        )
+                      })}
+                    </div>
+                  </section>
+                )}
+              </>
+            )}
           </div>
-
-          {activeTab === 'specs' && (
-            <div className="grid md:grid-cols-2 gap-6">
-              {specEntries.map(([cat, specs]) => (
-                <div key={cat} className="bg-white rounded-2xl p-6 shadow-md">
-                  <h3 className="mb-4" style={{ fontSize: '20px' }}>{cat}</h3>
-                  {specs.map(({ label, value }) => (
-                    <div key={label} className="flex justify-between py-3 border-b last:border-0" style={{ borderColor: 'var(--light-gray)' }}>
-                      <span style={{ color: 'var(--dark-gray)', fontSize: '15px' }}>{label}</span>
-                      <span style={{ color: 'var(--charcoal)', fontWeight: 600, fontSize: '15px' }}>{value}</span>
-                    </div>
-                  ))}
-                </div>
-              ))}
-            </div>
-          )}
-
-          {activeTab === 'features' && (
-            <div className="space-y-8">
-              {product.features.map((f, i) => (
-                <div key={i} className={`grid lg:grid-cols-2 gap-8 items-center ${i % 2 !== 0 ? 'lg:grid-flow-dense' : ''}`}>
-                  <div className={i % 2 !== 0 ? 'lg:col-start-2' : ''}>
-                    <div className="rounded-2xl overflow-hidden shadow-lg" style={{ height: '280px' }}>
-                      <img src={f.image} alt={f.title} className="w-full h-full object-cover" />
-                    </div>
-                  </div>
-                  <div className={i % 2 !== 0 ? 'lg:col-start-1 lg:row-start-1' : ''}>
-                    <h3 className="mb-4" style={{ fontSize: '24px' }}>{f.title}</h3>
-                    <p className="mb-4" style={{ color: 'var(--dark-gray)', fontSize: '16px', lineHeight: '1.7' }}>{f.description}</p>
-                    <div className="flex items-start gap-2 p-4 rounded-lg" style={{ backgroundColor: 'rgba(255,107,53,0.08)' }}>
-                      <CheckCircle size={18} style={{ color: 'var(--accent-orange)', marginTop: '2px', flexShrink: 0 }} />
-                      <p style={{ color: 'var(--charcoal)', fontSize: '15px', fontWeight: 500 }}>{f.benefit}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {activeTab === 'applications' && (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {product.applications.map((a) => (
-                <div key={a} className="bg-white rounded-xl p-5 shadow-md flex items-center gap-4">
-                  <CheckCircle size={24} style={{ color: 'var(--accent-orange)', flexShrink: 0 }} />
-                  <span style={{ color: 'var(--charcoal)', fontSize: '16px', fontWeight: 500 }}>{a}</span>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {activeTab === 'package' && (
-            <div className="grid md:grid-cols-3 gap-6">
-              {product.packageIncludes.map(({ title, items }) => (
-                <div key={title} className="bg-white rounded-2xl p-6 shadow-md">
-                  <h3 className="mb-4" style={{ fontSize: '20px' }}>{title}</h3>
-                  {items.map((item) => (
-                    <div key={item} className="flex items-start gap-3 py-2">
-                      <CheckCircle size={16} style={{ color: 'var(--accent-orange)', marginTop: '2px', flexShrink: 0 }} />
-                      <span style={{ color: 'var(--dark-gray)', fontSize: '15px' }}>{item}</span>
-                    </div>
-                  ))}
-                </div>
-              ))}
-            </div>
-          )}
-
-          {activeTab === 'faqs' && (
-            <div className="max-w-3xl mx-auto space-y-4">
-              {product.faqs.map(({ q, a }, i) => (
-                <div key={i} className="bg-white rounded-xl shadow-md overflow-hidden">
-                  <button onClick={() => setOpenFAQ(openFAQ === i ? null : i)} className="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-gray-50 transition-colors">
-                    <span style={{ fontSize: '16px', fontWeight: 600, color: openFAQ === i ? 'var(--accent-orange)' : 'var(--charcoal)', lineHeight: '1.4' }}>{q}</span>
-                    <div className="w-8 h-8 rounded-full flex items-center justify-center ml-4 flex-shrink-0" style={{ backgroundColor: openFAQ === i ? 'var(--accent-orange)' : 'var(--light-gray)' }}>
-                      {openFAQ === i ? <Minus size={18} color="white" /> : <Plus size={18} style={{ color: 'var(--dark-gray)' }} />}
-                    </div>
-                  </button>
-                  {openFAQ === i && <div className="px-6 pb-5" style={{ fontSize: '15px', color: 'var(--dark-gray)', lineHeight: '1.7' }}>{a}</div>}
-                </div>
-              ))}
-            </div>
-          )}
-          </>
-          )}
         </div>
       </section>
 

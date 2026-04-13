@@ -1,4 +1,14 @@
-import { Facebook, Instagram, Linkedin, Youtube, MapPin, Phone, Mail, MessageCircle, Clock } from 'lucide-react'
+import {
+  Facebook,
+  Instagram,
+  Linkedin,
+  Youtube,
+  MapPin,
+  Phone,
+  Mail,
+  MessageCircle,
+  Clock,
+} from 'lucide-react'
 import { useNavigation } from '../../context/NavigationContext.jsx'
 
 const QUICK_LINKS = [
@@ -24,14 +34,21 @@ export function Footer() {
     <footer style={{ backgroundColor: 'var(--charcoal)' }}>
       <div style={{ height: '4px', background: 'linear-gradient(90deg, var(--gradient-red) 0%, var(--gradient-purple) 50%, var(--gradient-blue) 100%)' }} />
 
-      <div className="max-w-[1400px] mx-auto px-6 py-16">
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-12 sm:py-16">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-10">
           <div>
-            <img
-              src="/bgr_logo.png"
-              alt="ZMS LIZZA"
-              style={{ height: '58px', width: 'auto', maxWidth: '320px', objectFit: 'contain', marginBottom: '16px' }}
-            />
+            <button
+              type="button"
+              onClick={() => navigateTo('home')}
+              aria-label="Go to home"
+              style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
+            >
+              <img
+                src="/bgr_logo.png"
+                alt="ZMS LIZZA"
+                style={{ height: '52px', width: 'auto', maxWidth: '280px', objectFit: 'contain', marginBottom: '16px' }}
+              />
+            </button>
             <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14px', lineHeight: '1.6', marginBottom: '8px' }}>
               European Technology for Indian Excellence
             </p>
@@ -39,19 +56,19 @@ export function Footer() {
               Leading manufacturer of high-performance embroidery machines, serving textile factories across India.
             </p>
             <div className="flex gap-3">
-              {SOCIALS.map(({ Icon }, i) => (
+              {SOCIALS.map(({ Icon }, index) => (
                 <a
-                  key={i}
+                  key={index}
                   href="#"
                   className="w-10 h-10 rounded-full flex items-center justify-center border transition-all hover:scale-110"
                   style={{ borderColor: 'rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.7)' }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = 'var(--accent-orange)'
-                    e.currentTarget.style.color = 'var(--accent-orange)'
+                  onMouseEnter={(event) => {
+                    event.currentTarget.style.borderColor = 'var(--accent-orange)'
+                    event.currentTarget.style.color = 'var(--accent-orange)'
                   }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'
-                    e.currentTarget.style.color = 'rgba(255,255,255,0.7)'
+                  onMouseLeave={(event) => {
+                    event.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'
+                    event.currentTarget.style.color = 'rgba(255,255,255,0.7)'
                   }}
                 >
                   <Icon size={18} />
@@ -67,16 +84,16 @@ export function Footer() {
                 <li key={label}>
                   <a
                     href="#"
-                    onClick={(e) => {
-                      e.preventDefault()
+                    onClick={(event) => {
+                      event.preventDefault()
                       navigateTo(page)
                     }}
                     style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14px' }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.color = 'var(--accent-orange)'
+                    onMouseEnter={(event) => {
+                      event.currentTarget.style.color = 'var(--accent-orange)'
                     }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.color = 'rgba(255,255,255,0.7)'
+                    onMouseLeave={(event) => {
+                      event.currentTarget.style.color = 'rgba(255,255,255,0.7)'
                     }}
                   >
                     {label}
@@ -93,16 +110,16 @@ export function Footer() {
                 <li key={label}>
                   <a
                     href="#"
-                    onClick={(e) => {
-                      e.preventDefault()
+                    onClick={(event) => {
+                      event.preventDefault()
                       navigateTo(page)
                     }}
                     style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14px' }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.color = 'var(--accent-orange)'
+                    onMouseEnter={(event) => {
+                      event.currentTarget.style.color = 'var(--accent-orange)'
                     }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.color = 'rgba(255,255,255,0.7)'
+                    onMouseLeave={(event) => {
+                      event.currentTarget.style.color = 'rgba(255,255,255,0.7)'
                     }}
                   >
                     {label}
@@ -121,18 +138,18 @@ export function Footer() {
                 { Icon: Mail, text: 'info@zmslizza.com', href: 'mailto:info@zmslizza.com', iconColor: 'var(--accent-orange)' },
                 { Icon: MessageCircle, text: 'WhatsApp Us', href: 'https://wa.me/919876543210', iconColor: 'var(--whatsapp-green)' },
                 { Icon: Clock, text: 'Mon-Sat, 10 AM - 6 PM', href: null, iconColor: 'var(--accent-orange)' },
-              ].map(({ Icon, text, href, iconColor }, i) => (
-                <li key={i} className="flex items-start gap-3">
+              ].map(({ Icon, text, href, iconColor }, index) => (
+                <li key={index} className="flex items-start gap-3">
                   <Icon size={18} style={{ color: iconColor, marginTop: '2px', flexShrink: 0 }} />
                   {href ? (
                     <a
                       href={href}
                       style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14px' }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.color = iconColor
+                      onMouseEnter={(event) => {
+                        event.currentTarget.style.color = iconColor
                       }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.color = 'rgba(255,255,255,0.7)'
+                      onMouseLeave={(event) => {
+                        event.currentTarget.style.color = 'rgba(255,255,255,0.7)'
                       }}
                     >
                       {text}
@@ -148,9 +165,9 @@ export function Footer() {
       </div>
 
       <div className="border-t" style={{ borderColor: 'rgba(255,255,255,0.1)', backgroundColor: 'rgba(0,0,0,0.2)' }}>
-        <div className="max-w-[1400px] mx-auto px-6 py-6 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-6 flex flex-col md:flex-row justify-between items-center gap-4">
           <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '14px' }}>
-            © 2026 LIZZA INDIA PVT. LTD. All rights reserved.
+            Copyright 2026 LIZZA INDIA PVT. LTD. All rights reserved.
           </p>
           <div className="flex gap-6">
             {['Privacy Policy', 'Terms & Conditions'].map((link) => (
@@ -158,11 +175,11 @@ export function Footer() {
                 key={link}
                 href="#"
                 style={{ color: 'rgba(255,255,255,0.6)', fontSize: '14px' }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.color = 'var(--accent-orange)'
+                onMouseEnter={(event) => {
+                  event.currentTarget.style.color = 'var(--accent-orange)'
                 }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.color = 'rgba(255,255,255,0.6)'
+                onMouseLeave={(event) => {
+                  event.currentTarget.style.color = 'rgba(255,255,255,0.6)'
                 }}
               >
                 {link}

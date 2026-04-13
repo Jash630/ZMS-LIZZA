@@ -1,4 +1,5 @@
 const Product = require('../../models/Product')
+const mongoose = require('mongoose')
 const AppError = require('../../utils/AppError')
 const { sendSuccess, sendPaginated } = require('../../utils/apiResponse')
 const { trackUniqueView } = require('../../utils/viewTracker')
@@ -33,7 +34,7 @@ exports.getPublicProducts = async (req, res, next) => {
     const total = await Product.countDocuments(query)
     const products = await Product.find(query)
       .select(
-        'name slug tagline badge image description keySpecs isFeatured isPopular views publishedAt createdAt'
+        'name slug tagline badge category modelNo priceDisplay priceNote image galleryImages description keySpecs keyFeatures specifications features isFeatured isPopular views publishedAt createdAt'
       )
       .sort({ isFeatured: -1, publishedAt: -1, createdAt: -1 })
       .skip(skip)
@@ -54,9 +55,14 @@ exports.getPublicProducts = async (req, res, next) => {
 // GET /api/v1/public/products/:slug
 exports.getPublicProductBySlug = async (req, res, next) => {
   try {
+    const identifier = String(req.params.slug || '').trim()
+    const slugOrIdFilter = mongoose.Types.ObjectId.isValid(identifier)
+      ? { $or: [{ slug: identifier }, { _id: identifier }] }
+      : { slug: identifier }
+
     const product = await Product.findOne({
       ...getPublishedFilter(),
-      slug: req.params.slug,
+      ...slugOrIdFilter,
     }).populate('author', 'name avatar')
 
     if (!product) return next(new AppError('Product not found', 404))

@@ -2,7 +2,22 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useTheme } from '../../context/ThemeContext'
 import { useAuth } from '../../context/AuthContext'
-import { Sun, Moon, Bell, Search, Menu, ChevronDown, Settings, LogOut, RefreshCw } from 'lucide-react'
+import {
+  Sun,
+  Moon,
+  Bell,
+  Search,
+  Menu,
+  ChevronDown,
+  Settings,
+  LogOut,
+  RefreshCw,
+  Flame,
+  MessageCircle,
+  FileText,
+  User,
+  BellRing,
+} from 'lucide-react'
 import { notificationsService } from '../../services/notificationsService'
 import './Header.css'
 
@@ -19,9 +34,15 @@ const PAGE_TITLES = {
   '/settings': { title: 'Settings', sub: 'Configure your panel' },
 }
 
-const NOTIF_EMOJIS = { lead: '🔥', comment: '💬', post: '📝', system: '⚙️', user: '👤' }
+const NOTIF_ICONS = {
+  lead: Flame,
+  comment: MessageCircle,
+  post: FileText,
+  system: Settings,
+  user: User,
+}
 
-export default function Header({ setCollapsed }) {
+export default function Header({ onMenuClick }) {
   const { theme, toggleTheme } = useTheme()
   const { user, logout } = useAuth()
   const location = useLocation()
@@ -67,9 +88,9 @@ export default function Header({ setCollapsed }) {
   }, [])
 
   useEffect(() => {
-    const handleClick = (e) => {
-      if (notifRef.current && !notifRef.current.contains(e.target)) setShowNotifs(false)
-      if (userRef.current && !userRef.current.contains(e.target)) setShowUser(false)
+    const handleClick = (event) => {
+      if (notifRef.current && !notifRef.current.contains(event.target)) setShowNotifs(false)
+      if (userRef.current && !userRef.current.contains(event.target)) setShowUser(false)
     }
     document.addEventListener('mousedown', handleClick)
     return () => document.removeEventListener('mousedown', handleClick)
@@ -78,7 +99,7 @@ export default function Header({ setCollapsed }) {
   const markAllAsRead = async () => {
     try {
       await notificationsService.markAllAsRead()
-      setNotifications((current) => current.map((n) => ({ ...n, read: true })))
+      setNotifications((current) => current.map((notification) => ({ ...notification, read: true })))
     } catch (err) {
       setNotifError(err?.message || 'Failed to mark all as read.')
     }
@@ -87,7 +108,7 @@ export default function Header({ setCollapsed }) {
   const markAsRead = async (id) => {
     try {
       await notificationsService.markAsRead(id)
-      setNotifications((current) => current.map((n) => (n._id === id ? { ...n, read: true } : n)))
+      setNotifications((current) => current.map((notification) => (notification._id === id ? { ...notification, read: true } : notification)))
     } catch (err) {
       setNotifError(err?.message || 'Failed to update notification.')
     }
@@ -101,7 +122,12 @@ export default function Header({ setCollapsed }) {
   return (
     <header className="header">
       <div className="header-left">
-        <button className="btn btn-icon btn-ghost" onClick={() => setCollapsed((v) => !v)}>
+        <button
+          type="button"
+          className="btn btn-icon btn-ghost header-menu-btn"
+          onClick={onMenuClick}
+          aria-label="Toggle sidebar"
+        >
           <Menu size={18} />
         </button>
         <div className="header-page-info">
@@ -124,7 +150,7 @@ export default function Header({ setCollapsed }) {
           <button
             className="btn btn-icon btn-ghost header-icon-btn notif-btn"
             onClick={() => {
-              setShowNotifs((v) => !v)
+              setShowNotifs((value) => !value)
               setShowUser(false)
             }}
           >
@@ -151,21 +177,26 @@ export default function Header({ setCollapsed }) {
                 {notifications.length === 0 && !notifError && (
                   <div style={{ padding: 16, color: 'var(--text-muted)', textAlign: 'center' }}>No notifications</div>
                 )}
-                {notifications.map((notification) => (
-                  <button
-                    key={notification._id}
-                    className={`notif-item ${!notification.read ? 'unread' : ''}`}
-                    onClick={() => markAsRead(notification._id)}
-                    style={{ width: '100%', border: 'none', background: 'transparent', cursor: 'pointer' }}
-                  >
-                    <div className="notif-icon">{NOTIF_EMOJIS[notification.type] || '📢'}</div>
-                    <div className="notif-content">
-                      <p>{notification.message}</p>
-                      <span>{new Date(notification.createdAt).toLocaleString()}</span>
-                    </div>
-                    {!notification.read && <div className="notif-dot" />}
-                  </button>
-                ))}
+                {notifications.map((notification) => {
+                  const NotificationIcon = NOTIF_ICONS[notification.type] || BellRing
+                  return (
+                    <button
+                      key={notification._id}
+                      className={`notif-item ${!notification.read ? 'unread' : ''}`}
+                      onClick={() => markAsRead(notification._id)}
+                      style={{ width: '100%', border: 'none', background: 'transparent', cursor: 'pointer' }}
+                    >
+                      <div className="notif-icon">
+                        <NotificationIcon size={16} />
+                      </div>
+                      <div className="notif-content">
+                        <p>{notification.message}</p>
+                        <span>{new Date(notification.createdAt).toLocaleString()}</span>
+                      </div>
+                      {!notification.read && <div className="notif-dot" />}
+                    </button>
+                  )
+                })}
               </div>
               <div className="dropdown-footer">
                 <button className="btn btn-ghost btn-sm" onClick={markAllAsRead}>Mark all as read</button>
@@ -179,7 +210,7 @@ export default function Header({ setCollapsed }) {
           <button
             className="header-user-btn"
             onClick={() => {
-              setShowUser((v) => !v)
+              setShowUser((value) => !value)
               setShowNotifs(false)
             }}
           >

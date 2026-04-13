@@ -79,8 +79,8 @@ export function ContactPage() {
       <Header />
       <WhatsAppButton />
 
-      <section className="pt-36 pb-12 bg-white">
-        <div className="max-w-[1400px] mx-auto px-6">
+      <section className="pb-12 bg-white" style={{ paddingTop: 'calc(var(--site-header-height) + 3.25rem)' }}>
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
           <div className="flex items-center gap-2 mb-8 text-sm" style={{ color: 'var(--dark-gray)' }}>
             <span className="cursor-pointer hover:text-[var(--accent-orange)]" onClick={() => navigateTo('home')}>Home</span>
             <ChevronRight size={14} />
@@ -94,7 +94,7 @@ export function ContactPage() {
       </section>
 
       <section className="py-12 bg-white">
-        <div className="max-w-[1400px] mx-auto px-6">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
           <div className="grid lg:grid-cols-2 gap-12">
 
             {/* Form */}
@@ -217,7 +217,7 @@ export function ContactPage() {
       </section>
 
       <section className="py-12 bg-white">
-        <div className="max-w-[1400px] mx-auto px-6">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
           <h2 className="text-center mb-8">Find Us on the Map</h2>
           <div className="rounded-2xl overflow-hidden shadow-xl">
             <iframe
@@ -228,7 +228,7 @@ export function ContactPage() {
       </section>
 
       <section className="py-20" style={{ backgroundColor: 'var(--light-gray)' }}>
-        <div className="max-w-[900px] mx-auto px-6">
+        <div className="max-w-[900px] mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
             <h2 className="mb-4">Frequently Asked Questions</h2>
           </div>

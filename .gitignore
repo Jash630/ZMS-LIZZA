@@ -35,6 +35,20 @@ lerna-debug.log*
 !**/.env.example
 !**/.env.*.example
 
+# Keys / certificates / service account secrets
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+*.jks
+*.keystore
+serviceAccount*.json
+*-service-account*.json
+firebase-adminsdk*.json
+**/secrets/
+**/.secrets/
+
 # -------------------------------
 # Dependencies / package managers
 # -------------------------------

@@ -1,6 +1,7 @@
 .layout {
   display: flex;
   min-height: 100vh;
+  position: relative;
 }
 .layout-main {
   flex: 1;
@@ -14,6 +15,17 @@
 .layout.sidebar-collapsed .layout-main { margin-left: 68px; }
 .layout-content { flex: 1; background: var(--bg-primary); }
 
-@media (max-width: 768px) {
+.layout-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  border: none;
+  background: rgba(9, 12, 18, 0.45);
+  backdrop-filter: blur(2px);
+  cursor: pointer;
+}
+
+@media (max-width: 1024px) {
   .layout-main { margin-left: 0; }
+  .layout.sidebar-collapsed .layout-main { margin-left: 0; }
 }

@@ -1,6 +1,8 @@
 export const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/v1'
 
+const REQUEST_TIMEOUT_MS = Number(import.meta.env.VITE_HTTP_TIMEOUT_MS || 15000)
+
 let tokenGetter = () => null
 let unauthorizedHandler = null
 
@@ -72,12 +74,28 @@ export async function apiRequest(path, options = {}) {
 
   if (token) requestHeaders.Authorization = `Bearer ${token}`
 
-  const response = await fetch(buildUrl(path, query), {
-    method,
-    headers: requestHeaders,
-    body: body === undefined ? undefined : isFormData ? body : JSON.stringify(body),
-    signal,
-  })
+  const controller = signal ? null : new AbortController()
+  const timeoutId = controller
+    ? window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
+    : null
+
+  let response
+  try {
+    response = await fetch(buildUrl(path, query), {
+      method,
+      headers: requestHeaders,
+      body: body === undefined ? undefined : isFormData ? body : JSON.stringify(body),
+      signal: signal || controller?.signal,
+    })
+  } catch (error) {
+    if (timeoutId) window.clearTimeout(timeoutId)
+    if (error?.name === 'AbortError') {
+      throw new ApiError('Request timed out. Please try again.', 408)
+    }
+    throw error
+  }
+
+  if (timeoutId) window.clearTimeout(timeoutId)
 
   const payload = await parseResponse(response)
 

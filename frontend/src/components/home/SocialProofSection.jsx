@@ -10,7 +10,7 @@ const STATS = [
 export function SocialProofSection() {
   return (
     <section className="py-24 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, var(--gradient-blue) 0%, var(--gradient-purple) 100%)' }}>
-      <div className="max-w-[1400px] mx-auto px-6 relative z-10">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 relative z-10">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="mb-4" style={{ color: 'white' }}>Trusted by Leading Textile Manufacturers</h2>
           <p style={{ fontSize: '18px', color: 'rgba(255,255,255,0.9)' }}>Factories across Surat, Ahmedabad, Mumbai, and beyond rely on our machines daily</p>

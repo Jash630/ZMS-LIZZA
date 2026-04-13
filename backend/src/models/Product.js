@@ -57,6 +57,15 @@ const ProductSchema = new mongoose.Schema(
     },
     tagline: { type: String, trim: true, maxlength: [240, 'Tagline cannot exceed 240 characters'] },
     badge: { type: String, trim: true, maxlength: [60, 'Badge cannot exceed 60 characters'] },
+    category: {
+      type: String,
+      trim: true,
+      maxlength: [120, 'Category cannot exceed 120 characters'],
+      default: 'Embroidery Machine',
+    },
+    modelNo: { type: String, trim: true, maxlength: [120, 'Model number cannot exceed 120 characters'] },
+    priceDisplay: { type: String, trim: true, maxlength: [120, 'Price display cannot exceed 120 characters'] },
+    priceNote: { type: String, trim: true, maxlength: [240, 'Price note cannot exceed 240 characters'] },
     image: { type: String, trim: true },
     description: {
       type: String,
@@ -99,8 +108,9 @@ const ProductSchema = new mongoose.Schema(
 
 ProductSchema.index({ status: 1, publishedAt: -1 })
 ProductSchema.index({ author: 1 })
+ProductSchema.index({ category: 1, status: 1 })
 ProductSchema.index({ isFeatured: 1, isPopular: 1 })
-ProductSchema.index({ name: 'text', description: 'text', keySpecs: 'text', keyFeatures: 'text' })
+ProductSchema.index({ name: 'text', description: 'text', category: 'text', keySpecs: 'text', keyFeatures: 'text' })
 
 ProductSchema.pre('save', function saveHook(next) {
   if (this.isModified('name')) {

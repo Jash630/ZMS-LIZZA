@@ -11,7 +11,7 @@ const COLORS = ['var(--gradient-red)', 'var(--gradient-purple)', 'var(--gradient
 export function TestimonialsSection() {
   return (
     <section className="py-24" style={{ backgroundColor: 'var(--light-gray)' }}>
-      <div className="max-w-[1400px] mx-auto px-6">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="mb-4">What Our Customers Say</h2>
         </div>

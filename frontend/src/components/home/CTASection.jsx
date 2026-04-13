@@ -5,7 +5,7 @@ export function CTASection() {
   const { navigateTo } = useNavigation()
   return (
     <section className="py-24 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, var(--gradient-red) 0%, var(--gradient-blue) 100%)' }}>
-      <div className="max-w-[1400px] mx-auto px-6 relative z-10">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 relative z-10">
         <div className="text-center max-w-4xl mx-auto">
           <h2 className="mb-6" style={{ color: 'white' }}>Ready to Upgrade Your Production?</h2>
           <p className="mb-12" style={{ fontSize: '20px', color: 'rgba(255,255,255,0.95)', lineHeight: '1.6' }}>Experience European technology that delivers speed, quality, and reliability</p>

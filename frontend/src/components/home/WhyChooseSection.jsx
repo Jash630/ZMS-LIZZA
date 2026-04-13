@@ -10,7 +10,7 @@ const FEATURES = [
 export function WhyChooseSection() {
   return (
     <section className="py-24 bg-white">
-      <div className="max-w-[1400px] mx-auto px-6">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="mb-4">Why Leading Factories Choose ZMS LIZZA</h2>
           <p style={{ fontSize: '18px', color: 'var(--dark-gray)' }}>

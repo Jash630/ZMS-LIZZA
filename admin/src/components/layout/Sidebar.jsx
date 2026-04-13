@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext'
 import {
   LayoutDashboard, FileText, MessageSquare, Image, BarChart3,
   PhoneCall, Users, Settings, LogOut, ChevronLeft, ChevronRight,
-  Bell, Globe
+  Bell, Globe, X
 } from 'lucide-react'
 import './Sidebar.css'
 
@@ -27,19 +27,25 @@ const ROLE_COLORS = {
   editor:     { bg: 'linear-gradient(135deg,#FF6B35,#E63946)', text: 'Editor' },
 }
 
-export default function Sidebar({ collapsed, setCollapsed }) {
+export default function Sidebar({ collapsed, setCollapsed, isMobile = false, mobileOpen = false, onNavigate }) {
   const { user, logout, hasPermission } = useAuth()
   const navigate = useNavigate()
 
   const handleLogout = async () => {
     await logout()
     navigate('/login', { replace: true })
+    onNavigate?.()
   }
+
+  const handleNavItemClick = () => {
+    if (isMobile) onNavigate?.()
+  }
+
   const roleInfo = ROLE_COLORS[user?.role] || ROLE_COLORS.editor
   const initials = user?.name?.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase() || 'ZA'
 
   return (
-    <aside className={`sidebar ${collapsed ? 'collapsed' : ''}`}>
+    <aside className={`sidebar ${collapsed ? 'collapsed' : ''} ${isMobile && mobileOpen ? 'mobile-open' : ''}`}>
       {/* Logo */}
       <div className="sidebar-logo">
         {collapsed ? (
@@ -50,9 +56,15 @@ export default function Sidebar({ collapsed, setCollapsed }) {
             <span className="logo-sub">Admin Panel</span>
           </div>
         )}
-        <button className="sidebar-collapse-btn" onClick={() => setCollapsed(v => !v)}>
-          {collapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
-        </button>
+        {isMobile ? (
+          <button type="button" className="sidebar-close-btn" onClick={onNavigate} aria-label="Close sidebar">
+            <X size={14} />
+          </button>
+        ) : (
+          <button className="sidebar-collapse-btn" onClick={() => setCollapsed(v => !v)} aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}>
+            {collapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
+          </button>
+        )}
       </div>
 
       {/* User */}
@@ -79,6 +91,7 @@ export default function Sidebar({ collapsed, setCollapsed }) {
               to={item.path}
               className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
               data-tooltip={collapsed ? item.label : undefined}
+              onClick={handleNavItemClick}
             >
               <Icon size={18} className="nav-icon" />
               {!collapsed && <span className="nav-label">{item.label}</span>}

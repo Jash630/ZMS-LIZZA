@@ -19,8 +19,8 @@ export function ServicesPage() {
       <Header />
       <WhatsAppButton />
 
-      <section className="pt-36 pb-16 bg-white">
-        <div className="max-w-[1400px] mx-auto px-6">
+      <section className="pb-16 bg-white" style={{ paddingTop: 'calc(var(--site-header-height) + 3.25rem)' }}>
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
           <div className="flex items-center gap-2 mb-8 text-sm" style={{ color: 'var(--dark-gray)' }}>
             <span className="cursor-pointer hover:text-[var(--accent-orange)]" onClick={() => navigateTo('home')}>Home</span>
             <ChevronRight size={14} />
@@ -34,7 +34,7 @@ export function ServicesPage() {
       </section>
 
       <section className="py-16" style={{ backgroundColor: 'var(--light-gray)' }}>
-        <div className="max-w-[1400px] mx-auto px-6">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {SERVICES.map(({ Icon, title, color, items }) => (
               <div key={title} className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 border-t-4" style={{ borderTopColor: color }}>
@@ -60,7 +60,7 @@ export function ServicesPage() {
       </section>
 
       <section className="py-20 text-center" style={{ background: 'linear-gradient(135deg, var(--gradient-red), var(--gradient-purple), var(--gradient-blue))' }}>
-        <div className="max-w-3xl mx-auto px-6">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6">
           <h2 style={{ color: 'white' }} className="mb-6">Ready to Experience Complete Support?</h2>
           <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '18px' }} className="mb-10">Contact us today to discuss your service requirements</p>
           <button onClick={() => navigateTo('contact')} className="px-10 py-5 rounded-lg font-bold text-lg transition-all hover:scale-105 hover:shadow-2xl" style={{ backgroundColor: 'var(--accent-orange)', color: 'white' }}>

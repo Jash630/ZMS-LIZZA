@@ -4,6 +4,7 @@ const cloudinary = require('../config/cloudinary')
 const AppError = require('../utils/AppError')
 const { sendSuccess, sendPaginated } = require('../utils/apiResponse')
 const { formatFileSize } = require('../middleware/upload')
+const YOUTUBE_HOSTS = new Set(['youtube.com', 'm.youtube.com', 'music.youtube.com'])
 
 const resolveMediaType = (mimetype = '') => {
   if (mimetype.startsWith('image/')) return 'image'
@@ -50,6 +51,35 @@ const uploadBufferToCloudinary = (file, type) => {
 
 const hasCloudinaryConfig = () =>
   Boolean(process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET)
+
+const extractYoutubeVideoId = (rawUrl = '') => {
+  if (!rawUrl || typeof rawUrl !== 'string') return null
+
+  try {
+    const parsed = new URL(rawUrl)
+    const host = parsed.hostname.replace(/^www\./, '')
+    let videoId = ''
+
+    if (host === 'youtu.be') {
+      videoId = parsed.pathname.split('/').filter(Boolean)[0] || ''
+    } else if (YOUTUBE_HOSTS.has(host)) {
+      if (parsed.pathname === '/watch') {
+        videoId = parsed.searchParams.get('v') || ''
+      } else if (parsed.pathname.startsWith('/shorts/')) {
+        videoId = parsed.pathname.split('/')[2] || ''
+      } else if (parsed.pathname.startsWith('/embed/')) {
+        videoId = parsed.pathname.split('/')[2] || ''
+      } else if (parsed.pathname.startsWith('/live/')) {
+        videoId = parsed.pathname.split('/')[2] || ''
+      }
+    }
+
+    if (!/^[a-zA-Z0-9_-]{11}$/.test(videoId)) return null
+    return videoId
+  } catch {
+    return null
+  }
+}
 
 // GET /api/v1/media
 exports.getMedia = async (req, res, next) => {
@@ -121,6 +151,57 @@ exports.uploadMedia = async (req, res, next) => {
     const media = await Media.create(mediaPayload)
 
     sendSuccess(res, { data: media, statusCode: 201, message: 'File uploaded successfully' })
+  } catch (err) {
+    next(err)
+  }
+}
+
+// POST /api/v1/media/url
+exports.createMediaFromUrl = async (req, res, next) => {
+  try {
+    const name = String(req.body?.name || '').trim()
+    const rawUrl = String(req.body?.url || '').trim()
+
+    if (!rawUrl) {
+      return next(new AppError('Please provide a YouTube URL.', 400))
+    }
+
+    const videoId = extractYoutubeVideoId(rawUrl)
+    if (!videoId) {
+      return next(new AppError('Invalid YouTube URL. Use a watch/share/shorts link.', 400))
+    }
+
+    const canonicalUrl = `https://www.youtube.com/watch?v=${videoId}`
+    const existing = await Media.findOne({ type: 'video', url: canonicalUrl })
+    if (existing) {
+      return sendSuccess(res, {
+        data: existing,
+        message: 'This YouTube video already exists in the media library.',
+      })
+    }
+
+    const title = name || `YouTube Video ${videoId}`
+    const media = await Media.create({
+      name: title,
+      originalName: title,
+      type: 'video',
+      mimeType: 'video/youtube',
+      size: 0,
+      sizeFormatted: 'External',
+      url: canonicalUrl,
+      provider: 'external',
+      publicId: `youtube:${videoId}`,
+      resourceType: 'video',
+      path: null,
+      uploadedBy: req.user.id,
+      alt: title,
+    })
+
+    sendSuccess(res, {
+      data: media,
+      statusCode: 201,
+      message: 'YouTube video added to media library.',
+    })
   } catch (err) {
     next(err)
   }
