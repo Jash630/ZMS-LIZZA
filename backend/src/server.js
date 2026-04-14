@@ -31,7 +31,9 @@ app.use(
 )
 const allowedOrigins = [
   "https://zmslizzafrontend.vercel.app",
-  "https://zmslizzaadmin.vercel.app"
+  "https://zmslizzaadmin.vercel.app",
+   "http://localhost:5174/",
+   "http://localhost:5173/"
 ];
 
 const corsOptions = {
