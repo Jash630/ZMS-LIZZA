@@ -74,11 +74,9 @@ export function AuthProvider({ children }) {
   const login = async (email, password) => {
     try {
       const payload = await authService.login(email, password)
-      console.log("LOGIN RESPONSE:", payload)
       const nextToken = payload?.token
       const nextUser = payload?.data
       if (!nextToken || !nextUser) {
-        console.error("Missing token or user data:", { token: nextToken, user: nextUser })
         return { success: false, error: 'Invalid login response from server.' }
       }
 
@@ -88,8 +86,7 @@ export function AuthProvider({ children }) {
       setStoredUser(nextUser)
       return { success: true }
     } catch (err) {
-      console.error("Login error:", err)
-      return { success: false, error: err?.payload?.message || err?.message || 'Login failed.' }
+      return { success: false, error: err?.message || 'Login failed.' }
     }
   }
 

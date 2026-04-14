@@ -10,7 +10,6 @@ const helmet = require('helmet')
 const morgan = require('morgan')
 const rateLimit = require('express-rate-limit')
 const mongoSanitize = require('express-mongo-sanitize')
-const allowedOrigins = process.env.CORS_ORIGINS.split(",");
 
 const connectDB = require('./config/db')
 const logger = require('./utils/logger')
@@ -30,43 +29,27 @@ app.use(
     crossOriginResourcePolicy: { policy: 'cross-origin' },
   })
 )
+const allowedOrigins = [
+  "https://zmslizzafrontend.vercel.app",
+  "https://zmslizzaadmin.vercel.app"
+];
 
-const defaultLocalOrigins = [
-  'http://localhost:5173',
-  'http://localhost:5174',
-  'http://127.0.0.1:5173',
-  'http://127.0.0.1:5174',
-]
+const corsOptions = {
+  origin: function (origin, callback) {
+    // allow requests with no origin (like Postman)
+    if (!origin) return callback(null, true);
 
-const normalizeOrigin = (origin) => origin.trim().replace(/\/+$/, '')
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(null, false);
+    }
+  },
+  credentials: true,
+};
 
-const envOrigins = process.env.CORS_ORIGINS
-  ? process.env.CORS_ORIGINS.split(',').map(normalizeOrigin).filter(Boolean)
-  : process.env.CLIENT_URL
-    ? [normalizeOrigin(process.env.CLIENT_URL)]
-    : []
-
-const corsOrigins = Array.from(
-  new Set([
-    ...envOrigins,
-    ...(process.env.NODE_ENV === 'production' ? [] : defaultLocalOrigins.map(normalizeOrigin)),
-  ])
-)
-
-app.use(
-  cors({
-    origin: (origin, cb) => {
-      if (!origin) return cb(null, true)
-      const normalized = normalizeOrigin(origin)
-      if (corsOrigins.includes(normalized)) return cb(null, true)
-      return cb(null, false)
-    },
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-  })
-)
-app.options('*', cors())
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 
 app.use(mongoSanitize())
 
