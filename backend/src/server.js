@@ -10,6 +10,7 @@ const helmet = require('helmet')
 const morgan = require('morgan')
 const rateLimit = require('express-rate-limit')
 const mongoSanitize = require('express-mongo-sanitize')
+const allowedOrigins = process.env.CORS_ORIGINS.split(",");
 
 const connectDB = require('./config/db')
 const logger = require('./utils/logger')
@@ -58,13 +59,14 @@ app.use(
       if (!origin) return cb(null, true)
       const normalized = normalizeOrigin(origin)
       if (corsOrigins.includes(normalized)) return cb(null, true)
-      return cb(new AppError(`CORS blocked for origin: ${origin}`, 403))
+      return cb(null, false)
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   })
 )
+app.options('*', cors())
 
 app.use(mongoSanitize())
 
