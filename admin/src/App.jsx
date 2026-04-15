@@ -15,6 +15,7 @@ import UsersPage         from './pages/users/UsersPage'
 import SeoPage           from './pages/seo/SeoPage'
 import NotificationsPage from './pages/notifications/NotificationsPage'
 import SettingsPage      from './pages/settings/SettingsPage'
+import SubscribersPage   from './pages/subscribers/SubscribersPage'
 
 function ProtectedRoute({ children, page }) {
   const { user, loading, hasPermission } = useAuth()
@@ -44,6 +45,7 @@ function AppRoutes() {
         <Route path="/users"         element={<ProtectedRoute page="users"><UsersPage /></ProtectedRoute>} />
         <Route path="/seo"           element={<ProtectedRoute page="seo"><SeoPage /></ProtectedRoute>} />
         <Route path="/notifications" element={<ProtectedRoute page="notifications"><NotificationsPage /></ProtectedRoute>} />
+        <Route path="/subscribers"   element={<ProtectedRoute page="subscribers"><SubscribersPage /></ProtectedRoute>} />
         <Route path="/settings"      element={<ProtectedRoute page="settings"><SettingsPage /></ProtectedRoute>} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

@@ -10,6 +10,7 @@ const notificationRoutes = require('./notificationRoutes')
 const seoRoutes = require('./seoRoutes')
 const settingsRoutes = require('./settingsRoutes')
 const productRoutes = require('./productRoutes')
+const subscriberRoutes = require('./subscriberRoutes')
 
 const router = express.Router()
 
@@ -23,5 +24,6 @@ router.use('/notifications', notificationRoutes)
 router.use('/seo', seoRoutes)
 router.use('/settings', settingsRoutes)
 router.use('/products', productRoutes)
+router.use('/subscribers', subscriberRoutes)
 
 module.exports = router

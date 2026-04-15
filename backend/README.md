@@ -21,6 +21,10 @@
 Optional:
 - `CLIENT_URL` (legacy fallback when `CORS_ORIGINS` is not provided)
 - `VIEW_FINGERPRINT_SALT` (recommended for unique view fingerprint hashing)
+- `EMAIL_APP`, `EMAIL_APP_PASS` (for newsletter and lead emails)
+- `EMAIL_FROM_NAME` (display name in outgoing emails)
+- `STAFF_NOTIFICATION_EMAIL` (internal email for new lead alerts)
+- `API_BASE_URL` (used in unsubscribe links)
 
 ## CORS Behavior
 
@@ -55,6 +59,8 @@ Unauthenticated endpoints under `/api/v1/public`:
 - `GET /seo`
 - `GET /settings`
 - `POST /leads`
+- `POST /newsletter/subscribe`
+- `GET /newsletter/unsubscribe?token=<token>`
 
 ## Admin Product APIs
 

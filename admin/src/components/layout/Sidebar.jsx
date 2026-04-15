@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext'
 import {
   LayoutDashboard, FileText, MessageSquare, Image, BarChart3,
   PhoneCall, Users, Settings, LogOut, ChevronLeft, ChevronRight,
-  Bell, Globe, X
+  Bell, Globe, X, Mail
 } from 'lucide-react'
 import './Sidebar.css'
 
@@ -16,6 +16,7 @@ const NAV_ITEMS = [
   { path: '/analytics',     label: 'Analytics',         icon: BarChart3,       perm: 'analytics' },
   { path: '/leads',         label: 'Leads & Enquiries', icon: PhoneCall,       perm: 'leads' },
   { path: '/users',         label: 'Users & Authors',   icon: Users,           perm: 'users' },
+  { path: '/subscribers',   label: 'Subscribers',       icon: Mail,            perm: 'subscribers' },
   { path: '/seo',           label: 'SEO Manager',       icon: Globe,           perm: 'seo' },
   { path: '/notifications', label: 'Notifications',     icon: Bell,            perm: 'notifications' },
   { path: '/settings',      label: 'Settings',          icon: Settings,        perm: 'settings' },
