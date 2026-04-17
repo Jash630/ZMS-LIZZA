@@ -4,31 +4,29 @@ import { useAuth, ROLES } from '../../context/AuthContext'
 import { Eye, EyeOff, Loader2, Shield, User, Edit3 } from 'lucide-react'
 import './Login.css'
 
-const ROLE_CARDS = import.meta.env.DEV
-  ? [
-      {
-        role: ROLES.SUPERADMIN,
-        label: 'Super Admin',
-        icon: Shield,
-        desc: 'Full system control',
-        gradient: 'linear-gradient(135deg,#E63946,#8B2F97)',
-      },
-      {
-        role: ROLES.ADMIN,
-        label: 'Admin',
-        icon: User,
-        desc: 'Manage content & leads',
-        gradient: 'linear-gradient(135deg,#2E5EAA,#8B2F97)',
-      },
-      {
-        role: ROLES.EDITOR,
-        label: 'Editor',
-        icon: Edit3,
-        desc: 'Create & edit content',
-        gradient: 'linear-gradient(135deg,#FF6B35,#E63946)',
-      },
-    ]
-  : []
+const ROLE_CARDS = [
+  {
+    role: ROLES.SUPERADMIN,
+    label: 'Super Admin',
+    icon: Shield,
+    desc: 'Full system control',
+    gradient: 'linear-gradient(135deg,#E63946,#8B2F97)',
+  },
+  {
+    role: ROLES.ADMIN,
+    label: 'Admin',
+    icon: User,
+    desc: 'Manage content & leads',
+    gradient: 'linear-gradient(135deg,#2E5EAA,#8B2F97)',
+  },
+  {
+    role: ROLES.EDITOR,
+    label: 'Editor',
+    icon: Edit3,
+    desc: 'Create & edit content',
+    gradient: 'linear-gradient(135deg,#FF6B35,#E63946)',
+  },
+]
 
 export default function LoginPage() {
   const navigate = useNavigate()
