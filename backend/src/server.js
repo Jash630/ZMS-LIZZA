@@ -36,8 +36,6 @@ const normalizeOrigin = (value = '') => String(value).trim().replace(/\/$/, '').
 const defaultAllowedOrigins = [
   'https://zmslizzafrontend.vercel.app',
   'https://zmslizzaadmin.vercel.app',
-  'http://localhost:5174',
-  'http://localhost:5173',
 ]
 
 const envAllowedOrigins = String(process.env.CORS_ORIGINS || '')
@@ -122,7 +120,7 @@ const PORT = process.env.PORT || 5000
 
 const server = app.listen(PORT, () => {
   logger.info(`ZMS LIZZA API running on port ${PORT} in ${process.env.NODE_ENV} mode`)
-  logger.info(`API base: http://localhost:${PORT}/api/v1`)
+  logger.info(`API base: ${process.env.API_BASE_URL || 'https://zms-lizza-backend.onrender.com/api/v1'}`)
 })
 
 process.on('unhandledRejection', (err) => {

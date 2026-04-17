@@ -30,11 +30,9 @@ Optional:
 
 - If `CORS_ORIGINS` is set, only those origins are allowed.
 - If `CORS_ORIGINS` is missing, `CLIENT_URL` is used.
-- If both are missing, local defaults are used:
-  - `http://localhost:5173`
-  - `http://localhost:5174`
-  - `http://127.0.0.1:5173`
-  - `http://127.0.0.1:5174`
+- If both are missing, production-safe defaults are used:
+   - `https://zmslizzafrontend.vercel.app`
+   - `https://zmslizzaadmin.vercel.app`
 
 ## Settings API
 
@@ -80,8 +78,34 @@ Run:
 - `npm run seed`
 - `npm run seed:destroy`
 
-Default credentials:
+Seed credentials are environment-driven and not hardcoded in source anymore.
 
-- `superadmin@zmslizza.com / super123`
-- `admin@zmslizza.com / admin123`
-- `editor@zmslizza.com / editor123`
+Optional variables you can set in `.env` before seeding:
+
+- `SEED_SUPERADMIN_EMAIL`, `SEED_SUPERADMIN_PASSWORD`
+- `SEED_ADMIN_EMAIL`, `SEED_ADMIN_PASSWORD`
+- `SEED_EDITOR_EMAIL`, `SEED_EDITOR_PASSWORD`
+- `SEED_INACTIVE_EDITOR_EMAIL`, `SEED_INACTIVE_EDITOR_PASSWORD`
+
+If password variables are not set, strong random passwords are generated during `npm run seed` and printed once in the terminal.
+
+## Production Password Rotation (Non-Destructive)
+
+Use this when your live credentials were previously exposed. This updates only matching user passwords and does not delete content data.
+
+1. Set one or more target emails (required):
+   - `ROTATE_SUPERADMIN_EMAIL`
+   - `ROTATE_ADMIN_EMAIL`
+   - `ROTATE_EDITOR_EMAIL`
+2. Set passwords if you want fixed values (optional):
+   - `ROTATE_SUPERADMIN_PASSWORD`
+   - `ROTATE_ADMIN_PASSWORD`
+   - `ROTATE_EDITOR_PASSWORD`
+3. Run:
+   - `npm run rotate:admin-passwords`
+
+Notes:
+
+- If a password variable is omitted for a provided email, a strong random password is generated and printed once in terminal output.
+- Existing JWT sessions are invalidated because `passwordChangedAt` is updated.
+- Users not found by email are reported and skipped.

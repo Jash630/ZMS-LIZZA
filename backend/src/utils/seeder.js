@@ -1,4 +1,5 @@
 const path = require('path')
+const crypto = require('crypto')
 require('dotenv').config({
   path: path.resolve(__dirname, '../../.env'),
   override: true,
@@ -15,12 +16,38 @@ const SeoSettings  = require('../models/SeoSettings')
 const Settings     = require('../models/Settings')
 const ContentView  = require('../models/ContentView')
 
+const getEnv = (key, fallback) => {
+  const value = process.env[key]
+  return value && value.trim() ? value.trim() : fallback
+}
+
+const randomPassword = () => crypto.randomBytes(12).toString('base64url')
+
+const seedCredentials = {
+  superadmin: {
+    email: getEnv('SEED_SUPERADMIN_EMAIL', 'superadmin@local.test'),
+    password: getEnv('SEED_SUPERADMIN_PASSWORD', randomPassword()),
+  },
+  admin: {
+    email: getEnv('SEED_ADMIN_EMAIL', 'admin@local.test'),
+    password: getEnv('SEED_ADMIN_PASSWORD', randomPassword()),
+  },
+  editor: {
+    email: getEnv('SEED_EDITOR_EMAIL', 'editor@local.test'),
+    password: getEnv('SEED_EDITOR_PASSWORD', randomPassword()),
+  },
+  inactiveEditor: {
+    email: getEnv('SEED_INACTIVE_EDITOR_EMAIL', 'sneha@local.test'),
+    password: getEnv('SEED_INACTIVE_EDITOR_PASSWORD', randomPassword()),
+  },
+}
+
 // ── Sample Users ──────────────────────────────────────
 const users = [
-  { name: 'Ravi Kumar',   email: 'superadmin@zmslizza.com', password: 'SuperAdmin@123', role: 'superadmin', status: 'active'   },
-  { name: 'Priya Sharma', email: 'admin@zmslizza.com',      password: 'AdminUser@1234', role: 'admin',      status: 'active'   },
-  { name: 'Arjun Mehta',  email: 'editor@zmslizza.com',     password: 'EditorUser@123', role: 'editor',     status: 'active'   },
-  { name: 'Sneha Patel',  email: 'sneha@zmslizza.com',      password: 'EditorUser@124', role: 'editor',     status: 'inactive' },
+  { name: 'Ravi Kumar',   email: seedCredentials.superadmin.email,    password: seedCredentials.superadmin.password,    role: 'superadmin', status: 'active'   },
+  { name: 'Priya Sharma', email: seedCredentials.admin.email,         password: seedCredentials.admin.password,         role: 'admin',      status: 'active'   },
+  { name: 'Arjun Mehta',  email: seedCredentials.editor.email,        password: seedCredentials.editor.password,        role: 'editor',     status: 'active'   },
+  { name: 'Sneha Patel',  email: seedCredentials.inactiveEditor.email, password: seedCredentials.inactiveEditor.password, role: 'editor',     status: 'inactive' },
 ]
 
 const getPosts = (authorIds) => [
@@ -454,10 +481,11 @@ const importData = async () => {
     console.log('✅ Notifications created')
 
     console.log('\n🎉 Seed complete!\n')
-    console.log('📧 Login Credentials:')
-    console.log('   superadmin@zmslizza.com  /  super123')
-    console.log('   admin@zmslizza.com       /  admin123')
-    console.log('   editor@zmslizza.com      /  editor123\n')
+    console.log('📧 Seeded Login Credentials:')
+    console.log(`   ${seedCredentials.superadmin.email} / ${seedCredentials.superadmin.password}`)
+    console.log(`   ${seedCredentials.admin.email} / ${seedCredentials.admin.password}`)
+    console.log(`   ${seedCredentials.editor.email} / ${seedCredentials.editor.password}`)
+    console.log('   Inactive editor account is also created from SEED_INACTIVE_EDITOR_* values.\n')
     process.exit(0)
   } catch (error) {
     console.error('❌ Seed error:', error)

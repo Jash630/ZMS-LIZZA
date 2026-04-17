@@ -10,8 +10,6 @@ const ROLE_CARDS = import.meta.env.DEV
         role: ROLES.SUPERADMIN,
         label: 'Super Admin',
         icon: Shield,
-        email: 'superadmin@zmslizza.com',
-        password: 'SuperAdmin@123',
         desc: 'Full system control',
         gradient: 'linear-gradient(135deg,#E63946,#8B2F97)',
       },
@@ -19,8 +17,6 @@ const ROLE_CARDS = import.meta.env.DEV
         role: ROLES.ADMIN,
         label: 'Admin',
         icon: User,
-        email: 'admin@zmslizza.com',
-        password: 'AdminUser@1234',
         desc: 'Manage content & leads',
         gradient: 'linear-gradient(135deg,#2E5EAA,#8B2F97)',
       },
@@ -28,8 +24,6 @@ const ROLE_CARDS = import.meta.env.DEV
         role: ROLES.EDITOR,
         label: 'Editor',
         icon: Edit3,
-        email: 'editor@zmslizza.com',
-        password: 'EditorUser@123',
         desc: 'Create & edit content',
         gradient: 'linear-gradient(135deg,#FF6B35,#E63946)',
       },
@@ -48,8 +42,6 @@ export default function LoginPage() {
 
   const fillRole = (card) => {
     setSelected(card.role)
-    setEmail(card.email)
-    setPassword(card.password)
     setError('')
   }
 
@@ -148,7 +140,7 @@ export default function LoginPage() {
               {loading ? <><Loader2 size={18} className="spin" /> Signing in...</> : 'Sign In'}
             </button>
           </form>
-          {ROLE_CARDS.length > 0 && <p className="login-hint">Select a role above to auto-fill seeded credentials.</p>}
+          {ROLE_CARDS.length > 0 && <p className="login-hint">Select a role above, then enter your own credentials.</p>}
         </div>
         <p className="login-footer animate-fade-in">(c) 2026 LIZZA INDIA PVT. LTD. All rights reserved.</p>
       </div>

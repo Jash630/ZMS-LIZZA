@@ -1,7 +1,7 @@
 const trimTrailingSlashes = (value = '') => String(value).replace(/\/+$/, '')
 const REQUEST_TIMEOUT_MS = Number(import.meta.env.VITE_HTTP_TIMEOUT_MS || 15000)
 
-const API_V1_BASE = trimTrailingSlashes(import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/v1')
+const API_V1_BASE = trimTrailingSlashes(import.meta.env.VITE_API_BASE_URL || 'https://zms-lizza-backend.onrender.com/api/v1')
 
 const ensurePublicBase = (base) => {
   const normalized = trimTrailingSlashes(base)

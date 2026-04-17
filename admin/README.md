@@ -11,7 +11,11 @@
 ## Environment Variables
 
 - `VITE_API_BASE_URL`
-  - Example: `http://localhost:5000/api/v1`
+   - Example: `https://zms-lizza-backend.onrender.com/api/v1`
+- `VITE_PUBLIC_SITE_URL`
+   - Example: `https://zmslizzafrontend.vercel.app`
+- `VITE_HTTP_TIMEOUT_MS`
+   - Example: `15000`
 
 ## Local Run Sequence
 
@@ -22,6 +26,7 @@
 
 ## Seed Credentials (Development)
 
-- `superadmin@zmslizza.com / super123`
-- `admin@zmslizza.com / admin123`
-- `editor@zmslizza.com / editor123`
+Credentials are defined from backend seed environment variables and are no longer stored in this repository.
+
+Set seed values in `backend/.env` and run `npm run seed` in the backend.
+If seed passwords are not provided, secure random passwords are generated and shown once in the backend seed command output.

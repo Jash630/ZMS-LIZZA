@@ -4,7 +4,7 @@ if (import.meta.env.PROD && !ENV_API_BASE_URL) {
   throw new Error('VITE_API_BASE_URL is required in production.')
 }
 
-export const API_BASE_URL = ENV_API_BASE_URL || 'http://localhost:5000/api/v1'
+export const API_BASE_URL = ENV_API_BASE_URL || 'https://zms-lizza-backend.onrender.com/api/v1'
 
 const REQUEST_TIMEOUT_MS = Number(import.meta.env.VITE_HTTP_TIMEOUT_MS || 15000)
 

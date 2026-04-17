@@ -1,5 +1,5 @@
-const APP_BASE_URL = process.env.CLIENT_URL || 'http://localhost:5173'
-const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:5000/api/v1'
+const APP_BASE_URL = process.env.CLIENT_URL || 'https://zmslizzafrontend.vercel.app'
+const API_BASE_URL = process.env.API_BASE_URL || 'https://zms-lizza-backend.onrender.com/api/v1'
 
 function escapeHtml(value) {
   if (!value) return ''

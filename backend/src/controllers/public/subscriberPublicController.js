@@ -93,7 +93,7 @@ exports.unsubscribeNewsletter = async (req, res) => {
 }
 
 function renderUnsubscribePage(message, isSuccess) {
-  const homeUrl = process.env.CLIENT_URL || 'http://localhost:5173'
+  const homeUrl = process.env.CLIENT_URL || 'https://zmslizzafrontend.vercel.app'
   const title = isSuccess ? 'Unsubscribed' : 'Oops'
   const icon = isSuccess ? 'OK' : '!'
 

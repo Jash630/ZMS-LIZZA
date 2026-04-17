@@ -13,7 +13,7 @@ const STATUS_CONFIG = {
 const CAT_COLORS = { Product: 'badge-danger', Guide: 'badge-info', News: 'badge-purple', 'Case Study': 'badge-warning', Announcement: 'badge-neutral' }
 const CATEGORY_OPTIONS = ['Product', 'Guide', 'News', 'Case Study', 'Announcement']
 const STATUS_OPTIONS = ['draft', 'published', 'scheduled']
-const PUBLIC_SITE_URL = (import.meta.env.VITE_PUBLIC_SITE_URL || 'http://localhost:5173').replace(/\/+$/, '')
+const PUBLIC_SITE_URL = (import.meta.env.VITE_PUBLIC_SITE_URL || 'https://zmslizzafrontend.vercel.app').replace(/\/+$/, '')
 
 const emptyForm = {
   title: '',
