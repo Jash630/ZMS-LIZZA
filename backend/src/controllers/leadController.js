@@ -3,31 +3,41 @@ const Notification = require('../models/Notification')
 const AppError     = require('../utils/AppError')
 const { sendSuccess, sendPaginated } = require('../utils/apiResponse')
 
+const escapeRegex = (value = '') => String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+const parsePagination = (page, limit) => {
+  const parsedPage = Math.max(parseInt(page, 10) || 1, 1)
+  const parsedLimit = Math.min(Math.max(parseInt(limit, 10) || 12, 1), 100)
+  return { parsedPage, parsedLimit }
+}
+
 // GET /api/v1/leads
 exports.getLeads = async (req, res, next) => {
   try {
     const { page = 1, limit = 12, status, source, search } = req.query
+    const { parsedPage, parsedLimit } = parsePagination(page, limit)
 
     const query = {}
     if (status) query.status = status
     if (source) query.source = source
     if (search) {
+      const safeSearch = escapeRegex(search)
       query.$or = [
-        { name:    { $regex: search, $options: 'i' } },
-        { city:    { $regex: search, $options: 'i' } },
-        { contact: { $regex: search, $options: 'i' } },
+        { name:    { $regex: safeSearch, $options: 'i' } },
+        { city:    { $regex: safeSearch, $options: 'i' } },
+        { contact: { $regex: safeSearch, $options: 'i' } },
       ]
     }
 
-    const skip  = (page - 1) * limit
+    const skip  = (parsedPage - 1) * parsedLimit
     const total = await Lead.countDocuments(query)
     const leads = await Lead.find(query)
       .populate('assignedTo', 'name email')
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(parseInt(limit))
+      .limit(parsedLimit)
 
-    sendPaginated(res, { data: leads, total, page, limit })
+    sendPaginated(res, { data: leads, total, page: parsedPage, limit: parsedLimit })
   } catch (err) {
     next(err)
   }

@@ -3,10 +3,17 @@ const Notification = require('../models/Notification')
 const AppError     = require('../utils/AppError')
 const { sendSuccess, sendPaginated } = require('../utils/apiResponse')
 
+const parsePagination = (page, limit) => {
+  const parsedPage = Math.max(parseInt(page, 10) || 1, 1)
+  const parsedLimit = Math.min(Math.max(parseInt(limit, 10) || 10, 1), 100)
+  return { parsedPage, parsedLimit }
+}
+
 // GET /api/v1/posts
 exports.getPosts = async (req, res, next) => {
   try {
     const { page = 1, limit = 10, status, category, search, author } = req.query
+    const { parsedPage, parsedLimit } = parsePagination(page, limit)
 
     const query = {}
     if (status)   query.status   = status
@@ -14,17 +21,17 @@ exports.getPosts = async (req, res, next) => {
     if (author)   query.author   = author
     if (search)   query.$text    = { $search: search }
 
-    const skip  = (page - 1) * limit
+    const skip  = (parsedPage - 1) * parsedLimit
     const total = await Post.countDocuments(query)
     const posts = await Post.find(query)
       .populate('author', 'name email avatar')
       .populate('commentCount')
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(parseInt(limit))
+      .limit(parsedLimit)
       .lean()
 
-    sendPaginated(res, { data: posts, total, page, limit })
+    sendPaginated(res, { data: posts, total, page: parsedPage, limit: parsedLimit })
   } catch (err) {
     next(err)
   }

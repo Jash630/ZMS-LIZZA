@@ -6,6 +6,14 @@ const { sendSuccess, sendPaginated } = require('../utils/apiResponse')
 const { formatFileSize } = require('../middleware/upload')
 const YOUTUBE_HOSTS = new Set(['youtube.com', 'm.youtube.com', 'music.youtube.com'])
 
+const escapeRegex = (value = '') => String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+const parsePagination = (page, limit) => {
+  const parsedPage = Math.max(parseInt(page, 10) || 1, 1)
+  const parsedLimit = Math.min(Math.max(parseInt(limit, 10) || 20, 1), 100)
+  return { parsedPage, parsedLimit }
+}
+
 const resolveMediaType = (mimetype = '') => {
   if (mimetype.startsWith('image/')) return 'image'
   if (mimetype === 'application/pdf') return 'pdf'
@@ -85,20 +93,21 @@ const extractYoutubeVideoId = (rawUrl = '') => {
 exports.getMedia = async (req, res, next) => {
   try {
     const { page = 1, limit = 20, type, search } = req.query
+    const { parsedPage, parsedLimit } = parsePagination(page, limit)
 
     const query = {}
     if (type)   query.type = type
-    if (search) query.name = { $regex: search, $options: 'i' }
+    if (search) query.name = { $regex: escapeRegex(search), $options: 'i' }
 
-    const skip  = (page - 1) * limit
+    const skip  = (parsedPage - 1) * parsedLimit
     const total = await Media.countDocuments(query)
     const media = await Media.find(query)
       .populate('uploadedBy', 'name')
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(parseInt(limit))
+      .limit(parsedLimit)
 
-    sendPaginated(res, { data: media, total, page, limit })
+    sendPaginated(res, { data: media, total, page: parsedPage, limit: parsedLimit })
   } catch (err) {
     next(err)
   }

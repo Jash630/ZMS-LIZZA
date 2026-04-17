@@ -4,11 +4,37 @@ import { useAuth, ROLES } from '../../context/AuthContext'
 import { Eye, EyeOff, Loader2, Shield, User, Edit3 } from 'lucide-react'
 import './Login.css'
 
-const ROLE_CARDS = [
-  { role: ROLES.SUPERADMIN, label: 'Super Admin', icon: Shield, email: 'superadmin@zmslizza.com', password: 'super123', desc: 'Full system control', gradient: 'linear-gradient(135deg,#E63946,#8B2F97)' },
-  { role: ROLES.ADMIN, label: 'Admin', icon: User, email: 'admin@zmslizza.com', password: 'admin123', desc: 'Manage content & leads', gradient: 'linear-gradient(135deg,#2E5EAA,#8B2F97)' },
-  { role: ROLES.EDITOR, label: 'Editor', icon: Edit3, email: 'editor@zmslizza.com', password: 'editor123', desc: 'Create & edit content', gradient: 'linear-gradient(135deg,#FF6B35,#E63946)' },
-]
+const ROLE_CARDS = import.meta.env.DEV
+  ? [
+      {
+        role: ROLES.SUPERADMIN,
+        label: 'Super Admin',
+        icon: Shield,
+        email: 'superadmin@zmslizza.com',
+        password: 'SuperAdmin@123',
+        desc: 'Full system control',
+        gradient: 'linear-gradient(135deg,#E63946,#8B2F97)',
+      },
+      {
+        role: ROLES.ADMIN,
+        label: 'Admin',
+        icon: User,
+        email: 'admin@zmslizza.com',
+        password: 'AdminUser@1234',
+        desc: 'Manage content & leads',
+        gradient: 'linear-gradient(135deg,#2E5EAA,#8B2F97)',
+      },
+      {
+        role: ROLES.EDITOR,
+        label: 'Editor',
+        icon: Edit3,
+        email: 'editor@zmslizza.com',
+        password: 'EditorUser@123',
+        desc: 'Create & edit content',
+        gradient: 'linear-gradient(135deg,#FF6B35,#E63946)',
+      },
+    ]
+  : []
 
 export default function LoginPage() {
   const navigate = useNavigate()
@@ -60,24 +86,26 @@ export default function LoginPage() {
             <h2>Welcome back</h2>
             <p>Sign in to your account</p>
           </div>
-          <div className="login-roles">
-            {ROLE_CARDS.map((card) => {
-              const Icon = card.icon
-              return (
-                <button
-                  key={card.role}
-                  type="button"
-                  className={`role-card ${selected === card.role ? 'active' : ''}`}
-                  style={{ '--role-color': card.gradient.match(/#\w+/)?.[0], '--role-grad': card.gradient }}
-                  onClick={() => fillRole(card)}
-                >
-                  <div className="role-icon"><Icon size={16} /></div>
-                  <span className="role-label">{card.label}</span>
-                  <span className="role-desc">{card.desc}</span>
-                </button>
-              )
-            })}
-          </div>
+          {ROLE_CARDS.length > 0 && (
+            <div className="login-roles">
+              {ROLE_CARDS.map((card) => {
+                const Icon = card.icon
+                return (
+                  <button
+                    key={card.role}
+                    type="button"
+                    className={`role-card ${selected === card.role ? 'active' : ''}`}
+                    style={{ '--role-color': card.gradient.match(/#\w+/)?.[0], '--role-grad': card.gradient }}
+                    onClick={() => fillRole(card)}
+                  >
+                    <div className="role-icon"><Icon size={16} /></div>
+                    <span className="role-label">{card.label}</span>
+                    <span className="role-desc">{card.desc}</span>
+                  </button>
+                )
+              })}
+            </div>
+          )}
           <form className="login-form" onSubmit={handleSubmit} noValidate>
             <div className="form-group">
               <label htmlFor="email">Email Address</label>
@@ -120,9 +148,9 @@ export default function LoginPage() {
               {loading ? <><Loader2 size={18} className="spin" /> Signing in...</> : 'Sign In'}
             </button>
           </form>
-          <p className="login-hint">Select a role above to auto-fill seeded credentials.</p>
+          {ROLE_CARDS.length > 0 && <p className="login-hint">Select a role above to auto-fill seeded credentials.</p>}
         </div>
-        <p className="login-footer animate-fade-in">© 2026 LIZZA INDIA PVT. LTD. All rights reserved.</p>
+        <p className="login-footer animate-fade-in">(c) 2026 LIZZA INDIA PVT. LTD. All rights reserved.</p>
       </div>
     </div>
   )

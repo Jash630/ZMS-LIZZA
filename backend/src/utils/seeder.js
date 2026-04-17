@@ -17,10 +17,10 @@ const ContentView  = require('../models/ContentView')
 
 // ── Sample Users ──────────────────────────────────────
 const users = [
-  { name: 'Ravi Kumar',   email: 'superadmin@zmslizza.com', password: 'super123',  role: 'superadmin', status: 'active'   },
-  { name: 'Priya Sharma', email: 'admin@zmslizza.com',      password: 'admin123',  role: 'admin',      status: 'active'   },
-  { name: 'Arjun Mehta',  email: 'editor@zmslizza.com',     password: 'editor123', role: 'editor',     status: 'active'   },
-  { name: 'Sneha Patel',  email: 'sneha@zmslizza.com',      password: 'editor123', role: 'editor',     status: 'inactive' },
+  { name: 'Ravi Kumar',   email: 'superadmin@zmslizza.com', password: 'SuperAdmin@123', role: 'superadmin', status: 'active'   },
+  { name: 'Priya Sharma', email: 'admin@zmslizza.com',      password: 'AdminUser@1234', role: 'admin',      status: 'active'   },
+  { name: 'Arjun Mehta',  email: 'editor@zmslizza.com',     password: 'EditorUser@123', role: 'editor',     status: 'active'   },
+  { name: 'Sneha Patel',  email: 'sneha@zmslizza.com',      password: 'EditorUser@124', role: 'editor',     status: 'inactive' },
 ]
 
 const getPosts = (authorIds) => [

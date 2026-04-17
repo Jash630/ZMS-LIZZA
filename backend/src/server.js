@@ -24,34 +24,47 @@ connectDB()
 
 const app = express()
 
+app.set('trust proxy', 1)
+
 app.use(
   helmet({
     crossOriginResourcePolicy: { policy: 'cross-origin' },
   })
 )
-const allowedOrigins = [
-  "https://zmslizzafrontend.vercel.app",
-  "https://zmslizzaadmin.vercel.app",
-   "http://localhost:5174/",
-   "http://localhost:5173/"
-];
+const normalizeOrigin = (value = '') => String(value).trim().replace(/\/$/, '').toLowerCase()
+
+const defaultAllowedOrigins = [
+  'https://zmslizzafrontend.vercel.app',
+  'https://zmslizzaadmin.vercel.app',
+  'http://localhost:5174',
+  'http://localhost:5173',
+]
+
+const envAllowedOrigins = String(process.env.CORS_ORIGINS || '')
+  .split(',')
+  .map((item) => item.trim())
+  .filter(Boolean)
+
+const allowedOrigins = new Set(
+  [...defaultAllowedOrigins, ...envAllowedOrigins].map((origin) => normalizeOrigin(origin))
+)
 
 const corsOptions = {
   origin: function (origin, callback) {
     // allow requests with no origin (like Postman)
-    if (!origin) return callback(null, true);
+    if (!origin) return callback(null, true)
 
-    if (allowedOrigins.includes(origin)) {
-      callback(null, true);
+    if (allowedOrigins.has(normalizeOrigin(origin))) {
+      callback(null, true)
     } else {
-      callback(null, false);
+      callback(null, false)
     }
   },
   credentials: true,
-};
+}
 
-app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
+app.use(cors(corsOptions))
+app.options('*', cors(corsOptions))
 
 app.use(mongoSanitize())
 
@@ -90,7 +103,6 @@ app.get('/api/v1/health', (req, res) => {
   res.json({
     success: true,
     message: 'ZMS LIZZA API is running',
-    environment: process.env.NODE_ENV,
     timestamp: new Date().toISOString(),
   })
 })

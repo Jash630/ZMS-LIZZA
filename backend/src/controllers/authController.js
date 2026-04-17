@@ -3,6 +3,18 @@ const AppError  = require('../utils/AppError')
 const { sendSuccess } = require('../utils/apiResponse')
 const logger    = require('../utils/logger')
 
+const PROFILE_KEYS = ['name', 'email', 'avatar']
+
+const pick = (source = {}, keys = []) => {
+  const next = {}
+  for (const key of keys) {
+    if (Object.prototype.hasOwnProperty.call(source, key)) {
+      next[key] = source[key]
+    }
+  }
+  return next
+}
+
 const sendTokenResponse = (user, statusCode, res, message = 'Success') => {
   const token    = user.getSignedJwtToken()
   const userData = {
@@ -66,6 +78,10 @@ exports.updatePassword = async (req, res, next) => {
       return next(new AppError('Current password is incorrect', 400))
     }
 
+    if (await user.matchPassword(newPassword)) {
+      return next(new AppError('New password must be different from current password', 400))
+    }
+
     user.password          = newPassword
     user.passwordChangedAt = new Date()
     await user.save()
@@ -80,7 +96,7 @@ exports.updatePassword = async (req, res, next) => {
 // PUT /api/v1/auth/update-me
 exports.updateMe = async (req, res, next) => {
   try {
-    const { password, role, ...allowedFields } = req.body
+    const allowedFields = pick(req.body, PROFILE_KEYS)
     const user = await User.findByIdAndUpdate(req.user.id, allowedFields, {
       new: true, runValidators: true,
     })

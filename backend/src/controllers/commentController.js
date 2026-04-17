@@ -2,30 +2,46 @@ const Comment  = require('../models/Comment')
 const AppError = require('../utils/AppError')
 const { sendSuccess, sendPaginated } = require('../utils/apiResponse')
 
+const escapeRegex = (value = '') => String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+const parsePagination = (page, limit) => {
+  const parsedPage = Math.max(parseInt(page, 10) || 1, 1)
+  const parsedLimit = Math.min(Math.max(parseInt(limit, 10) || 10, 1), 100)
+  return { parsedPage, parsedLimit }
+}
+
 // GET /api/v1/comments
 exports.getComments = async (req, res, next) => {
   try {
     const { page = 1, limit = 10, status, search } = req.query
+    const { parsedPage, parsedLimit } = parsePagination(page, limit)
 
     const query = {}
     if (status) query.status = status
     if (search) {
+      const safeSearch = escapeRegex(search)
       query.$or = [
-        { author:  { $regex: search, $options: 'i' } },
-        { content: { $regex: search, $options: 'i' } },
+        { author:  { $regex: safeSearch, $options: 'i' } },
+        { content: { $regex: safeSearch, $options: 'i' } },
       ]
     }
 
-    const skip     = (page - 1) * limit
+    const skip     = (parsedPage - 1) * parsedLimit
     const total    = await Comment.countDocuments(query)
-    const comments = await Comment.find(query)
+    const commentsQuery = Comment.find(query)
       .populate('post',       'title slug')
       .populate('reviewedBy', 'name')
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(parseInt(limit))
+      .limit(parsedLimit)
 
-    sendPaginated(res, { data: comments, total, page, limit })
+    if (!['admin', 'superadmin'].includes(req.user.role)) {
+      commentsQuery.select('-ipAddress -userAgent -email')
+    }
+
+    const comments = await commentsQuery
+
+    sendPaginated(res, { data: comments, total, page: parsedPage, limit: parsedLimit })
   } catch (err) {
     next(err)
   }

@@ -2,30 +2,40 @@ const User     = require('../models/User')
 const AppError = require('../utils/AppError')
 const { sendSuccess, sendPaginated } = require('../utils/apiResponse')
 
+const escapeRegex = (value = '') => String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+const parsePagination = (page, limit) => {
+  const parsedPage = Math.max(parseInt(page, 10) || 1, 1)
+  const parsedLimit = Math.min(Math.max(parseInt(limit, 10) || 20, 1), 100)
+  return { parsedPage, parsedLimit }
+}
+
 // GET /api/v1/users
 exports.getUsers = async (req, res, next) => {
   try {
     const { page = 1, limit = 20, search, role, status } = req.query
+    const { parsedPage, parsedLimit } = parsePagination(page, limit)
 
     const query = {}
     if (role)   query.role   = role
     if (status) query.status = status
     if (search) {
+      const safeSearch = escapeRegex(search)
       query.$or = [
-        { name:  { $regex: search, $options: 'i' } },
-        { email: { $regex: search, $options: 'i' } },
+        { name:  { $regex: safeSearch, $options: 'i' } },
+        { email: { $regex: safeSearch, $options: 'i' } },
       ]
     }
 
-    const skip  = (page - 1) * limit
+    const skip  = (parsedPage - 1) * parsedLimit
     const total = await User.countDocuments(query)
     const users = await User.find(query)
       .populate('postCount')
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(parseInt(limit))
+      .limit(parsedLimit)
 
-    sendPaginated(res, { data: users, total, page, limit })
+    sendPaginated(res, { data: users, total, page: parsedPage, limit: parsedLimit })
   } catch (err) {
     next(err)
   }

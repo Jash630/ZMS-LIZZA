@@ -153,11 +153,11 @@ export default function SubscribersPage() {
 
       <div className="stats-grid stagger-children" style={{ marginBottom: 20 }}>
         {[
-          ['Total', summary.total, Users],
-          ['Active', summary.active, Mail],
-          ['Unsubscribed', summary.unsubscribed, UserMinus],
-          ['Emails Sent', summary.emailsSent, Send],
-        ].map(([label, value, Icon]) => (
+          { label: 'Total', value: summary.total, icon: Users },
+          { label: 'Active', value: summary.active, icon: Mail },
+          { label: 'Unsubscribed', value: summary.unsubscribed, icon: UserMinus },
+          { label: 'Emails Sent', value: summary.emailsSent, icon: Send },
+        ].map(({ label, value, icon }) => (
           <div key={label} className="card animate-fade-in" style={{ padding: '18px 20px', display: 'flex', gap: 14 }}>
             <div
               style={{
@@ -171,7 +171,7 @@ export default function SubscribersPage() {
                 color: 'var(--text-primary)',
               }}
             >
-              <Icon size={20} />
+              {React.createElement(icon, { size: 20 })}
             </div>
             <div>
               <div style={{ fontFamily: 'Syne', fontSize: 26, fontWeight: 800, color: 'var(--text-primary)' }}>{value}</div>
