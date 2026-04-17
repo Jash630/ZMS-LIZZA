@@ -36,6 +36,16 @@ const parseResponse = async (response) => {
 const request = async (path, options = {}) => {
   const normalizedPath = path.startsWith('/') ? path : `/${path}`
   const url = `${PUBLIC_API_BASE}${normalizedPath}${toQueryString(options.query)}`
+  const method = options.method || 'GET'
+  const hasBody = options.body !== undefined && options.body !== null
+  const headers = {
+    ...(options.headers || {}),
+  }
+
+  if (hasBody && !headers['Content-Type']) {
+    headers['Content-Type'] = 'application/json'
+  }
+
   const controller = options.signal ? null : new AbortController()
   const timeoutId = controller
     ? window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
@@ -44,12 +54,9 @@ const request = async (path, options = {}) => {
   let response
   try {
     response = await fetch(url, {
-      method: options.method || 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(options.headers || {}),
-      },
-      body: options.body ? JSON.stringify(options.body) : undefined,
+      method,
+      headers,
+      body: hasBody ? JSON.stringify(options.body) : undefined,
       signal: options.signal || controller?.signal,
     })
   } catch (error) {
