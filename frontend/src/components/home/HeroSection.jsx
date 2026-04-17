@@ -1,39 +1,28 @@
 import { Phone, Award, Users, Shield, ArrowRight, Star, Zap } from 'lucide-react'
 import { useNavigation } from '../../context/NavigationContext.jsx'
+import { useTranslation } from '../../i18n/index.js'
 
-const BADGES = [
-  { Icon: Award, label: '5+ Years' },
-  { Icon: Users, label: '100+ Factories' },
-  { Icon: Shield, label: 'European Quality' },
-]
+const BADGE_ICONS = [Award, Users, Shield]
 
-const STATS = [
+const STATS_META = [
   {
     key: 'speed',
-    title: '1200 SPM',
-    subtitle: 'Max Speed',
     accent: 'var(--accent-orange)',
     position: 'top-3 left-0 -translate-x-2 sm:-translate-x-4',
   },
   {
     key: 'warranty',
-    title: '2-Yr Warranty',
-    subtitle: 'Included Free',
     accent: '#10B981',
     position: 'bottom-4 left-0 -translate-x-2 sm:-translate-x-4',
     stars: true,
   },
   {
     key: 'sequins',
-    title: '8 Sequins',
-    subtitle: 'Multi-Function',
     accent: 'var(--gradient-blue)',
     position: 'bottom-4 right-0 translate-x-2 sm:translate-x-4',
   },
   {
     key: 'tech',
-    title: 'European Tech',
-    subtitle: 'German Engineering',
     accent: 'var(--gradient-purple)',
     position: 'hidden md:block top-1/2 right-0 translate-x-2 sm:translate-x-4 -translate-y-1/2',
     icon: true,
@@ -42,6 +31,8 @@ const STATS = [
 
 export function HeroSection() {
   const { navigateTo } = useNavigation()
+  const { t } = useTranslation()
+  const badges = Array.isArray(t('hero.badges', [])) ? t('hero.badges', []) : []
 
   return (
     <section
@@ -103,21 +94,20 @@ export function HeroSection() {
               }}
             />
             <span className="text-[10px] sm:text-xs font-bold tracking-[0.18em] uppercase" style={{ color: 'var(--gradient-blue)' }}>
-              European Technology and Made for India
+              {t('hero.tagline')}
             </span>
           </div>
 
           <h1 className="mb-5" style={{ lineHeight: 1.02 }}>
-            <span className="gradient-text">Precision.</span>
+            <span className="gradient-text">{t('hero.line1')}</span>
             <br />
-            <span className="gradient-text">Power.</span>
+            <span className="gradient-text">{t('hero.line2')}</span>
             <br />
-            <span className="gradient-text">Performance.</span>
+            <span className="gradient-text">{t('hero.line3')}</span>
           </h1>
 
           <p className="mb-8 max-w-[520px] text-base sm:text-lg" style={{ color: '#5a6b7c' }}>
-            High-speed embroidery machines with European technology for sequins,
-            beads and coding work, built for factories that demand quality.
+            {t('hero.description')}
           </p>
 
           <div className="flex flex-wrap gap-3 mb-8">
@@ -127,7 +117,7 @@ export function HeroSection() {
               className="px-6 sm:px-7 h-[48px] rounded-[10px] border-none font-bold text-[15px] text-white inline-flex items-center gap-2 transition-transform hover:scale-[1.02]"
               style={{ backgroundColor: 'var(--accent-orange)', boxShadow: '0 6px 20px rgba(255,107,53,0.28)' }}
             >
-              Request a Demo <ArrowRight size={17} />
+              {t('hero.requestDemo')} <ArrowRight size={17} />
             </button>
 
             <a
@@ -135,14 +125,17 @@ export function HeroSection() {
               className="px-5 sm:px-6 h-[48px] rounded-[10px] text-[15px] no-underline inline-flex items-center gap-2 transition-transform hover:scale-[1.02]"
               style={{ border: '2px solid var(--accent-orange)', color: 'var(--accent-orange)', backgroundColor: 'white', fontWeight: 600 }}
             >
-              <Phone size={17} /> Call Us Now
+              <Phone size={17} /> {t('hero.callUs')}
             </a>
           </div>
 
           <div className="flex flex-wrap gap-2.5">
-            {BADGES.map(({ Icon, label }) => (
+            {badges.map((badge, index) => {
+              const Icon = BADGE_ICONS[index] || Award
+              const label = badge?.label || ''
+              return (
               <div
-                key={label}
+                key={`${label}-${index}`}
                 className="transition-transform hover:-translate-y-0.5"
                 style={{
                   display: 'flex',
@@ -160,7 +153,7 @@ export function HeroSection() {
                 <Icon size={13} style={{ color: 'var(--gradient-blue)' }} />
                 {label}
               </div>
-            ))}
+            )})}
           </div>
         </div>
 
@@ -189,33 +182,36 @@ export function HeroSection() {
             />
           </div>
 
-          {STATS.map((stat) => (
-            <div
-              key={stat.key}
-              className={`absolute ${stat.position} bg-white rounded-[13px] p-3 shadow-md min-w-[110px] max-w-[170px]`}
-              style={{ borderLeft: `4px solid ${stat.accent}` }}
-            >
-              {stat.stars && (
-                <div className="flex gap-[3px] mb-1">
-                  {[1, 2, 3, 4, 5].map((value) => (
-                    <Star key={value} size={9} fill="#FBBF24" stroke="#FBBF24" />
-                  ))}
-                </div>
-              )}
-              {stat.icon && (
-                <div className="flex items-center gap-1 mb-1">
-                  <Zap size={11} style={{ color: 'var(--gradient-purple)' }} />
-                  <span style={{ fontSize: 9, color: 'var(--gradient-purple)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.6 }}>
-                    Premium
-                  </span>
-                </div>
-              )}
-              <p className="font-extrabold text-sm sm:text-base" style={{ margin: 0 }}>
-                {stat.title}
-              </p>
-              <p style={{ fontSize: 10.5, color: '#999', margin: 0, fontWeight: 600 }}>{stat.subtitle}</p>
-            </div>
-          ))}
+          {STATS_META.map((stat) => {
+            const statContent = t(`hero.stats.${stat.key}`, {})
+            return (
+              <div
+                key={stat.key}
+                className={`absolute ${stat.position} bg-white rounded-[13px] p-3 shadow-md min-w-[110px] max-w-[170px]`}
+                style={{ borderLeft: `4px solid ${stat.accent}` }}
+              >
+                {stat.stars && (
+                  <div className="flex gap-[3px] mb-1">
+                    {[1, 2, 3, 4, 5].map((value) => (
+                      <Star key={value} size={9} fill="#FBBF24" stroke="#FBBF24" />
+                    ))}
+                  </div>
+                )}
+                {stat.icon && (
+                  <div className="flex items-center gap-1 mb-1">
+                    <Zap size={11} style={{ color: 'var(--gradient-purple)' }} />
+                    <span style={{ fontSize: 9, color: 'var(--gradient-purple)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.6 }}>
+                      {t('hero.stats.tech.label')}
+                    </span>
+                  </div>
+                )}
+                <p className="font-extrabold text-sm sm:text-base" style={{ margin: 0 }}>
+                  {statContent?.title}
+                </p>
+                <p style={{ fontSize: 10.5, color: '#999', margin: 0, fontWeight: 600 }}>{statContent?.subtitle}</p>
+              </div>
+            )
+          })}
         </div>
       </div>
     </section>

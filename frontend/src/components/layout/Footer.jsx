@@ -10,25 +10,27 @@ import {
   Clock,
 } from 'lucide-react'
 import { useNavigation } from '../../context/NavigationContext.jsx'
+import { LANGUAGES, useTranslation } from '../../i18n/index.js'
 
 const QUICK_LINKS = [
-  { label: 'Home', page: 'home' },
-  { label: 'About Us', page: 'about' },
-  { label: 'Products', page: 'products' },
-  { label: 'Gallery', page: 'gallery' },
-  { label: 'Services', page: 'services' },
+  { key: 'nav.home', page: 'home' },
+  { key: 'nav.about', page: 'about' },
+  { key: 'nav.products', page: 'products' },
+  { key: 'nav.gallery', page: 'gallery' },
+  { key: 'nav.services', page: 'services' },
 ]
 
 const RESOURCE_LINKS = [
-  { label: 'Blog', page: 'blog' },
-  { label: 'Contact Us', page: 'contact' },
-  { label: 'Request Demo', page: 'contact' },
+  { key: 'nav.blog', page: 'blog' },
+  { key: 'footer.contactUs', page: 'contact' },
+  { key: 'footer.requestDemo', page: 'contact' },
 ]
 
 const SOCIALS = [{ Icon: Facebook }, { Icon: Instagram }, { Icon: Linkedin }, { Icon: Youtube }]
 
 export function Footer() {
   const { navigateTo } = useNavigation()
+  const { lang, setLang, t } = useTranslation()
 
   return (
     <footer style={{ backgroundColor: 'var(--charcoal)' }}>
@@ -50,10 +52,10 @@ export function Footer() {
               />
             </button>
             <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14px', lineHeight: '1.6', marginBottom: '8px' }}>
-              European Technology for Indian Excellence
+              {t('footer.tagline')}
             </p>
             <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '13px', lineHeight: '1.7', marginBottom: '24px' }}>
-              Leading manufacturer of high-performance embroidery machines, serving textile factories across India.
+              {t('footer.description')}
             </p>
             <div className="flex gap-3">
               {SOCIALS.map(({ Icon }, index) => (
@@ -78,10 +80,10 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 style={{ color: 'white', fontSize: '18px', marginBottom: '24px' }}>Quick Links</h4>
+            <h4 style={{ color: 'white', fontSize: '18px', marginBottom: '24px' }}>{t('footer.quickLinks')}</h4>
             <ul className="space-y-3">
-              {QUICK_LINKS.map(({ label, page }) => (
-                <li key={label}>
+              {QUICK_LINKS.map(({ key, page }) => (
+                <li key={key}>
                   <a
                     href="#"
                     onClick={(event) => {
@@ -96,7 +98,7 @@ export function Footer() {
                       event.currentTarget.style.color = 'rgba(255,255,255,0.7)'
                     }}
                   >
-                    {label}
+                    {t(key)}
                   </a>
                 </li>
               ))}
@@ -104,10 +106,10 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 style={{ color: 'white', fontSize: '18px', marginBottom: '24px' }}>Resources</h4>
+            <h4 style={{ color: 'white', fontSize: '18px', marginBottom: '24px' }}>{t('footer.resources')}</h4>
             <ul className="space-y-3">
-              {RESOURCE_LINKS.map(({ label, page }) => (
-                <li key={label}>
+              {RESOURCE_LINKS.map(({ key, page }) => (
+                <li key={key}>
                   <a
                     href="#"
                     onClick={(event) => {
@@ -122,7 +124,7 @@ export function Footer() {
                       event.currentTarget.style.color = 'rgba(255,255,255,0.7)'
                     }}
                   >
-                    {label}
+                    {t(key)}
                   </a>
                 </li>
               ))}
@@ -130,14 +132,14 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 style={{ color: 'white', fontSize: '18px', marginBottom: '24px' }}>Contact Us</h4>
+            <h4 style={{ color: 'white', fontSize: '18px', marginBottom: '24px' }}>{t('footer.contactUs')}</h4>
             <ul className="space-y-4">
               {[
                 { Icon: MapPin, text: 'Surat, Gujarat, India', href: null, iconColor: 'var(--accent-orange)' },
                 { Icon: Phone, text: '+91 98765 43210', href: 'tel:+919876543210', iconColor: 'var(--accent-orange)' },
                 { Icon: Mail, text: 'info@zmslizza.com', href: 'mailto:info@zmslizza.com', iconColor: 'var(--accent-orange)' },
-                { Icon: MessageCircle, text: 'WhatsApp Us', href: 'https://wa.me/919876543210', iconColor: 'var(--whatsapp-green)' },
-                { Icon: Clock, text: 'Mon-Sat, 10 AM - 6 PM', href: null, iconColor: 'var(--accent-orange)' },
+                { Icon: MessageCircle, text: t('footer.whatsAppUs'), href: 'https://wa.me/919876543210', iconColor: 'var(--whatsapp-green)' },
+                { Icon: Clock, text: t('footer.businessHours'), href: null, iconColor: 'var(--accent-orange)' },
               ].map(({ Icon, text, href, iconColor }, index) => (
                 <li key={index} className="flex items-start gap-3">
                   <Icon size={18} style={{ color: iconColor, marginTop: '2px', flexShrink: 0 }} />
@@ -160,6 +162,23 @@ export function Footer() {
                 </li>
               ))}
             </ul>
+            <div className="mt-6">
+              <label style={{ color: 'rgba(255,255,255,0.75)', fontSize: '12px', fontWeight: 700, display: 'block', marginBottom: 6 }}>
+                {t('lang.title')}
+              </label>
+              <select
+                value={lang}
+                onChange={(event) => setLang(event.target.value)}
+                className="w-full px-3 py-2 rounded-md border"
+                style={{ borderColor: 'rgba(255,255,255,0.2)', backgroundColor: 'rgba(255,255,255,0.08)', color: 'white', fontSize: '13px', fontWeight: 600 }}
+              >
+                {LANGUAGES.map((item) => (
+                  <option key={item.code} value={item.code} style={{ color: '#111827' }}>
+                    {item.flag} {item.nativeName}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
       </div>
@@ -167,10 +186,10 @@ export function Footer() {
       <div className="border-t" style={{ borderColor: 'rgba(255,255,255,0.1)', backgroundColor: 'rgba(0,0,0,0.2)' }}>
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-6 flex flex-col md:flex-row justify-between items-center gap-4">
           <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '14px' }}>
-            Copyright 2026 LIZZA INDIA PVT. LTD. All rights reserved.
+            {t('footer.copyright')}
           </p>
           <div className="flex gap-6">
-            {['Privacy Policy', 'Terms & Conditions'].map((link) => (
+            {[t('footer.privacyPolicy'), t('footer.terms')].map((link) => (
               <a
                 key={link}
                 href="#"

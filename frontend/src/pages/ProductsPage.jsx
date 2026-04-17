@@ -6,6 +6,8 @@ import { buildProductCarouselImages } from '../components/shared/ProductImageCar
 import { useNavigation } from '../context/NavigationContext.jsx'
 import { ChevronRight, PhoneCall, ArrowRight } from 'lucide-react'
 import { publicService } from '../services/publicService.js'
+import { useTranslation } from '../i18n/index.js'
+import { useRuntimeTranslatedValue } from '../i18n/useRuntimeTranslatedValue.js'
 
 const PRODUCT_IMAGE_ALLOWLIST = new Set([
   'IMG-20250408-WA0012.jpg',
@@ -43,12 +45,14 @@ const withImageFallback = (event) => {
 
 export function ProductsPage() {
   const { navigateTo } = useNavigation()
-  const [products, setProducts] = useState([])
+  const { t } = useTranslation()
+  const [rawProducts, setRawProducts] = useState([])
   const [productMediaImages, setProductMediaImages] = useState([])
   const [activeCategory, setActiveCategory] = useState('all')
   const [activeImageByProduct, setActiveImageByProduct] = useState({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const products = useRuntimeTranslatedValue(rawProducts)
 
   useEffect(() => {
     let active = true
@@ -70,11 +74,11 @@ export function ProductsPage() {
         const fallbackAllImages = rawImages.map((item) => item.url).filter(Boolean)
         const mediaPool = allowlistedImages.length > 0 ? allowlistedImages : fallbackAllImages
 
-        setProducts(productsRes.items || [])
+        setRawProducts(productsRes.items || [])
         setProductMediaImages(mediaPool)
       } catch (err) {
         if (!active) return
-        setError(err?.message || 'Failed to load products.')
+        setError(err?.message || t('common.error'))
       } finally {
         if (active) setLoading(false)
       }
@@ -84,7 +88,7 @@ export function ProductsPage() {
     return () => {
       active = false
     }
-  }, [])
+  }, [t])
 
   const cards = useMemo(
     () => (products || []).map((product, index) => ({
@@ -108,10 +112,10 @@ export function ProductsPage() {
     })
 
     return [
-      { key: 'all', label: 'All Machines', count: cards.length },
+      { key: 'all', label: t('productsPage.allMachines'), count: cards.length },
       ...Array.from(byCategory.entries()).map(([label, count]) => ({ key: label, label, count })),
     ]
-  }, [cards])
+  }, [cards, t])
 
   const filteredCards = useMemo(
     () => cards.filter((item) => activeCategory === 'all' || item.category === activeCategory),
@@ -135,14 +139,13 @@ export function ProductsPage() {
       <section className="pb-10 bg-white" style={{ paddingTop: 'calc(var(--site-header-height) + 3rem)' }}>
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
           <div className="flex items-center gap-2 mb-6 text-sm" style={{ color: 'var(--dark-gray)' }}>
-            <span className="cursor-pointer hover:text-[var(--accent-orange)]" onClick={() => navigateTo('home')}>Home</span>
+            <span className="cursor-pointer hover:text-[var(--accent-orange)]" onClick={() => navigateTo('home')}>{t('common.home')}</span>
             <ChevronRight size={14} />
-            <span style={{ fontWeight: 600, color: 'var(--charcoal)' }}>Products</span>
+            <span style={{ fontWeight: 600, color: 'var(--charcoal)' }}>{t('productsPage.breadcrumb')}</span>
           </div>
-          <h1 className="mb-4">Embroidery Machines and Custom Solutions</h1>
+          <h1 className="mb-4">{t('productsPage.title')}</h1>
           <p style={{ fontSize: '18px', color: 'var(--dark-gray)', maxWidth: 980 }}>
-            LIZZA INDIA PVT. LTD. (ZMS LIZZA) deals in all types of embroidery machines and also provides
-            custom embroidery machines as per your exact production requirements.
+            {t('productsPage.subtitle')}
           </p>
         </div>
       </section>
@@ -151,7 +154,7 @@ export function ProductsPage() {
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 grid lg:grid-cols-[270px_1fr] gap-6">
           <aside className="bg-white rounded-xl shadow-sm border border-black/5 p-4 h-fit lg:sticky lg:top-[calc(var(--site-header-height)+16px)]">
             <p style={{ fontSize: 12, letterSpacing: 0.8, textTransform: 'uppercase', color: '#6b7280', marginBottom: 10, fontWeight: 700 }}>
-              Product Categories
+              {t('productsPage.categories')}
             </p>
             <div className="space-y-2">
               {categories.map((category) => (
@@ -174,10 +177,10 @@ export function ProductsPage() {
           </aside>
 
           <div className="space-y-8">
-            {loading && <p style={{ color: 'var(--dark-gray)' }}>Loading products...</p>}
+            {loading && <p style={{ color: 'var(--dark-gray)' }}>{t('productsPage.loading')}</p>}
             {!loading && error && <p style={{ color: '#EF4444' }}>{error}</p>}
             {!loading && !error && filteredCards.length === 0 && (
-              <p style={{ color: 'var(--dark-gray)' }}>No products found in this category.</p>
+              <p style={{ color: 'var(--dark-gray)' }}>{t('productsPage.noProducts')}</p>
             )}
 
             {!loading && !error && filteredCards.map((product) => {
@@ -198,7 +201,7 @@ export function ProductsPage() {
                       className="px-4 py-2 rounded-full border text-sm font-semibold"
                       style={{ borderColor: 'var(--accent-orange)', color: 'var(--accent-orange)', backgroundColor: 'white' }}
                     >
-                      <PhoneCall size={14} style={{ display: 'inline-block', marginRight: 6 }} /> Request Callback
+                      <PhoneCall size={14} style={{ display: 'inline-block', marginRight: 6 }} /> {t('productsPage.requestCallback')}
                     </button>
                   </div>
 
@@ -234,14 +237,14 @@ export function ProductsPage() {
                         className="mt-4 px-8 py-2.5 rounded-full font-semibold border"
                         style={{ color: 'var(--accent-orange)', borderColor: 'var(--accent-orange)', backgroundColor: 'white' }}
                       >
-                        Get Best Quote
+                        {t('productsPage.getBestQuote')}
                       </button>
                     </div>
 
                     <div>
                       <div className="flex flex-wrap items-baseline gap-2 mb-3">
-                        <p style={{ fontSize: 26, fontWeight: 800, color: 'var(--charcoal)' }}>{product.priceDisplay || 'Price On Request'}</p>
-                        <span style={{ color: 'var(--accent-orange)', fontWeight: 700 }}>{product.priceNote || 'Get Latest Price'}</span>
+                        <p style={{ fontSize: 26, fontWeight: 800, color: 'var(--charcoal)' }}>{product.priceDisplay || t('productsPage.priceOnRequest')}</p>
+                        <span style={{ color: 'var(--accent-orange)', fontWeight: 700 }}>{product.priceNote || t('productsPage.getLatestPrice')}</span>
                       </div>
 
                       <div className="space-y-2 mb-4">
@@ -270,7 +273,7 @@ export function ProductsPage() {
                           className="px-5 py-3 rounded-lg text-white font-semibold"
                           style={{ backgroundColor: 'var(--accent-orange)' }}
                         >
-                          View Details <ArrowRight size={16} style={{ display: 'inline-block', marginLeft: 4 }} />
+                          {t('productsPage.viewDetails')} <ArrowRight size={16} style={{ display: 'inline-block', marginLeft: 4 }} />
                         </button>
                         <button
                           type="button"
@@ -278,7 +281,7 @@ export function ProductsPage() {
                           className="px-5 py-3 rounded-lg font-semibold border"
                           style={{ borderColor: 'var(--accent-orange)', color: 'var(--accent-orange)' }}
                         >
-                          Yes! I am Interested
+                          {t('productsPage.interested')}
                         </button>
                       </div>
                     </div>

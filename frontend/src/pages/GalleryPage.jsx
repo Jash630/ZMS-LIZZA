@@ -5,15 +5,10 @@ import { WhatsAppButton }     from '../components/shared/WhatsAppButton.jsx'
 import { useNavigation }      from '../context/NavigationContext.jsx'
 import { publicService }      from '../services/publicService.js'
 import { ChevronRight, X }    from 'lucide-react'
+import { useTranslation } from '../i18n/index.js'
 
 const FALLBACK_IMAGE =
   'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="800" height="560" viewBox="0 0 800 560"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="%23F3F4F6"/><stop offset="100%" stop-color="%23E5E7EB"/></linearGradient></defs><rect width="800" height="560" fill="url(%23g)"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%236B7280" font-family="Arial,sans-serif" font-size="28">Image unavailable</text></svg>'
-
-const FILTERS = [
-  { key: 'all', label: 'All Media' },
-  { key: 'images', label: 'Images' },
-  { key: 'videos', label: 'Videos' },
-]
 
 const withImageFallback = (event) => {
   if (event.currentTarget.dataset.fallbackApplied === 'true') return
@@ -72,6 +67,7 @@ const fetchAllPublicMedia = async () => {
 
 export function GalleryPage() {
   const { navigateTo } = useNavigation()
+  const { t } = useTranslation()
   const [activeFilter, setActiveFilter] = useState('all')
   const [lightbox, setLightbox] = useState(null)
   const [media, setMedia] = useState([])
@@ -117,14 +113,14 @@ export function GalleryPage() {
       <section className="pb-12 bg-white" style={{ paddingTop: 'calc(var(--site-header-height) + 3.25rem)' }}>
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
           <div className="flex items-center gap-2 mb-8 text-sm" style={{ color: 'var(--dark-gray)' }}>
-            <span className="cursor-pointer hover:text-[var(--accent-orange)]" onClick={() => navigateTo('home')}>Home</span>
+            <span className="cursor-pointer hover:text-[var(--accent-orange)]" onClick={() => navigateTo('home')}>{t('common.home')}</span>
             <ChevronRight size={14} />
-            <span style={{ fontWeight: 600, color: 'var(--charcoal)' }}>Gallery</span>
+            <span style={{ fontWeight: 600, color: 'var(--charcoal)' }}>{t('galleryPage.breadcrumb')}</span>
           </div>
           <div className="text-center max-w-3xl mx-auto">
-            <h1 className="mb-6">Our Work Gallery</h1>
+            <h1 className="mb-6">{t('galleryPage.title')}</h1>
             <p style={{ fontSize: '20px', color: 'var(--dark-gray)', lineHeight: '1.6' }}>
-              Images and videos are now loaded directly from your media database.
+              {t('galleryPage.subtitle')}
             </p>
           </div>
         </div>
@@ -132,7 +128,11 @@ export function GalleryPage() {
 
       <section className="py-6 bg-white border-b" style={{ borderColor: 'rgba(0,0,0,0.06)' }}>
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 flex flex-wrap gap-3 justify-center">
-          {FILTERS.map((filter) => (
+          {[
+            { key: 'all', label: t('galleryPage.filters.all') },
+            { key: 'images', label: t('galleryPage.filters.images') },
+            { key: 'videos', label: t('galleryPage.filters.videos') },
+          ].map((filter) => (
             <button
               key={filter.key}
               onClick={() => setActiveFilter(filter.key)}
@@ -151,14 +151,14 @@ export function GalleryPage() {
 
       <section className="py-12" style={{ backgroundColor: 'var(--light-gray)' }}>
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 space-y-12">
-          {loading && <p style={{ color: 'var(--dark-gray)' }}>Loading gallery media...</p>}
+          {loading && <p style={{ color: 'var(--dark-gray)' }}>{t('galleryPage.loading')}</p>}
           {!loading && error && <p style={{ color: '#EF4444' }}>{error}</p>}
 
           {!loading && !error && showImages && (
             <div>
-              <h2 className="mb-6" style={{ fontSize: '30px' }}>Images ({images.length})</h2>
+              <h2 className="mb-6" style={{ fontSize: '30px' }}>{t('galleryPage.imagesTitle')} ({images.length})</h2>
               {images.length === 0 && (
-                <p style={{ color: 'var(--dark-gray)' }}>No images found in media library.</p>
+                <p style={{ color: 'var(--dark-gray)' }}>{t('galleryPage.noImages')}</p>
               )}
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {images.map((img) => (
@@ -186,9 +186,9 @@ export function GalleryPage() {
 
           {!loading && !error && showVideos && (
             <div>
-              <h2 className="mb-6" style={{ fontSize: '30px' }}>Videos ({videos.length})</h2>
+              <h2 className="mb-6" style={{ fontSize: '30px' }}>{t('galleryPage.videosTitle')} ({videos.length})</h2>
               {videos.length === 0 && (
-                <p style={{ color: 'var(--dark-gray)' }}>No videos found in media library yet.</p>
+                <p style={{ color: 'var(--dark-gray)' }}>{t('galleryPage.noVideos')}</p>
               )}
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {videos.map((video) => {
@@ -213,7 +213,7 @@ export function GalleryPage() {
                       <div className="p-4">
                         <p style={{ color: 'var(--charcoal)', fontWeight: 600 }}>{video.name || 'Video'}</p>
                         <p style={{ color: 'var(--dark-gray)', fontSize: '13px', marginTop: 6 }}>
-                          {embedUrl ? 'YouTube Embed' : 'Direct Video File'}
+                          {embedUrl ? t('galleryPage.youtubeEmbed') : t('galleryPage.directVideo')}
                         </p>
                       </div>
                     </article>

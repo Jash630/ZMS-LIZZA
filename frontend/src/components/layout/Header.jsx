@@ -1,19 +1,21 @@
 import { useState, useEffect } from 'react'
 import { Menu, X, MessageCircle } from 'lucide-react'
 import { useNavigation } from '../../context/NavigationContext.jsx'
+import { LANGUAGES, useTranslation } from '../../i18n/index.js'
 
 const NAV_ITEMS = [
-    { label: 'Home', page: 'home' },
-    { label: 'About Us', page: 'about' },
-    { label: 'Products', page: 'products' },
-    { label: 'Gallery', page: 'gallery' },
-    { label: 'Services', page: 'services' },
-    { label: 'Blog', page: 'blog' },
-    { label: 'Contact', page: 'contact' },
+    { key: 'nav.home', page: 'home' },
+    { key: 'nav.about', page: 'about' },
+    { key: 'nav.products', page: 'products' },
+    { key: 'nav.gallery', page: 'gallery' },
+    { key: 'nav.services', page: 'services' },
+    { key: 'nav.blog', page: 'blog' },
+    { key: 'nav.contact', page: 'contact' },
 ]
 
 export function Header() {
     const { currentPage, navigateTo } = useNavigation()
+    const { lang, setLang, t } = useTranslation()
     const [isScrolled, setIsScrolled] = useState(false)
     const [mobileOpen, setMobileOpen] = useState(false)
     const activePage = currentPage === 'blog-detail' ? 'blog' : currentPage === 'product-detail' ? 'products' : currentPage
@@ -45,7 +47,7 @@ export function Header() {
 
                 {/* Desktop Nav */}
                 <nav className="hidden lg:flex items-center gap-8">
-                    {NAV_ITEMS.map(({ label, page }) => (
+                    {NAV_ITEMS.map(({ key, page }) => (
 
                         <a key={page}
                             href="#"
@@ -56,19 +58,33 @@ export function Header() {
                                 fontWeight: activePage === page ? 600 : 500,
                             }}
                         >
-                            {label}
+                            {t(key)}
                         </a>
                     ))}
                 </nav>
 
                 {/* Right Actions */}
                 <div className="flex items-center gap-4">
+                    <label className="hidden md:flex items-center gap-2" style={{ color: isScrolled ? 'var(--charcoal)' : 'var(--charcoal)' }}>
+                        <span className="text-xs font-semibold">{t('lang.title')}</span>
+                        <select
+                            value={lang}
+                            onChange={(event) => setLang(event.target.value)}
+                            className="px-2 py-1.5 rounded-md border"
+                            style={{ borderColor: 'rgba(0,0,0,0.15)', backgroundColor: '#fff', fontSize: '13px', fontWeight: 600 }}
+                        >
+                            {LANGUAGES.map((item) => (
+                                <option key={item.code} value={item.code}>{item.flag} {item.nativeName}</option>
+                            ))}
+                        </select>
+                    </label>
+
                     <button
                         onClick={() => go('contact')}
                         className="hidden md:flex items-center gap-2 px-6 py-3 rounded-lg transition-all hover:scale-105 hover:shadow-lg"
                         style={{ backgroundColor: 'var(--accent-orange)', color: 'white', fontWeight: 600, fontSize: '15px' }}
                     >
-                        Request Demo
+                        {t('header.requestDemo')}
                     </button>
 
                     <a href="https://wa.me/919876543210"
@@ -95,7 +111,21 @@ export function Header() {
             {mobileOpen && (
                 <div className="lg:hidden bg-white border-t shadow-lg max-h-[calc(100vh-var(--site-header-height))] overflow-auto">
                     <nav className="flex flex-col p-5 gap-3">
-                        {NAV_ITEMS.map(({ label, page }) => (
+                        <label className="mb-2" style={{ color: 'var(--charcoal)' }}>
+                            <span className="block text-xs font-semibold mb-1">{t('lang.title')}</span>
+                            <select
+                                value={lang}
+                                onChange={(event) => setLang(event.target.value)}
+                                className="w-full px-3 py-2 rounded-md border"
+                                style={{ borderColor: 'rgba(0,0,0,0.15)', backgroundColor: '#fff', fontSize: '14px', fontWeight: 600 }}
+                            >
+                                {LANGUAGES.map((item) => (
+                                    <option key={item.code} value={item.code}>{item.flag} {item.nativeName}</option>
+                                ))}
+                            </select>
+                        </label>
+
+                        {NAV_ITEMS.map(({ key, page }) => (
 
                             <a key={page}
                                 href="#"
@@ -103,7 +133,7 @@ export function Header() {
                                 className="py-2 transition-colors hover:text-[var(--accent-orange)]"
                                 style={{ color: activePage === page ? 'var(--accent-orange)' : 'var(--dark-gray)', fontWeight: activePage === page ? 600 : 500 }}
                             >
-                                {label}
+                                {t(key)}
                             </a>
                         ))}
                         <button
@@ -111,7 +141,7 @@ export function Header() {
                             className="mt-4 px-6 py-3 rounded-lg"
                             style={{ backgroundColor: 'var(--accent-orange)', color: 'white', fontWeight: 600 }}
                         >
-                            Request Demo
+                            {t('header.requestDemo')}
                         </button>
                     </nav>
                 </div>
