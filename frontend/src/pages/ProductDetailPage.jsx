@@ -6,6 +6,8 @@ import { buildProductCarouselImages } from '../components/shared/ProductImageCar
 import { useNavigation } from '../context/NavigationContext.jsx'
 import { ChevronRight, PhoneCall, ArrowRight, PlayCircle } from 'lucide-react'
 import { publicService } from '../services/publicService.js'
+import { useTranslation } from '../i18n/index.js'
+import { useRuntimeTranslatedValue } from '../i18n/useRuntimeTranslatedValue.js'
 
 const PRODUCT_IMAGE_ALLOWLIST = new Set([
   'IMG-20250408-WA0012.jpg',
@@ -62,6 +64,7 @@ const getYoutubeVideoId = (rawUrl = '') => {
 
 export function ProductDetailPage({ productId }) {
   const { navigateTo } = useNavigation()
+  const { t } = useTranslation()
   const [allProducts, setAllProducts] = useState([])
   const [product, setProduct] = useState(null)
   const [mediaImages, setMediaImages] = useState([])
@@ -69,6 +72,8 @@ export function ProductDetailPage({ productId }) {
   const [activeImageIndex, setActiveImageIndex] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const translatedProducts = useRuntimeTranslatedValue(allProducts)
+  const translatedProduct = useRuntimeTranslatedValue(product)
 
   useEffect(() => {
     let active = true
@@ -106,7 +111,7 @@ export function ProductDetailPage({ productId }) {
         setActiveImageIndex(0)
       } catch (err) {
         if (!active) return
-        setError(err?.message || 'Failed to load product details.')
+        setError(err?.message || t('common.error'))
       } finally {
         if (active) setLoading(false)
       }
@@ -116,35 +121,35 @@ export function ProductDetailPage({ productId }) {
     return () => {
       active = false
     }
-  }, [productId])
+  }, [productId, t])
 
   const groupedCategories = useMemo(() => {
     const groups = new Map()
-    allProducts.forEach((item) => {
+    translatedProducts.forEach((item) => {
       const categoryName = item.category || 'Embroidery Machine'
       if (!groups.has(categoryName)) groups.set(categoryName, [])
       groups.get(categoryName).push(item)
     })
     return Array.from(groups.entries()).map(([category, items]) => ({ category, items }))
-  }, [allProducts])
+  }, [translatedProducts])
 
   const gallery = useMemo(() => {
-    if (!product) return [FALLBACK_IMAGE]
-    const merged = buildProductCarouselImages(product, mediaImages, { poolOnly: false })
+    if (!translatedProduct) return [FALLBACK_IMAGE]
+    const merged = buildProductCarouselImages(translatedProduct, mediaImages, { poolOnly: false })
     return merged.length > 0 ? merged : [FALLBACK_IMAGE]
-  }, [product, mediaImages])
+  }, [translatedProduct, mediaImages])
 
   const activeImage = gallery[activeImageIndex] || gallery[0]
-  const flatSpecs = useMemo(() => flattenSpecs(product?.specifications || {}), [product?.specifications])
+  const flatSpecs = useMemo(() => flattenSpecs(translatedProduct?.specifications || {}), [translatedProduct?.specifications])
 
   const featureBullets = useMemo(
     () => [
-      ...(Array.isArray(product?.keyFeatures) ? product.keyFeatures : []),
-      ...(Array.isArray(product?.features)
-        ? product.features.map((item) => item?.title || item?.description).filter(Boolean)
+      ...(Array.isArray(translatedProduct?.keyFeatures) ? translatedProduct.keyFeatures : []),
+      ...(Array.isArray(translatedProduct?.features)
+        ? translatedProduct.features.map((item) => item?.title || item?.description).filter(Boolean)
         : []),
     ],
-    [product?.keyFeatures, product?.features]
+    [translatedProduct?.keyFeatures, translatedProduct?.features]
   )
 
   return (
@@ -155,15 +160,15 @@ export function ProductDetailPage({ productId }) {
       <section className="pb-8 bg-white" style={{ paddingTop: 'calc(var(--site-header-height) + 2rem)' }}>
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
           <div className="flex items-center gap-2 mb-5 text-sm" style={{ color: 'var(--dark-gray)' }}>
-            <span className="cursor-pointer hover:text-[var(--accent-orange)]" onClick={() => navigateTo('home')}>Home</span>
+            <span className="cursor-pointer hover:text-[var(--accent-orange)]" onClick={() => navigateTo('home')}>{t('common.home')}</span>
             <ChevronRight size={14} />
-            <span className="cursor-pointer hover:text-[var(--accent-orange)]" onClick={() => navigateTo('products')}>Products</span>
+            <span className="cursor-pointer hover:text-[var(--accent-orange)]" onClick={() => navigateTo('products')}>{t('productsPage.breadcrumb')}</span>
             <ChevronRight size={14} />
-            <span style={{ fontWeight: 600, color: 'var(--charcoal)' }}>{product?.name || 'Details'}</span>
+            <span style={{ fontWeight: 600, color: 'var(--charcoal)' }}>{translatedProduct?.name || t('productDetail.breadcrumb')}</span>
           </div>
-          <h1>{product?.category || 'Embroidery Machine'}</h1>
+          <h1>{translatedProduct?.category || 'Embroidery Machine'}</h1>
           <p style={{ fontSize: 17, color: 'var(--dark-gray)', marginTop: 8 }}>
-            ZMS LIZZA by LIZZA INDIA PVT. LTD. offers reliable machine solutions for every production scale.
+            {t('productDetail.subtitle')}
           </p>
         </div>
       </section>
@@ -197,16 +202,16 @@ export function ProductDetailPage({ productId }) {
           </aside>
 
           <div className="space-y-6">
-            {loading && <p style={{ color: 'var(--dark-gray)' }}>Loading product...</p>}
+            {loading && <p style={{ color: 'var(--dark-gray)' }}>{t('productDetail.loading')}</p>}
             {!loading && error && <p style={{ color: '#EF4444' }}>{error}</p>}
-            {!loading && !error && !product && <p style={{ color: 'var(--dark-gray)' }}>Product not found.</p>}
+            {!loading && !error && !translatedProduct && <p style={{ color: 'var(--dark-gray)' }}>{t('productDetail.notFound')}</p>}
 
-            {!loading && !error && product && (
+            {!loading && !error && translatedProduct && (
               <>
                 <article className="bg-white rounded-xl shadow-sm border border-black/5 overflow-hidden">
                   <div className="px-4 sm:px-5 py-3 border-b bg-[#f7f7f7] flex flex-wrap items-center justify-between gap-3">
                     <h2 className="text-2xl sm:text-3xl lg:text-4xl" style={{ fontWeight: 800, color: 'var(--charcoal)', lineHeight: 1.08 }}>
-                      {product.name}
+                      {translatedProduct.name}
                     </h2>
                     <button
                       type="button"
@@ -214,7 +219,7 @@ export function ProductDetailPage({ productId }) {
                       className="px-4 py-2 rounded-full border text-sm font-semibold"
                       style={{ borderColor: 'var(--accent-orange)', color: 'var(--accent-orange)', backgroundColor: 'white' }}
                     >
-                      <PhoneCall size={14} style={{ display: 'inline-block', marginRight: 6 }} /> Request Callback
+                      <PhoneCall size={14} style={{ display: 'inline-block', marginRight: 6 }} /> {t('productDetail.requestCallback')}
                     </button>
                   </div>
 
@@ -223,7 +228,7 @@ export function ProductDetailPage({ productId }) {
                       <div className="rounded-lg overflow-hidden border border-black/10 bg-[#f8fafc]">
                         <img
                           src={activeImage}
-                          alt={product.name}
+                          alt={translatedProduct.name}
                           onError={withImageFallback}
                           className="w-full h-full object-cover"
                           style={{ maxHeight: 430 }}
@@ -239,7 +244,7 @@ export function ProductDetailPage({ productId }) {
                             className="w-[72px] h-[58px] rounded-md overflow-hidden border"
                             style={{ borderColor: index === activeImageIndex ? 'var(--accent-orange)' : 'rgba(0,0,0,0.14)' }}
                           >
-                            <img src={imageUrl} alt={`${product.name} ${index + 1}`} onError={withImageFallback} className="w-full h-full object-cover" />
+                            <img src={imageUrl} alt={`${translatedProduct.name} ${index + 1}`} onError={withImageFallback} className="w-full h-full object-cover" />
                           </button>
                         ))}
                       </div>
@@ -250,18 +255,18 @@ export function ProductDetailPage({ productId }) {
                         className="mt-4 px-8 py-2.5 rounded-full font-semibold border"
                         style={{ color: 'var(--accent-orange)', borderColor: 'var(--accent-orange)', backgroundColor: 'white' }}
                       >
-                        Get Best Quote
+                        {t('productDetail.getBestQuote')}
                       </button>
                     </div>
 
                     <div>
                       <div className="flex flex-wrap items-baseline gap-2 mb-3">
-                        <p style={{ fontSize: 26, fontWeight: 800, color: 'var(--charcoal)' }}>{product.priceDisplay || 'Price On Request'}</p>
-                        <span style={{ color: 'var(--accent-orange)', fontWeight: 700 }}>{product.priceNote || 'Get Latest Price'}</span>
+                        <p style={{ fontSize: 26, fontWeight: 800, color: 'var(--charcoal)' }}>{translatedProduct.priceDisplay || t('productDetail.priceOnRequest')}</p>
+                        <span style={{ color: 'var(--accent-orange)', fontWeight: 700 }}>{translatedProduct.priceNote || t('productDetail.getLatestPrice')}</span>
                       </div>
 
-                      {product.modelNo && (
-                        <p style={{ color: '#374151', fontWeight: 600, marginBottom: 8 }}>Model: {product.modelNo}</p>
+                      {translatedProduct.modelNo && (
+                        <p style={{ color: '#374151', fontWeight: 600, marginBottom: 8 }}>{t('productDetail.model')}: {translatedProduct.modelNo}</p>
                       )}
 
                       <div className="space-y-2 mb-4">
@@ -273,7 +278,7 @@ export function ProductDetailPage({ productId }) {
                         ))}
                       </div>
 
-                      <p style={{ color: '#111827', fontSize: 15, lineHeight: 1.7, marginBottom: 10 }}>{product.description}</p>
+                      <p style={{ color: '#111827', fontSize: 15, lineHeight: 1.7, marginBottom: 10 }}>{translatedProduct.description}</p>
 
                       {featureBullets.length > 0 && (
                         <ul className="list-disc pl-5 space-y-1.5" style={{ color: '#111827', fontSize: 14 }}>
@@ -290,7 +295,7 @@ export function ProductDetailPage({ productId }) {
                           className="px-5 py-3 rounded-lg text-white font-semibold"
                           style={{ backgroundColor: 'var(--accent-orange)' }}
                         >
-                          Yes! I am Interested
+                          {t('productDetail.interested')}
                         </button>
                         <button
                           type="button"
@@ -298,7 +303,7 @@ export function ProductDetailPage({ productId }) {
                           className="px-5 py-3 rounded-lg font-semibold border"
                           style={{ borderColor: 'var(--accent-orange)', color: 'var(--accent-orange)' }}
                         >
-                          Back to All Products <ArrowRight size={16} style={{ display: 'inline-block', marginLeft: 4 }} />
+                          {t('productDetail.backToAll')} <ArrowRight size={16} style={{ display: 'inline-block', marginLeft: 4 }} />
                         </button>
                       </div>
                     </div>
@@ -307,7 +312,7 @@ export function ProductDetailPage({ productId }) {
 
                 {videos.length > 0 && (
                   <section className="bg-white rounded-xl shadow-sm border border-black/5 p-4 sm:p-5">
-                    <h3 className="mb-4">Product Videos</h3>
+                    <h3 className="mb-4">{t('productDetail.productVideos')}</h3>
                     <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
                       {videos.slice(0, 3).map((video) => {
                         const youtubeId = getYoutubeVideoId(video.url)
@@ -339,7 +344,7 @@ export function ProductDetailPage({ productId }) {
                                 className="mt-3 px-4 py-2 rounded-lg text-sm font-semibold text-white"
                                 style={{ backgroundColor: 'var(--accent-orange)' }}
                               >
-                                Get Quote
+                                {t('productDetail.getQuote')}
                               </button>
                             </div>
                           </article>

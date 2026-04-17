@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { MessageCircle } from 'lucide-react'
+import { useTranslation } from '../../i18n/index.js'
 
 export function WhatsAppButton() {
     const [showTooltip, setShowTooltip] = useState(false)
+    const { t } = useTranslation()
 
     return (
         <div className="fixed bottom-6 right-6 md:bottom-8 md:right-8 z-50">
@@ -10,7 +12,7 @@ export function WhatsAppButton() {
                 <div className="absolute bottom-20 right-0 px-4 py-2 rounded-lg shadow-lg whitespace-nowrap hidden md:block"
                     style={{ backgroundColor: 'var(--charcoal)', color: 'white', fontSize: '14px', fontWeight: 500 }}
                 >
-                    Chat with us
+                    {t('whatsapp.tooltip')}
                     <div className="absolute -bottom-1 right-6 w-2 h-2 rotate-45" style={{ backgroundColor: 'var(--charcoal)' }} />
                 </div>
             )}

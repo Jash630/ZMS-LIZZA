@@ -2,6 +2,7 @@ import { useRef, useMemo } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useNavigation } from '../../context/NavigationContext.jsx'
 import { ProductImageCarousel, buildProductCarouselImages } from '../shared/ProductImageCarousel.jsx'
+import { useTranslation } from '../../i18n/index.js'
 
 const rotatePool = (pool, offset = 0) => {
   if (!Array.isArray(pool) || pool.length === 0) return []
@@ -11,6 +12,7 @@ const rotatePool = (pool, offset = 0) => {
 
 export function FeaturedProducts({ products = [], recentMediaImages = [] }) {
   const { navigateTo } = useNavigation()
+  const { t } = useTranslation()
   const trackRef = useRef(null)
 
   const cards = useMemo(
@@ -36,9 +38,9 @@ export function FeaturedProducts({ products = [], recentMediaImages = [] }) {
     <section className="py-24" style={{ backgroundColor: 'var(--light-gray)' }}>
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <h2 className="mb-4">Our Premium Machine Range</h2>
+          <h2 className="mb-4">{t('featuredProducts.title')}</h2>
           <p style={{ fontSize: '18px', color: 'var(--dark-gray)' }}>
-            European technology engineered for Indian textile excellence
+            {t('featuredProducts.subtitle')}
           </p>
         </div>
 
@@ -62,7 +64,7 @@ export function FeaturedProducts({ products = [], recentMediaImages = [] }) {
 
           <div ref={trackRef} className="overflow-x-auto scrollbar-hide pb-4">
             {cards.length === 0 && (
-              <p style={{ color: 'var(--dark-gray)' }}>No products available yet.</p>
+              <p style={{ color: 'var(--dark-gray)' }}>{t('featuredProducts.empty')}</p>
             )}
             <div className="flex gap-6" style={{ width: 'max-content' }}>
               {cards.map((product) => (
@@ -91,14 +93,14 @@ export function FeaturedProducts({ products = [], recentMediaImages = [] }) {
                         className="flex-1 px-4 py-2 rounded-lg border-2 transition-all hover:scale-105"
                         style={{ borderColor: 'var(--gradient-blue)', color: 'var(--gradient-blue)', fontWeight: 600, fontSize: '14px' }}
                       >
-                        View Details
+                        {t('featuredProducts.viewDetails')}
                       </button>
                       <button
                         type="button"
                         onClick={() => navigateTo('contact')}
                         style={{ color: 'var(--accent-orange)', fontWeight: 600, fontSize: '14px', background: 'none', border: 'none', cursor: 'pointer' }}
                       >
-                        Request Quote
+                        {t('featuredProducts.requestQuote')}
                       </button>
                     </div>
                   </div>

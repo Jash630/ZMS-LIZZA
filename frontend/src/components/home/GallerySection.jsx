@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { ArrowRight } from 'lucide-react'
 import { useNavigation } from '../../context/NavigationContext.jsx'
 import { publicService } from '../../services/publicService.js'
+import { useTranslation } from '../../i18n/index.js'
 
 const FALLBACK_IMAGE =
   'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="800" height="560" viewBox="0 0 800 560"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="%23F3F4F6"/><stop offset="100%" stop-color="%23E5E7EB"/></linearGradient></defs><rect width="800" height="560" fill="url(%23g)"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%236B7280" font-family="Arial,sans-serif" font-size="28">Image unavailable</text></svg>'
@@ -32,6 +33,7 @@ const fetchGalleryImages = async () => {
 
 export function GallerySection() {
   const { navigateTo } = useNavigation()
+  const { t } = useTranslation()
   const [hovered, setHovered] = useState(null)
   const [images, setImages] = useState([])
 
@@ -69,9 +71,9 @@ export function GallerySection() {
     <section className="py-24 bg-white">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <h2 className="mb-4">See the Quality Our Machines Deliver</h2>
+          <h2 className="mb-4">{t('gallerySection.title')}</h2>
           <p style={{ fontSize: '18px', color: 'var(--dark-gray)' }}>
-            From intricate sequin work to precise coding - real results from real factories.
+            {t('gallerySection.subtitle')}
           </p>
         </div>
 
@@ -105,7 +107,7 @@ export function GallerySection() {
           </div>
         ) : (
           <p className="mb-12 text-center" style={{ color: 'var(--dark-gray)' }}>
-            No gallery images available yet.
+            {t('gallerySection.empty')}
           </p>
         )}
 
@@ -115,7 +117,7 @@ export function GallerySection() {
             className="px-8 py-4 rounded-lg transition-all hover:scale-105 hover:shadow-xl inline-flex items-center gap-2"
             style={{ backgroundColor: 'var(--accent-orange)', color: 'white', fontWeight: 600, fontSize: '16px' }}
           >
-            View Full Gallery <ArrowRight size={20} />
+            {t('gallerySection.viewFull')} <ArrowRight size={20} />
           </button>
         </div>
       </div>

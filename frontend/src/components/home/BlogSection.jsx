@@ -1,18 +1,20 @@
 import { Calendar, ArrowRight } from 'lucide-react'
 import { useNavigation } from '../../context/NavigationContext.jsx'
+import { useTranslation } from '../../i18n/index.js'
 
 export function BlogSection({ posts = [] }) {
   const { navigateTo } = useNavigation()
+  const { t } = useTranslation()
   return (
     <section className="py-24 bg-white">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <h2 className="mb-4">Latest Industry Insights</h2>
-          <p style={{ fontSize: '18px', color: 'var(--dark-gray)' }}>Stay updated with textile technology trends and embroidery innovations</p>
+          <h2 className="mb-4">{t('blogSection.title')}</h2>
+          <p style={{ fontSize: '18px', color: 'var(--dark-gray)' }}>{t('blogSection.subtitle')}</p>
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
           {posts.length === 0 && (
-            <p style={{ color: 'var(--dark-gray)' }}>No blog posts available yet.</p>
+            <p style={{ color: 'var(--dark-gray)' }}>{t('blogSection.empty')}</p>
           )}
           {posts.map((post) => (
             <article
@@ -32,7 +34,7 @@ export function BlogSection({ posts = [] }) {
                     <Calendar size={16} style={{ color: 'var(--dark-gray)' }} />
                     <span style={{ fontSize: '13px', color: 'var(--dark-gray)' }}>{post.date}</span>
                   </div>
-                  <span style={{ color: 'var(--accent-orange)', fontWeight: 600, fontSize: '14px' }}>Read More</span>
+                  <span style={{ color: 'var(--accent-orange)', fontWeight: 600, fontSize: '14px' }}>{t('blogSection.readMore')}</span>
                 </div>
               </div>
             </article>
@@ -40,7 +42,7 @@ export function BlogSection({ posts = [] }) {
         </div>
         <div className="text-center">
           <button onClick={() => navigateTo('blog')} className="px-8 py-4 rounded-lg border-2 transition-all hover:scale-105 inline-flex items-center gap-2" style={{ borderColor: 'var(--gradient-blue)', color: 'var(--gradient-blue)', fontWeight: 600, fontSize: '16px', backgroundColor: 'white' }}>
-            Visit Blog <ArrowRight size={20} />
+            {t('blogSection.visitBlog')} <ArrowRight size={20} />
           </button>
         </div>
       </div>

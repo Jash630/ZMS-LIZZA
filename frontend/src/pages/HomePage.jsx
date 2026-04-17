@@ -12,6 +12,7 @@ import { ServicesSection }    from '../components/home/ServicesSection.jsx'
 import { BlogSection }        from '../components/home/BlogSection.jsx'
 import { CTASection }         from '../components/home/CTASection.jsx'
 import { publicService }      from '../services/publicService.js'
+import { useRuntimeTranslatedValue } from '../i18n/useRuntimeTranslatedValue.js'
 
 const PRODUCT_IMAGE_ALLOWLIST = new Set([
   'IMG-20250408-WA0012.jpg',
@@ -27,9 +28,11 @@ const PRODUCT_IMAGE_ALLOWLIST = new Set([
 const isAllowedProductMedia = (item) => PRODUCT_IMAGE_ALLOWLIST.has(String(item?.originalName || '').trim())
 
 export function HomePage() {
-  const [products, setProducts] = useState([])
-  const [posts, setPosts] = useState([])
+  const [rawProducts, setRawProducts] = useState([])
+  const [rawPosts, setRawPosts] = useState([])
   const [recentMediaImages, setRecentMediaImages] = useState([])
+  const products = useRuntimeTranslatedValue(rawProducts)
+  const posts = useRuntimeTranslatedValue(rawPosts)
 
   useEffect(() => {
     let active = true
@@ -53,13 +56,13 @@ export function HomePage() {
           .map((item) => item.url)
           .filter(Boolean)
 
-        setProducts(productItems || [])
-        setPosts(postsRes.items || [])
+        setRawProducts(productItems || [])
+        setRawPosts(postsRes.items || [])
         setRecentMediaImages(allowedMediaUrls)
       } catch {
         if (!active) return
-        setProducts([])
-        setPosts([])
+        setRawProducts([])
+        setRawPosts([])
         setRecentMediaImages([])
       }
     }

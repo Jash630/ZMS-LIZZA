@@ -5,6 +5,8 @@ import { WhatsAppButton } from '../components/shared/WhatsAppButton.jsx'
 import { useNavigation }  from '../context/NavigationContext.jsx'
 import { Search, ChevronRight, User, Calendar, Clock, ArrowRight, Send, Tag } from 'lucide-react'
 import { publicService } from '../services/publicService.js'
+import { useTranslation } from '../i18n/index.js'
+import { useRuntimeTranslatedValue } from '../i18n/useRuntimeTranslatedValue.js'
 
 const CATEGORY_COLORS = {
   Product:      { bg: '#1B2E4B', text: '#fff' },
@@ -43,7 +45,7 @@ function CategoryBadge({ category, small }) {
   )
 }
 
-function ArticleCard({ post, navigateTo }) {
+function ArticleCard({ post, navigateTo, readLabel }) {
   return (
     <article
       onClick={() => post.slug && navigateTo('blog-detail', post.slug)}
@@ -91,7 +93,7 @@ function ArticleCard({ post, navigateTo }) {
             <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Clock size={12} />{post.readTime}</span>
           </div>
           <span style={{ fontSize: '12px', fontWeight: 700, color: '#FF6B35', display: 'flex', alignItems: 'center', gap: '4px', letterSpacing: '0.02em' }}>
-            Read <ArrowRight size={13} />
+            {readLabel} <ArrowRight size={13} />
           </span>
         </div>
       </div>
@@ -101,13 +103,16 @@ function ArticleCard({ post, navigateTo }) {
 
 export function BlogPage() {
   const { navigateTo } = useNavigation()
+  const { t } = useTranslation()
   const [search, setSearch]     = useState('')
   const [category, setCategory] = useState('all')
   const [email, setEmail]       = useState('')
   const [subscribeState, setSubscribeState] = useState({ saving: false, message: '', error: '' })
-  const [posts, setPosts]       = useState([])
+  const [rawPosts, setRawPosts] = useState([])
   const [loading, setLoading]   = useState(true)
   const [error, setError]       = useState('')
+  const posts = useRuntimeTranslatedValue(rawPosts)
+  const topics = useRuntimeTranslatedValue(POPULAR_TOPICS)
 
   useEffect(() => {
     let active = true
@@ -117,17 +122,17 @@ export function BlogPage() {
         setError('')
         const response = await publicService.getPosts({ limit: 60 })
         if (!active) return
-        setPosts(response.items || [])
+        setRawPosts(response.items || [])
       } catch (err) {
         if (!active) return
-        setError(err?.message || 'Failed to load blog posts.')
+        setError(err?.message || t('common.error'))
       } finally {
         if (active) setLoading(false)
       }
     }
     load()
     return () => { active = false }
-  }, [])
+  }, [t])
 
   const filtered = posts.filter(p => {
     const matchCat    = category === 'all' || normalizeCategory(p.category) === category
@@ -153,12 +158,12 @@ export function BlogPage() {
     setSubscribeState({ saving: true, message: '', error: '' })
     try {
       const normalizedEmail = String(email || '').trim()
-      if (!normalizedEmail) throw new Error('Please enter your email address.')
+      if (!normalizedEmail) throw new Error(t('blogPage.emailPlaceholder'))
       const result = await publicService.subscribeNewsletter(normalizedEmail)
-      setSubscribeState({ saving: false, message: result?.message || 'Subscribed successfully.', error: '' })
+      setSubscribeState({ saving: false, message: result?.message || t('blogPage.subscribe'), error: '' })
       setEmail('')
     } catch (err) {
-      setSubscribeState({ saving: false, message: '', error: err?.message || 'Failed to subscribe. Please try again.' })
+      setSubscribeState({ saving: false, message: '', error: err?.message || t('common.error') })
     }
   }
 
@@ -189,19 +194,19 @@ export function BlogPage() {
       }}>
         <div style={{ maxWidth: 1400, margin: '0 auto', padding: '0 24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20, fontSize: 13 }}>
-            <span style={{ color: 'rgba(255,255,255,0.55)', cursor: 'pointer' }} onClick={() => navigateTo('home')}>Home</span>
+            <span style={{ color: 'rgba(255,255,255,0.55)', cursor: 'pointer' }} onClick={() => navigateTo('home')}>{t('common.home')}</span>
             <ChevronRight size={13} color="rgba(255,255,255,0.35)" />
-            <span style={{ color: '#FF6B35', fontWeight: 600 }}>Blog</span>
+            <span style={{ color: '#FF6B35', fontWeight: 600 }}>{t('blogPage.breadcrumb')}</span>
           </div>
           <div style={{ textAlign: 'center' }}>
             <div style={{ display: 'inline-block', background: 'rgba(255,107,53,0.18)', border: '1px solid rgba(255,107,53,0.35)', borderRadius: 20, padding: '4px 16px', fontSize: 12, fontWeight: 700, color: '#FF6B35', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 18 }}>
-              Industry Knowledge Hub
+              {t('blogPage.badge')}
             </div>
             <h1 style={{ color: '#fff', fontSize: 'clamp(32px, 5vw, 52px)', fontWeight: 800, lineHeight: 1.15, marginBottom: 16, letterSpacing: '-0.02em' }}>
-              Industry Insights &amp; Updates
+              {t('blogPage.title')}
             </h1>
             <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: 18, maxWidth: 540, margin: '0 auto' }}>
-              Stay ahead with the latest in textile technology and embroidery trends
+              {t('blogPage.subtitle')}
             </p>
           </div>
         </div>
@@ -217,7 +222,7 @@ export function BlogPage() {
           <div style={{ position: 'relative', flex: '1 1 260px', maxWidth: 380 }}>
             <input
               type="text"
-              placeholder="Search articles…"
+              placeholder={t('blogPage.searchPlaceholder')}
               value={search}
               onChange={e => setSearch(e.target.value)}
               className="search-input"
@@ -233,7 +238,7 @@ export function BlogPage() {
               className={`cat-btn${category === 'all' ? ' active' : ''}`}
               style={{ padding: '8px 18px', borderRadius: 6, border: '1.5px solid #dde3ee', backgroundColor: 'transparent', fontSize: 13, fontWeight: 600, cursor: 'pointer', color: '#4a5568' }}
             >
-              All
+              {t('blogPage.all')}
             </button>
             {categoryOptions.map(opt => (
               <button
@@ -250,7 +255,7 @@ export function BlogPage() {
       </div>
 
       <div style={{ maxWidth: 1400, margin: '0 auto', padding: '40px 24px 60px' }}>
-        {loading && <p style={{ color: '#6b7a90', padding: '40px 0' }}>Loading posts…</p>}
+        {loading && <p style={{ color: '#6b7a90', padding: '40px 0' }}>{t('blogPage.loading')}</p>}
         {!loading && error && <p style={{ color: '#EF4444', padding: '40px 0' }}>{error}</p>}
 
         {!loading && !error && (
@@ -281,7 +286,7 @@ export function BlogPage() {
                   <style>{`.featured-card:hover { box-shadow: 0 12px 48px rgba(15,31,61,0.16) !important; }`}</style>
                   <div style={{ position: 'relative', overflow: 'hidden' }}>
                     <div style={{ position: 'absolute', top: 16, left: 16, zIndex: 2, display: 'flex', gap: 8 }}>
-                      <span style={{ background: '#FF6B35', color: '#fff', fontSize: 11, fontWeight: 800, padding: '4px 12px', borderRadius: 4, letterSpacing: '0.07em', textTransform: 'uppercase' }}>Featured</span>
+                      <span style={{ background: '#FF6B35', color: '#fff', fontSize: 11, fontWeight: 800, padding: '4px 12px', borderRadius: 4, letterSpacing: '0.07em', textTransform: 'uppercase' }}>{t('blogPage.featured')}</span>
                       <CategoryBadge category={featuredPost.category} small />
                     </div>
                     <img src={featuredPost.image} alt={featuredPost.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', transition: 'transform 0.6s ease' }} className="feat-img" />
@@ -306,7 +311,7 @@ export function BlogPage() {
                       onMouseEnter={e => { e.currentTarget.style.background = '#e55a27'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
                       onMouseLeave={e => { e.currentTarget.style.background = '#FF6B35'; e.currentTarget.style.transform = 'translateY(0)'; }}
                     >
-                      Read Full Article <ArrowRight size={16} />
+                      {t('blogPage.readArticle')} <ArrowRight size={16} />
                     </button>
                   </div>
                 </div>
@@ -316,22 +321,22 @@ export function BlogPage() {
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
                 <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f1f3d', display: 'flex', alignItems: 'center', gap: 12 }}>
                   <span style={{ display: 'inline-block', width: 4, height: 24, background: '#FF6B35', borderRadius: 2 }} />
-                  Latest Articles
+                  {t('blogPage.latestArticles')}
                 </h2>
-                <span style={{ fontSize: 13, color: '#8a96a8', fontWeight: 500 }}>{filtered.length} articles</span>
+                <span style={{ fontSize: 13, color: '#8a96a8', fontWeight: 500 }}>{filtered.length} {t('blogPage.articles')}</span>
               </div>
 
               {gridPosts.length === 0 && filtered.length === 1 && (
-                <p style={{ color: '#8a96a8', fontSize: 14 }}>Only the featured article matches your filter.</p>
+                <p style={{ color: '#8a96a8', fontSize: 14 }}>{t('blogPage.onlyFeatured')}</p>
               )}
               {gridPosts.length === 0 && filtered.length === 0 && (
-                <p style={{ color: '#8a96a8', fontSize: 14 }}>No articles found.</p>
+                <p style={{ color: '#8a96a8', fontSize: 14 }}>{t('blogPage.noArticles')}</p>
               )}
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 24 }}>
                 {gridPosts.map((post, i) => (
                   <div key={post.id || post.slug} className="fade-up" style={{ animationDelay: `${i * 0.06}s` }}>
-                    <ArticleCard post={post} navigateTo={navigateTo} />
+                    <ArticleCard post={post} navigateTo={navigateTo} readLabel={t('blogPage.read')} />
                   </div>
                 ))}
               </div>
@@ -348,14 +353,14 @@ export function BlogPage() {
                   <div style={{ background: 'rgba(255,107,53,0.2)', borderRadius: 8, width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 14 }}>
                     <Send size={18} color="#FF6B35" />
                   </div>
-                  <h3 style={{ color: '#fff', fontSize: 18, fontWeight: 800, marginBottom: 8 }}>Stay Updated</h3>
+                  <h3 style={{ color: '#fff', fontSize: 18, fontWeight: 800, marginBottom: 8 }}>{t('blogPage.stayUpdated')}</h3>
                   <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: 13.5, lineHeight: 1.6, marginBottom: 20 }}>
-                    Get the latest industry insights delivered to your inbox weekly.
+                    {t('blogPage.newsletterDesc')}
                   </p>
                   <form onSubmit={handleSubscribe}>
                     <input
                       type="email"
-                      placeholder="Enter your email"
+                      placeholder={t('blogPage.emailPlaceholder')}
                       value={email}
                       onChange={e => setEmail(e.target.value)}
                       className="subscribe-input"
@@ -367,7 +372,7 @@ export function BlogPage() {
                       disabled={subscribeState.saving}
                       style={{ width: '100%', padding: '12px', borderRadius: 8, border: 'none', backgroundColor: '#FF6B35', color: '#fff', fontWeight: 700, fontSize: 14, cursor: subscribeState.saving ? 'not-allowed' : 'pointer', opacity: subscribeState.saving ? 0.75 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, transition: 'background 0.2s' }}
                     >
-                      <Send size={15} /> {subscribeState.saving ? 'Subscribing…' : 'Subscribe Now'}
+                      <Send size={15} /> {subscribeState.saving ? t('blogPage.subscribing') : t('blogPage.subscribe')}
                     </button>
                     {subscribeState.message && <p style={{ marginTop: 10, fontSize: 13, color: '#34d399' }}>{subscribeState.message}</p>}
                     {subscribeState.error   && <p style={{ marginTop: 10, fontSize: 13, color: '#f87171' }}>{subscribeState.error}</p>}
@@ -378,16 +383,16 @@ export function BlogPage() {
               {/* Popular Topics */}
               <div style={{ backgroundColor: '#fff', borderRadius: 14, padding: '24px 22px', border: '1px solid #e8edf4' }}>
                 <h3 style={{ fontSize: 16, fontWeight: 800, color: '#0f1f3d', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <Tag size={16} color="#FF6B35" /> Popular Topics
+                  <Tag size={16} color="#FF6B35" /> {t('blogPage.popularTopics')}
                 </h3>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                  {POPULAR_TOPICS.map(t => (
+                  {topics.map((topic) => (
                     <span
-                      key={t}
+                      key={topic}
                       className="topic-tag"
                       style={{ padding: '6px 14px', borderRadius: 20, fontSize: 12.5, fontWeight: 600, cursor: 'pointer', border: '1.5px solid #e8edf4', color: '#4a5568', backgroundColor: '#f8fafd', transition: 'all 0.18s ease' }}
                     >
-                      {t}
+                      {topic}
                     </span>
                   ))}
                 </div>
@@ -398,16 +403,16 @@ export function BlogPage() {
                 <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'rgba(255,107,53,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px' }}>
                   <ArrowRight size={20} color="#FF6B35" />
                 </div>
-                <h3 style={{ fontSize: 15, fontWeight: 800, color: '#0f1f3d', marginBottom: 8 }}>Ready to upgrade?</h3>
+                <h3 style={{ fontSize: 15, fontWeight: 800, color: '#0f1f3d', marginBottom: 8 }}>{t('blogPage.readyToUpgrade')}</h3>
                 <p style={{ fontSize: 13, color: '#6b7a90', lineHeight: 1.6, marginBottom: 18 }}>
-                  Explore ZMS LIZZA embroidery machines built for Indian factories.
+                  {t('blogPage.exploreMachines')}
                 </p>
                 <button
                   style={{ width: '100%', padding: '11px', borderRadius: 8, border: '2px solid #0f1f3d', backgroundColor: 'transparent', color: '#0f1f3d', fontWeight: 700, fontSize: 13.5, cursor: 'pointer', transition: 'all 0.2s' }}
                   onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#0f1f3d'; e.currentTarget.style.color = '#fff'; }}
                   onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = '#0f1f3d'; }}
                 >
-                  Request a Demo
+                  {t('blogPage.requestDemo')}
                 </button>
               </div>
             </aside>

@@ -33,9 +33,17 @@ app.use(
 )
 const normalizeOrigin = (value = '') => String(value).trim().replace(/\/$/, '').toLowerCase()
 
+const isAllowedVercelPreviewOrigin = (origin) => {
+  const normalized = normalizeOrigin(origin)
+  return /^https:\/\/zmslizzafrontend(?:-[a-z0-9-]+)?\.vercel\.app$/.test(normalized)
+    || /^https:\/\/zmslizzaadmin(?:-[a-z0-9-]+)?\.vercel\.app$/.test(normalized)
+}
+
 const defaultAllowedOrigins = [
   'https://zmslizzafrontend.vercel.app',
   'https://zmslizzaadmin.vercel.app',
+  'http://localhost:5173',
+  'http://localhost:4173',
 ]
 
 const envAllowedOrigins = String(process.env.CORS_ORIGINS || '')
@@ -52,7 +60,7 @@ const corsOptions = {
     // allow requests with no origin (like Postman)
     if (!origin) return callback(null, true)
 
-    if (allowedOrigins.has(normalizeOrigin(origin))) {
+    if (allowedOrigins.has(normalizeOrigin(origin)) || isAllowedVercelPreviewOrigin(origin)) {
       callback(null, true)
     } else {
       callback(null, false)

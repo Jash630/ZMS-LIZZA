@@ -5,11 +5,13 @@ import { WhatsAppButton } from '../components/shared/WhatsAppButton.jsx'
 import { useNavigation }  from '../context/NavigationContext.jsx'
 import { ChevronRight, Calendar, Download, Crosshair, Shield, Cpu, TrendingUp, Award, MapPin } from 'lucide-react'
 import { publicService } from '../services/publicService.js'
+import { useTranslation } from '../i18n/index.js'
 
 const BROCHURE_MEDIA_KEYS = ['file_ony5he', 'file_cx6svd']
 
 export function AboutPage() {
   const { navigateTo } = useNavigation()
+  const { t } = useTranslation()
   const [brochure, setBrochure] = useState(null)
   const [downloading, setDownloading] = useState(false)
 
@@ -43,7 +45,7 @@ export function AboutPage() {
   const downloadBrochure = async () => {
     if (downloading) return
     if (!brochure?.url) {
-      window.alert('Brochure image is not available yet. Please upload one in Media Library.')
+      window.alert(t('about.brochureUnavailable'))
       return
     }
 
@@ -68,27 +70,12 @@ export function AboutPage() {
     }
   }
 
-  const milestones = [
-    { year: '2019', text: 'Company founded in Surat' },
-    { year: '2020', text: 'First 50 installations completed' },
-    { year: '2022', text: 'Expanded to Mumbai & Ahmedabad' },
-    { year: '2024', text: '100+ happy customers across India' },
-  ]
+  const milestones = Array.isArray(t('about.milestones', [])) ? t('about.milestones', []) : []
 
-  const advantages = [
-    { Icon: Crosshair,  title: 'Higher Precision',       desc: 'Stitch accuracy down to 0.1mm for flawless designs' },
-    { Icon: Shield,     title: 'Superior Durability',    desc: 'Premium materials for 10+ years of heavy-duty operation' },
-    { Icon: Cpu,        title: 'Advanced Control',       desc: 'Intelligent software for automated adjustments' },
-    { Icon: TrendingUp, title: 'Consistent Performance', desc: 'High-speed without quality degradation' },
-    { Icon: Award,      title: 'Better Components',      desc: 'European-grade parts for lower maintenance costs' },
-  ]
+  const advantageIcons = [Crosshair, Shield, Cpu, TrendingUp, Award]
+  const advantages = Array.isArray(t('about.advantages', [])) ? t('about.advantages', []) : []
 
-  const locations = [
-    { city: 'Surat (HQ)', detail: 'Katargam, Surat',          radius: '< 4 Hours Response' },
-    { city: 'Ahmedabad',  detail: 'Serving Gujarat',          radius: 'Same-Day Service'  },
-    { city: 'Mumbai',     detail: 'Serving Maharashtra',      radius: 'Next-Day Service'  },
-    { city: 'Pan-India',  detail: 'Extended network',         radius: '2-3 Days Support'  },
-  ]
+  const locations = Array.isArray(t('about.locations', [])) ? t('about.locations', []) : []
 
   return (
     <div className="min-h-screen">
@@ -102,13 +89,13 @@ export function AboutPage() {
         </div>
         <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-center gap-2 text-white/80 text-sm mb-6">
-            <span className="cursor-pointer hover:text-white" onClick={() => navigateTo('home')}>Home</span>
+            <span className="cursor-pointer hover:text-white" onClick={() => navigateTo('home')}>{t('common.home')}</span>
             <ChevronRight size={14} />
-            <span>About Us</span>
+            <span>{t('about.breadcrumb')}</span>
           </div>
-          <h1 style={{ color: 'white' }}>European Technology,<br />Built for Indian Excellence</h1>
+          <h1 style={{ color: 'white' }}>{t('about.heroTitle')}<br />{t('about.heroTitle2')}</h1>
           <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '20px', maxWidth: '700px', margin: '24px auto 0' }}>
-            5+ years of delivering high-performance embroidery machines to leading textile manufacturers
+            {t('about.heroSubtitle')}
           </p>
         </div>
       </section>
@@ -117,17 +104,17 @@ export function AboutPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="grid lg:grid-cols-5 gap-16">
             <div className="lg:col-span-3">
-              <h2 className="mb-8">Who We Are</h2>
+              <h2 className="mb-8">{t('about.whoWeAre')}</h2>
               <div className="space-y-6" style={{ color: 'var(--dark-gray)', fontSize: '17px', lineHeight: '1.8' }}>
-                <p>ZMS LIZZA European Technology was founded with a singular vision: to bring the precision and reliability of European embroidery machinery to India's thriving textile industry.</p>
-                <p>Over 5+ years, we've grown from a small startup to a trusted partner for textile businesses across India.</p>
-                <p><strong style={{ color: 'var(--charcoal)' }}>Our Mission:</strong> To empower textile businesses with world-class European technology that drives productivity, quality, and profitability.</p>
-                <p><strong style={{ color: 'var(--charcoal)' }}>Our Vision:</strong> To be India's most trusted embroidery machinery partner, known for exceptional products, unmatched support, and lasting relationships.</p>
-                <p><strong style={{ color: 'var(--charcoal)' }}>Our Values:</strong> Quality in every machine. Reliability in our products and promises. Innovation in solving customer challenges.</p>
+                <p>{t('about.whoWeAreP1')}</p>
+                <p>{t('about.whoWeAreP2')}</p>
+                <p><strong style={{ color: 'var(--charcoal)' }}>{t('about.mission')}</strong> {t('about.missionText')}</p>
+                <p><strong style={{ color: 'var(--charcoal)' }}>{t('about.vision')}</strong> {t('about.visionText')}</p>
+                <p><strong style={{ color: 'var(--charcoal)' }}>{t('about.values')}</strong> {t('about.valuesText')}</p>
               </div>
             </div>
             <div className="lg:col-span-2">
-              <h3 className="mb-8">Our Journey</h3>
+              <h3 className="mb-8">{t('about.journey')}</h3>
               <div className="space-y-6 mb-10">
                 {milestones.map((m, i) => (
                   <div key={i} className="flex items-start gap-4">
@@ -152,18 +139,20 @@ export function AboutPage() {
       <section className="py-24" style={{ backgroundColor: 'var(--light-gray)' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-16">
-            <h2 className="mb-6">The European Difference</h2>
+            <h2 className="mb-6">{t('about.europeanDifference')}</h2>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-8">
-            {advantages.map(({ Icon, title, desc }) => (
-              <div key={title} className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-xl transition-all hover:-translate-y-1 group text-center">
+            {advantages.map((item, index) => {
+              const Icon = advantageIcons[index] || Crosshair
+              return (
+              <div key={`${item?.title}-${index}`} className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-xl transition-all hover:-translate-y-1 group text-center">
                 <div className="w-16 h-16 rounded-full flex items-center justify-center mb-6 mx-auto group-hover:scale-110 transition-transform" style={{ background: 'linear-gradient(135deg, var(--gradient-red), var(--gradient-blue))' }}>
                   <Icon size={32} color="white" strokeWidth={2} />
                 </div>
-                <h3 className="mb-4" style={{ fontSize: '18px' }}>{title}</h3>
-                <p style={{ color: 'var(--dark-gray)', fontSize: '14px', lineHeight: '1.6' }}>{desc}</p>
+                <h3 className="mb-4" style={{ fontSize: '18px' }}>{item?.title}</h3>
+                <p style={{ color: 'var(--dark-gray)', fontSize: '14px', lineHeight: '1.6' }}>{item?.desc}</p>
               </div>
-            ))}
+            )})}
           </div>
         </div>
       </section>
@@ -171,7 +160,7 @@ export function AboutPage() {
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
-            <h2 className="mb-4">Where We Serve</h2>
+            <h2 className="mb-4">{t('about.whereWeServe')}</h2>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {locations.map(({ city, detail, radius }) => (
@@ -190,11 +179,11 @@ export function AboutPage() {
 
       <section className="py-24" style={{ background: 'linear-gradient(135deg, var(--gradient-red), var(--gradient-purple), var(--gradient-blue))' }}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
-          <h2 style={{ color: 'white' }} className="mb-6">Want to Learn More?</h2>
-          <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '18px' }} className="mb-12">Visit our showroom or request a detailed presentation</p>
+          <h2 style={{ color: 'white' }} className="mb-6">{t('about.learnMore')}</h2>
+          <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '18px' }} className="mb-12">{t('about.learnMoreSub')}</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button onClick={() => navigateTo('contact')} className="flex items-center justify-center gap-3 px-8 py-4 rounded-lg hover:shadow-xl transition-all" style={{ backgroundColor: 'var(--accent-orange)', color: 'white', fontWeight: 600 }}>
-              <Calendar size={20} /> Schedule Visit
+              <Calendar size={20} /> {t('about.scheduleVisit')}
             </button>
             <button
               type="button"
@@ -208,7 +197,7 @@ export function AboutPage() {
                 cursor: downloading ? 'not-allowed' : 'pointer',
               }}
             >
-              <Download size={20} /> {downloading ? 'Downloading...' : 'Download Brochure'}
+              <Download size={20} /> {downloading ? t('about.downloading') : t('about.downloadBrochure')}
             </button>
           </div>
         </div>
