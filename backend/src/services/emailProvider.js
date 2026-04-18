@@ -4,6 +4,32 @@ const { isEmailDeliveryEnabled, validateEmailConfig } = require('../config/email
 
 let resendClient = null
 
+const EMAIL_REGEX = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i
+
+const normalizeFromField = (value) => {
+  const raw = String(value || '').trim()
+  if (!raw) return raw
+
+  if (/^[^<>]+<[^<>]+>$/.test(raw)) {
+    return raw
+  }
+
+  const match = raw.match(EMAIL_REGEX)
+  if (!match) return raw
+
+  const email = match[0]
+
+  // If value is only an email, this is already valid for Resend.
+  if (raw.toLowerCase() === email.toLowerCase()) {
+    return email
+  }
+
+  const name = raw.replace(email, '').replace(/[<>]/g, '').trim()
+  if (!name) return email
+
+  return `${name} <${email}>`
+}
+
 const initializeEmailProvider = () => {
   if (!isEmailDeliveryEnabled()) {
     logger.warn('Email delivery is disabled (EMAIL_DELIVERY_ENABLED=false). Jobs will be queued but not sent.')
@@ -29,8 +55,14 @@ const sendEmail = async ({ to, subject, html, replyTo }) => {
   }
 
   const client = initializeEmailProvider()
+  const normalizedFrom = normalizeFromField(process.env.EMAIL_FROM)
+
+  if (normalizedFrom !== String(process.env.EMAIL_FROM || '').trim()) {
+    logger.warn(`EMAIL_FROM auto-normalized for Resend: ${normalizedFrom}`)
+  }
+
   const response = await client.emails.send({
-    from: process.env.EMAIL_FROM,
+    from: normalizedFrom,
     to: [to],
     subject,
     html,
