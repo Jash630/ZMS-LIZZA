@@ -1,6 +1,7 @@
 import { Phone, Award, Users, Shield, ArrowRight, Star, Zap } from 'lucide-react'
 import { useNavigation } from '../../context/NavigationContext.jsx'
 import { useTranslation } from '../../i18n/index.js'
+import { SUPPORT_TEL_URL } from '../../constants/contact.js'
 
 const BADGE_ICONS = [Award, Users, Shield]
 
@@ -121,7 +122,7 @@ export function HeroSection() {
             </button>
 
             <a
-              href="tel:+919876543210"
+              href={SUPPORT_TEL_URL}
               className="px-5 sm:px-6 h-[48px] rounded-[10px] text-[15px] no-underline inline-flex items-center gap-2 transition-transform hover:scale-[1.02]"
               style={{ border: '2px solid var(--accent-orange)', color: 'var(--accent-orange)', backgroundColor: 'white', fontWeight: 600 }}
             >

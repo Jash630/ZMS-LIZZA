@@ -6,6 +6,7 @@ import { useNavigation }  from '../context/NavigationContext.jsx'
 import { ChevronRight, Phone, MessageCircle, Mail, MapPin, Clock, Send, CheckCircle, Loader, Plus, Minus, Facebook, Instagram, Linkedin, Youtube } from 'lucide-react'
 import { publicService } from '../services/publicService.js'
 import { useTranslation } from '../i18n/index.js'
+import { SUPPORT_PHONE_DISPLAY, buildTelUrl, buildWhatsAppUrl } from '../constants/contact.js'
 
 export function ContactPage() {
   const { navigateTo } = useNavigation()
@@ -165,8 +166,8 @@ export function ContactPage() {
             {/* Contact Info */}
             <div className="space-y-5">
               {[
-                { Icon: Phone,         label: t('contact.callUs'),   value: siteSettings?.general?.phone || '+91 98765 43210',          sub: t('footer.businessHours'),           href: `tel:${(siteSettings?.general?.phone || '+919876543210').replace(/\s+/g, '')}`, ic: 'var(--accent-orange)', bg: 'rgba(46,94,170,0.05)'  },
-                { Icon: MessageCircle, label: t('contact.whatsApp'),  value: siteSettings?.general?.whatsapp || '+91 98765 43210',       sub: t('contact.quickResponse'),       href: `https://wa.me/${(siteSettings?.general?.whatsapp || '+919876543210').replace(/\D/g, '')}`, ic: '#25D366',              bg: 'rgba(37,211,102,0.05)' },
+                { Icon: Phone,         label: t('contact.callUs'),   value: siteSettings?.general?.phone || SUPPORT_PHONE_DISPLAY,          sub: t('footer.businessHours'),           href: buildTelUrl(siteSettings?.general?.phone || SUPPORT_PHONE_DISPLAY), ic: 'var(--accent-orange)', bg: 'rgba(46,94,170,0.05)'  },
+                { Icon: MessageCircle, label: t('contact.whatsApp'),  value: siteSettings?.general?.whatsapp || SUPPORT_PHONE_DISPLAY,       sub: t('contact.quickResponse'),       href: buildWhatsAppUrl(siteSettings?.general?.whatsapp || SUPPORT_PHONE_DISPLAY), ic: '#25D366',              bg: 'rgba(37,211,102,0.05)' },
                 { Icon: Mail,          label: t('contact.emailLabel'),     value: siteSettings?.general?.email || 'info@zmslizza.com',        sub: t('contact.emailResponse'),   href: `mailto:${siteSettings?.general?.email || 'info@zmslizza.com'}`, ic: 'var(--accent-orange)', bg: 'rgba(245,247,250,1)'  },
                 { Icon: MapPin,        label: t('contact.showroom'),  value: siteSettings?.general?.address || 'Ring Road, Surat 395002',sub: t('contact.scheduleVisit'),href: 'https://maps.google.com/?q=Surat', ic: 'var(--accent-orange)', bg: 'white' },
               ].map(({ Icon, label, value, sub, href, ic, bg }) => (

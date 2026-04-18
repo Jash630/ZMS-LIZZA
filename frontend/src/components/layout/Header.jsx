@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
-import { Menu, X, MessageCircle } from 'lucide-react'
+import { Menu, X, MessageCircle, Languages, ChevronDown } from 'lucide-react'
 import { useNavigation } from '../../context/NavigationContext.jsx'
 import { LANGUAGES, useTranslation } from '../../i18n/index.js'
+import { SUPPORT_WHATSAPP_URL } from '../../constants/contact.js'
 
 const NAV_ITEMS = [
     { key: 'nav.home', page: 'home' },
@@ -67,16 +68,25 @@ export function Header() {
                 <div className="flex items-center gap-4">
                     <label className="hidden md:flex items-center gap-2" style={{ color: isScrolled ? 'var(--charcoal)' : 'var(--charcoal)' }}>
                         <span className="text-xs font-semibold">{t('lang.title')}</span>
-                        <select
-                            value={lang}
-                            onChange={(event) => setLang(event.target.value)}
-                            className="px-2 py-1.5 rounded-md border"
-                            style={{ borderColor: 'rgba(0,0,0,0.15)', backgroundColor: '#fff', fontSize: '13px', fontWeight: 600 }}
+                        <div
+                            className="relative rounded-xl p-[1px]"
+                            style={{ background: 'linear-gradient(135deg, rgba(46,94,170,0.55), rgba(230,57,70,0.45))' }}
                         >
-                            {LANGUAGES.map((item) => (
-                                <option key={item.code} value={item.code}>{item.flag} {item.nativeName}</option>
-                            ))}
-                        </select>
+                            <div className="relative rounded-[11px]" style={{ backgroundColor: '#fff' }}>
+                                <Languages size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2" style={{ color: 'var(--gradient-blue)' }} />
+                                <select
+                                    value={lang}
+                                    onChange={(event) => setLang(event.target.value)}
+                                    className="appearance-none pl-8 pr-8 py-1.5 rounded-[11px] border border-transparent"
+                                    style={{ backgroundColor: 'transparent', fontSize: '13px', fontWeight: 700, color: 'var(--charcoal)', minWidth: '130px' }}
+                                >
+                                    {LANGUAGES.map((item) => (
+                                        <option key={item.code} value={item.code}>{item.flag} {item.nativeName}</option>
+                                    ))}
+                                </select>
+                                <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: 'var(--dark-gray)' }} />
+                            </div>
+                        </div>
                     </label>
 
                     <button
@@ -87,7 +97,7 @@ export function Header() {
                         {t('header.requestDemo')}
                     </button>
 
-                    <a href="https://wa.me/919876543210"
+                    <a href={SUPPORT_WHATSAPP_URL}
                         target="_blank"
                         rel="noreferrer"
                         className="hidden md:flex items-center justify-center w-12 h-12 rounded-lg border-2 transition-all hover:scale-105"
@@ -113,16 +123,25 @@ export function Header() {
                     <nav className="flex flex-col p-5 gap-3">
                         <label className="mb-2" style={{ color: 'var(--charcoal)' }}>
                             <span className="block text-xs font-semibold mb-1">{t('lang.title')}</span>
-                            <select
-                                value={lang}
-                                onChange={(event) => setLang(event.target.value)}
-                                className="w-full px-3 py-2 rounded-md border"
-                                style={{ borderColor: 'rgba(0,0,0,0.15)', backgroundColor: '#fff', fontSize: '14px', fontWeight: 600 }}
+                            <div
+                                className="relative rounded-xl p-[1px]"
+                                style={{ background: 'linear-gradient(135deg, rgba(46,94,170,0.5), rgba(230,57,70,0.4))' }}
                             >
-                                {LANGUAGES.map((item) => (
-                                    <option key={item.code} value={item.code}>{item.flag} {item.nativeName}</option>
-                                ))}
-                            </select>
+                                <div className="relative rounded-[11px]" style={{ backgroundColor: '#fff' }}>
+                                    <Languages size={16} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--gradient-blue)' }} />
+                                    <select
+                                        value={lang}
+                                        onChange={(event) => setLang(event.target.value)}
+                                        className="w-full appearance-none pl-9 pr-9 py-2 rounded-[11px] border border-transparent"
+                                        style={{ backgroundColor: 'transparent', fontSize: '14px', fontWeight: 700, color: 'var(--charcoal)' }}
+                                    >
+                                        {LANGUAGES.map((item) => (
+                                            <option key={item.code} value={item.code}>{item.flag} {item.nativeName}</option>
+                                        ))}
+                                    </select>
+                                    <ChevronDown size={15} className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: 'var(--dark-gray)' }} />
+                                </div>
+                            </div>
                         </label>
 
                         {NAV_ITEMS.map(({ key, page }) => (
