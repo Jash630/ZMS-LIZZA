@@ -21,10 +21,45 @@
 Optional:
 - `CLIENT_URL` (legacy fallback when `CORS_ORIGINS` is not provided)
 - `VIEW_FINGERPRINT_SALT` (recommended for unique view fingerprint hashing)
-- `EMAIL_APP`, `EMAIL_APP_PASS` (for newsletter and lead emails)
-- `EMAIL_FROM_NAME` (display name in outgoing emails)
-- `STAFF_NOTIFICATION_EMAIL` (internal email for new lead alerts)
+- `EMAIL_DELIVERY_ENABLED` (`true|false`; defaults to `true` in production, `false` otherwise)
+- `RESEND_API_KEY` (required when email delivery is enabled)
+- `EMAIL_FROM` (required when email delivery is enabled)
+- `EMAIL_REPLY_TO_DEFAULT` (optional default reply-to)
+- `EMAIL_STAFF_TO` (internal email for new lead alerts)
+- `EMAIL_QUEUE_POLL_MS`, `EMAIL_QUEUE_BATCH_SIZE`, `EMAIL_QUEUE_LOCK_TIMEOUT_MS`
+- `EMAIL_QUEUE_MAX_ATTEMPTS`, `EMAIL_QUEUE_BASE_DELAY_SECONDS`, `EMAIL_QUEUE_MAX_DELAY_SECONDS`
 - `API_BASE_URL` (used in unsubscribe links)
+
+## Email Automation Architecture
+
+The backend uses a durable outbox queue (`EmailJob` collection) and a background worker:
+
+1. Public/admin flows enqueue email jobs only.
+2. Worker claims queued jobs with atomic locking.
+3. Worker sends via Resend.
+4. Success marks job as `sent`; failures retry with exponential backoff.
+5. Jobs move to `dead_letter` after max attempts.
+
+This prevents request-time email failures from breaking lead/newsletter APIs.
+
+## Resend Setup (Step by Step)
+
+1. Create/login to your Resend account at https://resend.com.
+2. Add your sending domain in Resend and complete DNS verification (SPF/DKIM).
+3. Create an API key from Resend dashboard (`API Keys` -> `Create API Key`).
+4. In backend `.env`, set:
+   - `EMAIL_DELIVERY_ENABLED=true`
+   - `RESEND_API_KEY=<your_key>`
+   - `EMAIL_FROM=LIZZA INDIA PRIVATE LIMITED <noreply@your-verified-domain>`
+   - `EMAIL_REPLY_TO_DEFAULT=<support email>`
+   - `EMAIL_STAFF_TO=<office notification email>`
+5. Redeploy backend service (Render) after saving env variables.
+6. Test with:
+   - Submit contact enquiry -> office email should receive lead alert, customer should receive acknowledgment.
+   - Subscribe newsletter -> user should receive welcome email.
+7. Monitor delivery:
+   - Resend dashboard for provider status.
+   - `EmailJob` documents for queue status (`queued`, `processing`, `sent`, `dead_letter`).
 
 ## CORS Behavior
 

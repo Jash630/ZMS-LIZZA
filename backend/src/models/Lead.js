@@ -12,7 +12,12 @@ const LeadSchema = new mongoose.Schema(
       required: [true, 'Contact number is required'],
       trim:     true,
     },
-    email:    { type: String, trim: true, lowercase: true },
+    email: {
+      type: String,
+      required: [true, 'Email is required'],
+      trim: true,
+      lowercase: true,
+    },
     businessName: { type: String, trim: true },
     city:     { type: String, trim: true },
     state:    { type: String, trim: true },

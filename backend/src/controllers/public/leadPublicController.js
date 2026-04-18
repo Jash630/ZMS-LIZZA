@@ -2,9 +2,7 @@ const Lead = require('../../models/Lead')
 const Notification = require('../../models/Notification')
 const { sendSuccess } = require('../../utils/apiResponse')
 const logger = require('../../utils/logger')
-const { sendMail } = require('../../services/emailService')
-const { buildLeadAcknowledgmentEmail } = require('../../templates/leadAcknowledgment')
-const { buildLeadStaffNotification } = require('../../templates/leadStaffNotification')
+const { queueLeadAutomationEmails } = require('../../services/emailAutomationService')
 
 // POST /api/v1/public/leads
 exports.createPublicLead = async (req, res, next) => {
@@ -12,7 +10,7 @@ exports.createPublicLead = async (req, res, next) => {
     const payload = {
       name: (req.body.name || req.body.fullName || '').trim(),
       contact: (req.body.contact || req.body.phone || '').trim(),
-      email: req.body.email || undefined,
+      email: String(req.body.email || '').trim().toLowerCase() || undefined,
       businessName: req.body.businessName || undefined,
       city: req.body.city || undefined,
       state: req.body.state || undefined,
@@ -35,35 +33,10 @@ exports.createPublicLead = async (req, res, next) => {
       })
     }
 
-    const emailJobs = []
-    const emailPayload = { ...lead.toObject() }
-
-    if (lead.email) {
-      const ack = buildLeadAcknowledgmentEmail(emailPayload)
-      emailJobs.push(
-        sendMail({ to: lead.email, subject: ack.subject, html: ack.html }).catch((error) => {
-          logger.warn(`Lead acknowledgment email failed for ${lead.email}: ${error.message}`)
-        })
-      )
-    }
-
-    const staffEmail = process.env.STAFF_NOTIFICATION_EMAIL
-    if (staffEmail) {
-      const alert = buildLeadStaffNotification(emailPayload)
-      emailJobs.push(
-        sendMail({
-          to: staffEmail,
-          subject: alert.subject,
-          html: alert.html,
-          replyTo: lead.email || undefined,
-        }).catch((error) => {
-          logger.warn(`Lead staff notification email failed: ${error.message}`)
-        })
-      )
-    }
-
-    if (emailJobs.length) {
-      Promise.allSettled(emailJobs).catch(() => {})
+    try {
+      await queueLeadAutomationEmails(lead)
+    } catch (error) {
+      logger.warn(`Lead email automation queueing failed for ${lead._id}: ${error.message}`)
     }
 
     sendSuccess(res, {

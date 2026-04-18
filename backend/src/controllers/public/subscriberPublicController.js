@@ -1,8 +1,7 @@
 const Subscriber = require('../../models/Subscriber')
 const { sendSuccess } = require('../../utils/apiResponse')
 const logger = require('../../utils/logger')
-const { sendMail } = require('../../services/emailService')
-const { buildWelcomeEmail } = require('../../templates/subscriberEmails')
+const { queueSubscriberWelcomeEmail } = require('../../services/emailAutomationService')
 
 const normalizeEmail = (value = '') => String(value).trim().toLowerCase()
 
@@ -26,10 +25,7 @@ exports.subscribeNewsletter = async (req, res, next) => {
       await subscriber.save()
 
       if (reactivated) {
-        const { subject, html } = buildWelcomeEmail({
-          unsubscribeToken: subscriber.unsubscribeToken,
-        })
-        sendMail({ to: subscriber.email, subject, html }).catch((error) => {
+        await queueSubscriberWelcomeEmail(subscriber).catch((error) => {
           logger.warn(`Welcome email failed for ${subscriber.email}: ${error.message}`)
         })
       }
@@ -49,10 +45,7 @@ exports.subscribeNewsletter = async (req, res, next) => {
       subscribedAt: new Date(),
     })
 
-    const { subject, html } = buildWelcomeEmail({
-      unsubscribeToken: subscriber.unsubscribeToken,
-    })
-    sendMail({ to: subscriber.email, subject, html }).catch((error) => {
+    await queueSubscriberWelcomeEmail(subscriber).catch((error) => {
       logger.warn(`Welcome email failed for ${subscriber.email}: ${error.message}`)
     })
 

@@ -56,7 +56,9 @@ const createPublicLeadValidators = [
     .isLength({ min: 6, max: 20 })
     .withMessage('Phone must be between 6 and 20 characters'),
   body('email')
-    .optional({ values: 'falsy' })
+    .trim()
+    .notEmpty()
+    .withMessage('Email is required')
     .isEmail()
     .withMessage('Please provide a valid email address'),
   body('city')
@@ -101,12 +103,16 @@ const createPublicLeadValidators = [
   body().custom((_, { req }) => {
     const name = req.body.name || req.body.fullName
     const contact = req.body.contact || req.body.phone
+    const email = req.body.email
 
     if (!name || !String(name).trim()) {
       throw new Error('Name is required')
     }
     if (!contact || !String(contact).trim()) {
       throw new Error('Contact number is required')
+    }
+    if (!email || !String(email).trim()) {
+      throw new Error('Email is required')
     }
     return true
   }),

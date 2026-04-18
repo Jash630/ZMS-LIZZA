@@ -42,8 +42,11 @@ export function ContactPage() {
 
   const validate = () => {
     const errs = {}
+    const emailValue = String(form.email || '').trim()
     if (!form.fullName.trim()) errs.fullName = t('contact.validation.fullName')
     if (!form.phone || form.phone === '+91 ') errs.phone = t('contact.validation.phone')
+    if (!emailValue) errs.email = t('contact.validation.email')
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue)) errs.email = t('contact.validation.emailFormat')
     if (!form.city.trim()) errs.city = t('contact.validation.city')
     if (!form.helpType) errs.helpType = t('contact.validation.helpType')
     setErrors(errs)
@@ -114,8 +117,9 @@ export function ContactPage() {
                     {errors.phone && <p className="text-xs mt-1" style={{ color: '#EF4444' }}>{errors.phone}</p>}
                   </div>
                   <div>
-                    <label className="block mb-2 text-sm font-semibold" style={{ color: 'var(--charcoal)' }}>{t('contact.email')}</label>
-                    <input name="email" value={form.email} onChange={onChange} type="email" placeholder={t('contact.placeholders.email')} className={baseInput} style={{ fontSize: '15px' }} />
+                    <label className="block mb-2 text-sm font-semibold" style={{ color: 'var(--charcoal)' }}>{t('contact.email')} <span style={{ color: 'var(--gradient-red)' }}>{t('common.required')}</span></label>
+                    <input name="email" value={form.email} onChange={onChange} type="email" placeholder={t('contact.placeholders.email')} className={baseInput} style={inputStyle('email')} />
+                    {errors.email && <p className="text-xs mt-1" style={{ color: '#EF4444' }}>{errors.email}</p>}
                   </div>
                 </div>
                 <div>
