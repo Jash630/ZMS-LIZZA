@@ -8,9 +8,12 @@ import {
   Mail,
   MessageCircle,
   Clock,
+  Languages,
+  ChevronDown,
 } from 'lucide-react'
 import { useNavigation } from '../../context/NavigationContext.jsx'
 import { LANGUAGES, useTranslation } from '../../i18n/index.js'
+import { SUPPORT_PHONE_DISPLAY, SUPPORT_TEL_URL, SUPPORT_WHATSAPP_URL } from '../../constants/contact.js'
 
 const QUICK_LINKS = [
   { key: 'nav.home', page: 'home' },
@@ -136,9 +139,9 @@ export function Footer() {
             <ul className="space-y-4">
               {[
                 { Icon: MapPin, text: 'Surat, Gujarat, India', href: null, iconColor: 'var(--accent-orange)' },
-                { Icon: Phone, text: '+91 98765 43210', href: 'tel:+919876543210', iconColor: 'var(--accent-orange)' },
+                { Icon: Phone, text: SUPPORT_PHONE_DISPLAY, href: SUPPORT_TEL_URL, iconColor: 'var(--accent-orange)' },
                 { Icon: Mail, text: 'info@zmslizza.com', href: 'mailto:info@zmslizza.com', iconColor: 'var(--accent-orange)' },
-                { Icon: MessageCircle, text: t('footer.whatsAppUs'), href: 'https://wa.me/919876543210', iconColor: 'var(--whatsapp-green)' },
+                { Icon: MessageCircle, text: t('footer.whatsAppUs'), href: SUPPORT_WHATSAPP_URL, iconColor: 'var(--whatsapp-green)' },
                 { Icon: Clock, text: t('footer.businessHours'), href: null, iconColor: 'var(--accent-orange)' },
               ].map(({ Icon, text, href, iconColor }, index) => (
                 <li key={index} className="flex items-start gap-3">
@@ -163,21 +166,30 @@ export function Footer() {
               ))}
             </ul>
             <div className="mt-6">
-              <label style={{ color: 'rgba(255,255,255,0.75)', fontSize: '12px', fontWeight: 700, display: 'block', marginBottom: 6 }}>
+              <label style={{ color: 'rgba(255,255,255,0.82)', fontSize: '12px', fontWeight: 700, display: 'block', marginBottom: 6 }}>
                 {t('lang.title')}
               </label>
-              <select
-                value={lang}
-                onChange={(event) => setLang(event.target.value)}
-                className="w-full px-3 py-2 rounded-md border"
-                style={{ borderColor: 'rgba(255,255,255,0.2)', backgroundColor: 'rgba(255,255,255,0.08)', color: 'white', fontSize: '13px', fontWeight: 600 }}
+              <div
+                className="relative rounded-xl p-[1px]"
+                style={{ background: 'linear-gradient(135deg, rgba(59,130,246,0.55), rgba(255,107,53,0.5))' }}
               >
-                {LANGUAGES.map((item) => (
-                  <option key={item.code} value={item.code} style={{ color: '#111827' }}>
-                    {item.flag} {item.nativeName}
-                  </option>
-                ))}
-              </select>
+                <div className="relative rounded-[11px]" style={{ backgroundColor: 'rgba(15,23,42,0.68)' }}>
+                  <Languages size={16} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'rgba(255,255,255,0.82)' }} />
+                  <select
+                    value={lang}
+                    onChange={(event) => setLang(event.target.value)}
+                    className="w-full appearance-none pl-9 pr-9 py-2 rounded-[11px] border border-transparent"
+                    style={{ backgroundColor: 'transparent', color: 'white', fontSize: '13px', fontWeight: 700 }}
+                  >
+                    {LANGUAGES.map((item) => (
+                      <option key={item.code} value={item.code} style={{ color: '#111827' }}>
+                        {item.flag} {item.nativeName}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown size={15} className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: 'rgba(255,255,255,0.8)' }} />
+                </div>
+              </div>
             </div>
           </div>
         </div>

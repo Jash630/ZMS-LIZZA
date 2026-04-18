@@ -236,7 +236,7 @@ export const gu = {
     message: 'સંદેશ',
     placeholders: {
       fullName: 'તમારું પૂરું નામ', businessName: 'તમારી કંપનીનું નામ',
-      phone: '+91 98765 43210', email: 'email@example.com',
+      phone: '+91 91040 94040', email: 'email@example.com',
       city: 'દા.ત., સુરત, ગુજરાત', message: 'તમારી જરૂરિયાતો વિશે વધુ જણાવો...',
     },
     machineOptions: {

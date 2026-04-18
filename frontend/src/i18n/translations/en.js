@@ -236,7 +236,7 @@ export const en = {
     message: 'Message',
     placeholders: {
       fullName: 'Your full name', businessName: 'Your company name',
-      phone: '+91 98765 43210', email: 'email@example.com',
+      phone: '+91 91040 94040', email: 'email@example.com',
       city: 'e.g., Surat, Gujarat', message: 'Tell us more about your requirements...',
     },
     machineOptions: {

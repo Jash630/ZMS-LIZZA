@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { MessageCircle } from 'lucide-react'
 import { useTranslation } from '../../i18n/index.js'
+import { SUPPORT_WHATSAPP_URL } from '../../constants/contact.js'
 
 export function WhatsAppButton() {
     const [showTooltip, setShowTooltip] = useState(false)
@@ -17,7 +18,7 @@ export function WhatsAppButton() {
                 </div>
             )}
 
-            <a href="https://wa.me/919876543210?text=Hello! I am interested in ZMS LIZZA embroidery machines."
+            <a href={SUPPORT_WHATSAPP_URL}
                 target="_blank"
                 rel="noreferrer"
                 onMouseEnter={() => setShowTooltip(true)}
