@@ -15,6 +15,7 @@ const connectDB = require('./config/db')
 const logger = require('./utils/logger')
 const errorHandler = require('./middleware/errorHandler')
 const AppError = require('./utils/AppError')
+const { startEmailWorker, stopEmailWorker } = require('./services/emailWorkerService')
 
 const authRoutes = require('./routes/authRoutes')
 const adminRoutes = require('./routes/admin')
@@ -129,14 +130,25 @@ const PORT = process.env.PORT || 5000
 const server = app.listen(PORT, () => {
   logger.info(`ZMS LIZZA API running on port ${PORT} in ${process.env.NODE_ENV} mode`)
   logger.info(`API base: ${process.env.API_BASE_URL || 'https://zms-lizza-backend.onrender.com/api/v1'}`)
+  startEmailWorker()
 })
 
+const gracefulShutdown = () => {
+  stopEmailWorker()
+  server.close(() => process.exit(0))
+}
+
+process.on('SIGINT', gracefulShutdown)
+process.on('SIGTERM', gracefulShutdown)
+
 process.on('unhandledRejection', (err) => {
+  stopEmailWorker()
   logger.error(`Unhandled Rejection: ${err.message}`)
   server.close(() => process.exit(1))
 })
 
 process.on('uncaughtException', (err) => {
+  stopEmailWorker()
   logger.error(`Uncaught Exception: ${err.message}`)
   process.exit(1)
 })

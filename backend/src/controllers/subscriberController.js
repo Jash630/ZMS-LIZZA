@@ -105,10 +105,10 @@ exports.sendOffer = async (req, res, next) => {
     if (!title) return next(new AppError('Offer title is required', 400))
 
     const result = await notifyOffer({ title, description, promoCode, image }, subscriberIds)
-    logger.info(`Offer broadcast by ${req.user?.email || 'unknown'}: ${result.sent}/${result.total} sent`)
+    logger.info(`Offer broadcast queued by ${req.user?.email || 'unknown'}: ${result.queued}/${result.total} queued`)
 
     sendSuccess(res, {
-      message: `Offer sent to ${result.sent} subscribers`,
+      message: `Offer queued for ${result.queued} subscribers`,
       data: result,
     })
   } catch (error) {

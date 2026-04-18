@@ -253,6 +253,7 @@ export const en = {
     },
     validation: {
       fullName: 'Full name is required', phone: 'Phone is required',
+      email: 'Email is required', emailFormat: 'Please enter a valid email address',
       city: 'City is required', helpType: 'Please select how we can help',
     },
     submitting: 'Submitting...', success: 'Sent Successfully!', submitBtn: 'Submit Inquiry',
