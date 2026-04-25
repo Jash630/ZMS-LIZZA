@@ -13,7 +13,7 @@ export function WhyChooseSection() {
   const features = Array.isArray(t('whyChoose.features', [])) ? t('whyChoose.features', []) : []
 
   return (
-    <section className="py-24" style={{ background: 'linear-gradient(180deg, #ffffff 0%, #f7f9ff 100%)' }}>
+    <section className="py-24" style={{ background: 'radial-gradient(circle at 10% 10%, rgba(46,94,170,0.08) 0%, transparent 45%), linear-gradient(180deg, #ffffff 0%, #f7f9ff 100%)' }}>
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="mb-4">{t('whyChoose.title')}</h2>
@@ -31,13 +31,24 @@ export function WhyChooseSection() {
             return (
             <article
               key={`${feature?.title}-${index}`}
-              className="relative overflow-hidden rounded-2xl border p-6 lg:p-7 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl"
+              className="relative overflow-hidden rounded-2xl border p-6 lg:p-7 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl"
               style={{
-                borderColor: 'rgba(15, 23, 42, 0.08)',
-                boxShadow: '0 10px 24px rgba(15,23,42,0.06)',
-                background: 'linear-gradient(165deg, #ffffff 0%, #f8fbff 100%)',
+                borderColor: 'rgba(15, 23, 42, 0.10)',
+                boxShadow: '0 14px 30px rgba(15,23,42,0.08)',
+                background: 'linear-gradient(165deg, #ffffff 0%, #f4f8ff 100%)',
               }}
             >
+              <div
+                style={{
+                  position: 'absolute',
+                  left: 0,
+                  right: 0,
+                  top: 0,
+                  height: 5,
+                  background: `linear-gradient(90deg, ${meta.color}, ${meta.color}99)`,
+                }}
+              />
+
               <div
                 style={{
                   position: 'absolute',
@@ -47,6 +58,15 @@ export function WhyChooseSection() {
                   height: 110,
                   borderRadius: '50%',
                   background: `radial-gradient(circle, ${meta.color}22 0%, transparent 70%)`,
+                  pointerEvents: 'none',
+                }}
+              />
+
+              <div
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  background: `linear-gradient(135deg, ${meta.color}10 0%, transparent 36%)`,
                   pointerEvents: 'none',
                 }}
               />
@@ -73,7 +93,10 @@ export function WhyChooseSection() {
               <h4 className="mb-3" style={{ fontSize: '22px', lineHeight: 1.25 }}>{feature?.title}</h4>
               <p style={{ fontSize: '15px', color: 'var(--dark-gray)', lineHeight: '1.7' }}>{feature?.description}</p>
 
-              <div style={{ marginTop: 18, height: 4, borderRadius: 999, background: `linear-gradient(90deg, ${meta.color}, ${meta.color}55)` }} />
+              <div style={{ marginTop: 18, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+                <div style={{ height: 4, flex: 1, borderRadius: 999, background: `linear-gradient(90deg, ${meta.color}, ${meta.color}55)` }} />
+                <span style={{ fontSize: 12, fontWeight: 700, color: meta.color }}>Trusted</span>
+              </div>
             </article>
           )})}
         </div>

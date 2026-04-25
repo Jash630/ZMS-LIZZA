@@ -73,8 +73,17 @@ export function FeaturedProducts({ products = [], recentMediaImages = [] }) {
               {cards.map((product) => (
                 <div
                   key={product.id || product.slug || product.name}
-                  className="gradient-border flex-shrink-0 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2"
+                  className="gradient-border flex-shrink-0 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 cursor-pointer"
                   style={{ width: 'min(360px, 84vw)' }}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => openDetails(product.detailTarget)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault()
+                      openDetails(product.detailTarget)
+                    }
+                  }}
                 >
                   <ProductImageCarousel images={product.carouselImages} alt={product.name} height={240} />
 
@@ -92,7 +101,10 @@ export function FeaturedProducts({ products = [], recentMediaImages = [] }) {
                     <div className="flex items-center gap-4">
                       <button
                         type="button"
-                        onClick={() => openDetails(product.detailTarget)}
+                        onClick={(event) => {
+                          event.stopPropagation()
+                          openDetails(product.detailTarget)
+                        }}
                         className="flex-1 px-4 py-2 rounded-lg border-2 transition-all hover:scale-105"
                         style={{ borderColor: 'var(--gradient-blue)', color: 'var(--gradient-blue)', fontWeight: 600, fontSize: '14px' }}
                       >
@@ -100,7 +112,10 @@ export function FeaturedProducts({ products = [], recentMediaImages = [] }) {
                       </button>
                       <button
                         type="button"
-                        onClick={() => navigateTo('contact')}
+                        onClick={(event) => {
+                          event.stopPropagation()
+                          navigateTo('contact')
+                        }}
                         style={{ color: 'var(--accent-orange)', fontWeight: 600, fontSize: '14px', background: 'none', border: 'none', cursor: 'pointer' }}
                       >
                         {t('featuredProducts.requestQuote')}

@@ -136,6 +136,7 @@
   content: '';
   position: absolute;
   inset: 0;
+  pointer-events: none;
   border-radius: inherit;
   padding: 2px;
   background: linear-gradient(135deg, var(--gradient-red), var(--gradient-purple), var(--gradient-blue));
