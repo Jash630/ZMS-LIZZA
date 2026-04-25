@@ -13,7 +13,7 @@ export function WhyChooseSection() {
   const features = Array.isArray(t('whyChoose.features', [])) ? t('whyChoose.features', []) : []
 
   return (
-    <section className="py-24 bg-white">
+    <section className="py-24" style={{ background: 'linear-gradient(180deg, #ffffff 0%, #f7f9ff 100%)' }}>
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="mb-4">{t('whyChoose.title')}</h2>
@@ -21,18 +21,60 @@ export function WhyChooseSection() {
             {t('whyChoose.subtitle')}
           </p>
         </div>
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 lg:gap-6">
           {features.map((feature, index) => {
             const meta = FEATURE_META[index] || FEATURE_META[0]
             const Icon = meta.Icon
+            const serial = `0${index + 1}`.slice(-2)
+
             return (
-            <div key={`${feature?.title}-${index}`} className="gradient-border bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
-              <div className="w-16 h-16 rounded-full flex items-center justify-center mb-6" style={{ background: `linear-gradient(135deg, ${meta.color}, ${meta.color}cc)` }}>
-                <Icon size={32} color="white" strokeWidth={2} />
+            <article
+              key={`${feature?.title}-${index}`}
+              className="relative overflow-hidden rounded-2xl border p-6 lg:p-7 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl"
+              style={{
+                borderColor: 'rgba(15, 23, 42, 0.08)',
+                boxShadow: '0 10px 24px rgba(15,23,42,0.06)',
+                background: 'linear-gradient(165deg, #ffffff 0%, #f8fbff 100%)',
+              }}
+            >
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '-34px',
+                  right: '-34px',
+                  width: 110,
+                  height: 110,
+                  borderRadius: '50%',
+                  background: `radial-gradient(circle, ${meta.color}22 0%, transparent 70%)`,
+                  pointerEvents: 'none',
+                }}
+              />
+
+              <div className="flex items-center justify-between gap-4 mb-5">
+                <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${meta.color}, ${meta.color}cc)` }}>
+                  <Icon size={27} color="white" strokeWidth={2.2} />
+                </div>
+                <span
+                  style={{
+                    fontSize: 12,
+                    fontWeight: 800,
+                    color: '#64748b',
+                    letterSpacing: '0.08em',
+                    backgroundColor: 'rgba(15,23,42,0.04)',
+                    borderRadius: 999,
+                    padding: '6px 10px',
+                  }}
+                >
+                  {serial}
+                </span>
               </div>
-              <h4 className="mb-3" style={{ fontSize: '20px' }}>{feature?.title}</h4>
-              <p style={{ fontSize: '15px', color: 'var(--dark-gray)', lineHeight: '1.6' }}>{feature?.description}</p>
-            </div>
+
+              <h4 className="mb-3" style={{ fontSize: '22px', lineHeight: 1.25 }}>{feature?.title}</h4>
+              <p style={{ fontSize: '15px', color: 'var(--dark-gray)', lineHeight: '1.7' }}>{feature?.description}</p>
+
+              <div style={{ marginTop: 18, height: 4, borderRadius: 999, background: `linear-gradient(90deg, ${meta.color}, ${meta.color}55)` }} />
+            </article>
           )})}
         </div>
       </div>

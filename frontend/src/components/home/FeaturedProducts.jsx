@@ -18,7 +18,7 @@ export function FeaturedProducts({ products = [], recentMediaImages = [] }) {
   const cards = useMemo(
     () => (products || []).map((product, index) => ({
       ...product,
-      detailTarget: product.slug || product.id || null,
+      detailTarget: product.id || product.slug || null,
       carouselImages: buildProductCarouselImages(product, rotatePool(recentMediaImages, index), { poolOnly: true }),
     })),
     [products, recentMediaImages]
@@ -30,7 +30,10 @@ export function FeaturedProducts({ products = [], recentMediaImages = [] }) {
   }
 
   const openDetails = (target) => {
-    if (!target) return
+    if (!target) {
+      navigateTo('products')
+      return
+    }
     navigateTo('product-detail', target)
   }
 
@@ -69,7 +72,7 @@ export function FeaturedProducts({ products = [], recentMediaImages = [] }) {
             <div className="flex gap-6" style={{ width: 'max-content' }}>
               {cards.map((product) => (
                 <div
-                  key={product.id}
+                  key={product.id || product.slug || product.name}
                   className="gradient-border flex-shrink-0 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2"
                   style={{ width: 'min(360px, 84vw)' }}
                 >

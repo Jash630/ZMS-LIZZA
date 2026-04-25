@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, X, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useNavigation } from '../../context/NavigationContext.jsx'
 import { publicService } from '../../services/publicService.js'
 import { useTranslation } from '../../i18n/index.js'
@@ -36,6 +36,23 @@ export function GallerySection() {
   const { t } = useTranslation()
   const [hovered, setHovered] = useState(null)
   const [images, setImages] = useState([])
+  const [activeImageIndex, setActiveImageIndex] = useState(null)
+
+  const closeLightbox = () => setActiveImageIndex(null)
+
+  const showPrev = () => {
+    setActiveImageIndex((current) => {
+      if (current === null || images.length === 0) return current
+      return (current - 1 + images.length) % images.length
+    })
+  }
+
+  const showNext = () => {
+    setActiveImageIndex((current) => {
+      if (current === null || images.length === 0) return current
+      return (current + 1) % images.length
+    })
+  }
 
   useEffect(() => {
     let active = true
@@ -67,6 +84,19 @@ export function GallerySection() {
     }
   }, [])
 
+  useEffect(() => {
+    if (activeImageIndex === null) return undefined
+
+    const onKeyDown = (event) => {
+      if (event.key === 'Escape') closeLightbox()
+      if (event.key === 'ArrowLeft') showPrev()
+      if (event.key === 'ArrowRight') showNext()
+    }
+
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [activeImageIndex, images.length])
+
   return (
     <section className="py-24 bg-white">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
@@ -86,6 +116,7 @@ export function GallerySection() {
                 style={{ height: img.height }}
                 onMouseEnter={() => setHovered(i)}
                 onMouseLeave={() => setHovered(null)}
+                onClick={() => setActiveImageIndex(i)}
               >
                 <img
                   src={img.url}
@@ -120,6 +151,66 @@ export function GallerySection() {
             {t('gallerySection.viewFull')} <ArrowRight size={20} />
           </button>
         </div>
+
+        {activeImageIndex !== null && images[activeImageIndex] && (
+          <div
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8"
+            style={{ backgroundColor: 'rgba(2,6,23,0.9)' }}
+            onClick={closeLightbox}
+          >
+            <button
+              type="button"
+              aria-label="Close image preview"
+              onClick={closeLightbox}
+              className="absolute top-4 right-4 md:top-6 md:right-6 w-11 h-11 rounded-full flex items-center justify-center"
+              style={{ backgroundColor: 'rgba(255,255,255,0.1)', color: '#fff' }}
+            >
+              <X size={22} />
+            </button>
+
+            {images.length > 1 && (
+              <button
+                type="button"
+                aria-label="Previous image"
+                onClick={(event) => {
+                  event.stopPropagation()
+                  showPrev()
+                }}
+                className="absolute left-4 md:left-6 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full flex items-center justify-center"
+                style={{ backgroundColor: 'rgba(255,255,255,0.1)', color: '#fff' }}
+              >
+                <ChevronLeft size={22} />
+              </button>
+            )}
+
+            <div className="max-w-[1100px] w-full" onClick={(event) => event.stopPropagation()}>
+              <img
+                src={images[activeImageIndex].url}
+                alt={images[activeImageIndex].caption}
+                onError={withImageFallback}
+                className="w-full max-h-[78vh] object-contain rounded-xl"
+              />
+              <p className="mt-3 text-center" style={{ color: 'rgba(255,255,255,0.9)', fontSize: 14 }}>
+                {images[activeImageIndex].caption}
+              </p>
+            </div>
+
+            {images.length > 1 && (
+              <button
+                type="button"
+                aria-label="Next image"
+                onClick={(event) => {
+                  event.stopPropagation()
+                  showNext()
+                }}
+                className="absolute right-4 md:right-6 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full flex items-center justify-center"
+                style={{ backgroundColor: 'rgba(255,255,255,0.1)', color: '#fff' }}
+              >
+                <ChevronRight size={22} />
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </section>
   )

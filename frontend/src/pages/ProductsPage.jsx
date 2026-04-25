@@ -93,7 +93,7 @@ export function ProductsPage() {
   const cards = useMemo(
     () => (products || []).map((product, index) => ({
       ...product,
-      detailTarget: product.slug || product.id || null,
+      detailTarget: product.id || product.slug || null,
       fullGallery: buildProductCarouselImages(product, rotatePool(productMediaImages, index), { poolOnly: false }),
       flatSpecs: flattenSpecs(product.specifications),
       featureBullets: [
@@ -123,7 +123,10 @@ export function ProductsPage() {
   )
 
   const openDetails = (target) => {
-    if (!target) return
+    if (!target) {
+      navigateTo('products')
+      return
+    }
     navigateTo('product-detail', target)
   }
 
