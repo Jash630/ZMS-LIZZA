@@ -9,6 +9,7 @@ import { ServicesPage }      from './pages/ServicesPage.jsx'
 import { BlogPage }          from './pages/BlogPage.jsx'
 import { BlogPostPage }      from './pages/BlogPostPage.jsx'
 import { ContactPage }       from './pages/ContactPage.jsx'
+import { NotFoundPage }      from './pages/NotFoundPage.jsx'
 import { publicService }     from './services/publicService.js'
 
 const SITE_URL = String(import.meta.env.VITE_SITE_URL || 'https://lizza.in').replace(/\/+$/, '')
@@ -59,6 +60,11 @@ const SEO_BY_PAGE = {
     description:
       'Contact LIZZA India for embroidery machine quotes, live demos, support and consultation. Call or submit your enquiry online.',
   },
+  'not-found': {
+    title: '404 Page Not Found | LIZZA India',
+    description:
+      'The page you requested could not be found. Return to the LIZZA India homepage or explore our embroidery machine catalog.',
+  },
 }
 
 const trimDescription = (value, limit = 160) => {
@@ -86,6 +92,8 @@ const buildSearchPath = (page, id = null) => {
       return id ? `/?page=blog-detail&slug=${encodeURIComponent(id)}` : '/?page=blog'
     case 'contact':
       return '/?page=contact'
+    case 'not-found':
+      return '/?page=not-found'
     default:
       return '/'
   }
@@ -179,6 +187,7 @@ function AppRoutes() {
   }, [currentPage, productId, blogSlug])
 
   switch (currentPage) {
+    case 'home':           return <HomePage />
     case 'about':          return <AboutPage />
     case 'products':       return <ProductsPage />
     case 'product-detail': return <ProductDetailPage productId={productId} />
@@ -187,6 +196,7 @@ function AppRoutes() {
     case 'blog':           return <BlogPage />
     case 'blog-detail':    return <BlogPostPage slug={blogSlug} />
     case 'contact':        return <ContactPage />
+    case 'not-found':      return <NotFoundPage />
     default:               return <HomePage />
   }
 }
