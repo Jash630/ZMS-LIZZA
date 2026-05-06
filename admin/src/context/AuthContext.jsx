@@ -14,7 +14,7 @@ export const ROLES = {
 
 export const ROLE_PERMISSIONS = {
   superadmin: ['all'],
-  admin: ['dashboard', 'posts', 'comments', 'media', 'analytics', 'leads', 'users', 'settings', 'seo', 'notifications', 'subscribers'],
+  admin: ['dashboard', 'posts', 'products', 'comments', 'media', 'analytics', 'leads', 'users', 'settings', 'seo', 'notifications', 'subscribers'],
   editor: ['dashboard', 'posts', 'comments', 'media'],
 }
 

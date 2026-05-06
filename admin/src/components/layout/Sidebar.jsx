@@ -4,13 +4,14 @@ import { useAuth } from '../../context/AuthContext'
 import {
   LayoutDashboard, FileText, MessageSquare, Image, BarChart3,
   PhoneCall, Users, Settings, LogOut, ChevronLeft, ChevronRight,
-  Bell, Globe, X, Mail
+  Bell, Globe, X, Mail, Package
 } from 'lucide-react'
 import './Sidebar.css'
 
 const NAV_ITEMS = [
   { path: '/dashboard',     label: 'Overview',          icon: LayoutDashboard, perm: 'dashboard' },
   { path: '/posts',         label: 'Blog Posts',        icon: FileText,        perm: 'posts' },
+  { path: '/products',      label: 'Products',          icon: Package,         perm: 'products' },
   { path: '/comments',      label: 'Comments',          icon: MessageSquare,   perm: 'comments' },
   { path: '/media',         label: 'Media Library',     icon: Image,           perm: 'media' },
   { path: '/analytics',     label: 'Analytics',         icon: BarChart3,       perm: 'analytics' },

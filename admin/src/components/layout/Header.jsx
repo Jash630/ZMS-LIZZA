@@ -24,6 +24,7 @@ import './Header.css'
 const PAGE_TITLES = {
   '/dashboard': { title: 'Dashboard', sub: 'Welcome back' },
   '/posts': { title: 'Blog Posts', sub: 'Manage your content' },
+  '/products': { title: 'Products', sub: 'Manage your product catalog' },
   '/comments': { title: 'Comments', sub: 'Moderate discussions' },
   '/media': { title: 'Media Library', sub: 'Manage files and assets' },
   '/analytics': { title: 'Analytics', sub: 'Performance insights' },
