@@ -5,10 +5,10 @@ const GeneralSettingsSchema = new mongoose.Schema(
     siteName: { type: String, default: 'ZMS LIZZA' },
     tagline: { type: String, default: 'European Technology - Embroidery Machine Manufacturer' },
     siteUrl: { type: String, default: 'https://zmslizza.com' },
-    phone: { type: String, default: '+91 91040 94040' },
-    whatsapp: { type: String, default: '+91 91040 94040' },
-    email: { type: String, default: 'info@zmslizza.com' },
-    address: { type: String, default: 'Mumbai, Maharashtra, India' },
+    phone: { type: String, default: '+91 98008 83300' },
+    whatsapp: { type: String, default: '+91 98008 83300' },
+    email: { type: String, default: 'infozmslizza@gmail.com' },
+    address: { type: String, default: '128 ZMS LIZZA EMBROIDERY MACHINE, RJD Business Hub Near Bada Ganesh Temple, Naginawadi, Katargam, Surat, Gujarat 395004' },
   },
   { _id: false }
 )

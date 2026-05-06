@@ -81,7 +81,19 @@ const limiter = rateLimit({
   message: { success: false, message: 'Too many requests. Please try again in 15 minutes.' },
   standardHeaders: true,
   legacyHeaders: false,
+  skip: (req) => req.path === '/v1/health',
 })
+
+const healthResponse = () => ({
+  success: true,
+  message: 'ZMS LIZZA API is running',
+  timestamp: new Date().toISOString(),
+})
+
+app.get('/health', (req, res) => {
+  res.json(healthResponse())
+})
+
 app.use('/api', limiter)
 
 const authLimiter = rateLimit({
@@ -107,11 +119,7 @@ if (process.env.NODE_ENV === 'development') {
 app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')))
 
 app.get('/api/v1/health', (req, res) => {
-  res.json({
-    success: true,
-    message: 'ZMS LIZZA API is running',
-    timestamp: new Date().toISOString(),
-  })
+  res.json(healthResponse())
 })
 
 const API = '/api/v1'

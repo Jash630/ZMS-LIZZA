@@ -14,10 +14,10 @@ const defaultGeneral = {
   siteName: 'ZMS LIZZA',
   tagline: 'European Technology - Embroidery Machine Manufacturer',
   siteUrl: 'https://zmslizza.com',
-  phone: '+91 98765 43210',
-  whatsapp: '+91 98765 43210',
-  email: 'info@zmslizza.com',
-  address: 'Mumbai, Maharashtra, India',
+  phone: '+91 98008 83300',
+  whatsapp: '+91 98008 83300',
+  email: 'infozmslizza@gmail.com',
+  address: '128 ZMS LIZZA EMBROIDERY MACHINE, RJD Business Hub Near Bada Ganesh Temple, Naginawadi, Katargam, Surat, Gujarat 395004',
 }
 
 const defaultAppearance = { defaultTheme: 'light', brandAccent: '#E63946' }
