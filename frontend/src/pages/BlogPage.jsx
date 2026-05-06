@@ -61,7 +61,7 @@ function ArticleCard({ post, navigateTo, readLabel }) {
       }}
       className="blog-card"
     >
-      <div style={{ position: 'relative', overflow: 'hidden', height: '210px', flexShrink: 0 }}>
+      <div className="card-media" style={{ position: 'relative', overflow: 'hidden', height: '210px', flexShrink: 0 }}>
         <div style={{ position: 'absolute', top: 12, left: 12, zIndex: 2 }}>
           <CategoryBadge category={post.category} small />
         </div>
@@ -77,7 +77,7 @@ function ArticleCard({ post, navigateTo, readLabel }) {
         }} />
       </div>
 
-      <div style={{ padding: '20px 22px 22px', display: 'flex', flexDirection: 'column', flex: 1 }}>
+      <div className="card-body" style={{ padding: '20px 22px 22px', display: 'flex', flexDirection: 'column', flex: 1 }}>
         <h3 style={{
           fontSize: '17px', fontWeight: 700, color: '#0f1f3d', lineHeight: '1.45',
           marginBottom: '10px', flex: 1,
@@ -87,7 +87,7 @@ function ArticleCard({ post, navigateTo, readLabel }) {
         <p style={{ fontSize: '13.5px', color: '#6b7a90', lineHeight: '1.65', marginBottom: '16px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
           {post.excerpt}
         </p>
-        <div style={{ borderTop: '1px solid #f0f2f7', paddingTop: '14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div className="card-meta" style={{ borderTop: '1px solid #f0f2f7', paddingTop: '14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '12px', color: '#8a96a8' }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><User size={12} />{post.author}</span>
             <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Clock size={12} />{post.readTime}</span>
@@ -181,6 +181,132 @@ export function BlogPage() {
         .cat-btn.active { background: #1B2E4B !important; color: #fff !important; border-color: #1B2E4B !important; }
         @keyframes fadeUp { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:translateY(0); } }
         .fade-up { animation: fadeUp 0.5s ease both; }
+        .blog-hero-inner,
+        .blog-filter-inner,
+        .blog-page-inner {
+          max-width: 1400px;
+          margin: 0 auto;
+          padding-left: 24px;
+          padding-right: 24px;
+        }
+        .blog-main-layout {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) 320px;
+          gap: 40px;
+          align-items: start;
+        }
+        .featured-card {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+          min-height: 400px;
+        }
+        .article-grid {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 24px;
+        }
+        .sidebar-column {
+          position: sticky;
+          top: calc(var(--site-header-height) + 80px);
+          display: flex;
+          flex-direction: column;
+          gap: 24px;
+        }
+        @media (max-width: 1180px) {
+          .blog-main-layout {
+            grid-template-columns: minmax(0, 1fr);
+            gap: 32px;
+          }
+          .sidebar-column {
+            position: static;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 20px;
+          }
+        }
+        @media (max-width: 900px) {
+          .featured-card {
+            grid-template-columns: minmax(0, 1fr);
+            min-height: auto;
+          }
+          .featured-card .featured-image-wrap {
+            min-height: 240px;
+          }
+          .featured-card .featured-content {
+            padding: 24px 22px 22px;
+          }
+          .article-grid {
+            grid-template-columns: minmax(0, 1fr);
+          }
+          .sidebar-column {
+            grid-template-columns: minmax(0, 1fr);
+          }
+        }
+        @media (max-width: 640px) {
+          .blog-hero-inner,
+          .blog-filter-inner,
+          .blog-page-inner {
+            padding-left: 14px;
+            padding-right: 14px;
+          }
+          .blog-filter-inner {
+            gap: 10px;
+          }
+          .blog-search-wrap {
+            flex: 1 1 100%;
+            max-width: none;
+          }
+          .blog-category-row {
+            width: 100%;
+            overflow-x: auto;
+            flex-wrap: nowrap;
+            padding-bottom: 2px;
+            scrollbar-width: none;
+          }
+          .blog-category-row::-webkit-scrollbar {
+            display: none;
+          }
+          .cat-btn {
+            flex: 0 0 auto;
+            white-space: nowrap;
+            padding: 8px 14px !important;
+          }
+          .featured-card .featured-image-wrap {
+            min-height: 200px;
+          }
+          .featured-card .featured-content {
+            padding: 20px 16px 18px;
+          }
+          .featured-card .featured-title {
+            font-size: 22px !important;
+          }
+          .featured-card .featured-meta {
+            gap: 10px !important;
+          }
+          .featured-card .featured-button {
+            width: 100%;
+            justify-content: center;
+          }
+          .blog-list-header {
+            align-items: flex-start;
+            gap: 8px;
+            flex-direction: column;
+          }
+          .blog-card .card-media {
+            height: 190px !important;
+          }
+          .blog-card .card-body {
+            padding: 16px 16px 18px !important;
+          }
+          .blog-card .card-title {
+            font-size: 16px !important;
+          }
+          .blog-card .card-meta {
+            flex-direction: column;
+            align-items: flex-start !important;
+            gap: 10px !important;
+          }
+        }
       `}</style>
 
       <Header />
@@ -192,7 +318,7 @@ export function BlogPage() {
         paddingTop: 'calc(var(--site-header-height) + 52px)',
         paddingBottom: '52px',
       }}>
-        <div style={{ maxWidth: 1400, margin: '0 auto', padding: '0 24px' }}>
+        <div className="blog-hero-inner">
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20, fontSize: 13 }}>
             <span style={{ color: 'rgba(255,255,255,0.55)', cursor: 'pointer' }} onClick={() => navigateTo('home')}>{t('common.home')}</span>
             <ChevronRight size={13} color="rgba(255,255,255,0.35)" />
@@ -218,8 +344,8 @@ export function BlogPage() {
         backgroundColor: '#fff', borderBottom: '1px solid #e8edf4',
         boxShadow: '0 2px 12px rgba(15,31,61,0.07)',
       }}>
-        <div style={{ maxWidth: 1400, margin: '0 auto', padding: '12px 24px', display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ position: 'relative', flex: '1 1 260px', maxWidth: 380 }}>
+        <div className="blog-filter-inner" style={{ paddingTop: 12, paddingBottom: 12, display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center', justifyContent: 'space-between' }}>
+          <div className="blog-search-wrap" style={{ position: 'relative', flex: '1 1 260px', maxWidth: 380 }}>
             <input
               type="text"
               placeholder={t('blogPage.searchPlaceholder')}
@@ -232,7 +358,7 @@ export function BlogPage() {
               <Search size={15} color="#fff" />
             </div>
           </div>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
+          <div className="blog-category-row" style={{ display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
             <button
               onClick={() => setCategory('all')}
               className={`cat-btn${category === 'all' ? ' active' : ''}`}
@@ -254,12 +380,12 @@ export function BlogPage() {
         </div>
       </div>
 
-      <div style={{ maxWidth: 1400, margin: '0 auto', padding: '40px 24px 60px' }}>
+      <div className="blog-page-inner" style={{ paddingTop: 40, paddingBottom: 60 }}>
         {loading && <p style={{ color: '#6b7a90', padding: '40px 0' }}>{t('blogPage.loading')}</p>}
         {!loading && error && <p style={{ color: '#EF4444', padding: '40px 0' }}>{error}</p>}
 
         {!loading && !error && (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 40, alignItems: 'start' }}>
+          <div className="blog-main-layout">
 
             {/* ── Main Column ── */}
             <div>
@@ -276,15 +402,12 @@ export function BlogPage() {
                     overflow: 'hidden',
                     border: '1px solid #e8edf4',
                     marginBottom: 40,
-                    display: 'grid',
-                    gridTemplateColumns: '1fr 1fr',
-                    minHeight: 400,
                     boxShadow: '0 4px 24px rgba(15,31,61,0.08)',
                     transition: 'box-shadow 0.25s ease',
                   }}
                 >
                   <style>{`.featured-card:hover { box-shadow: 0 12px 48px rgba(15,31,61,0.16) !important; }`}</style>
-                  <div style={{ position: 'relative', overflow: 'hidden' }}>
+                  <div className="featured-image-wrap" style={{ position: 'relative', overflow: 'hidden' }}>
                     <div style={{ position: 'absolute', top: 16, left: 16, zIndex: 2, display: 'flex', gap: 8 }}>
                       <span style={{ background: '#FF6B35', color: '#fff', fontSize: 11, fontWeight: 800, padding: '4px 12px', borderRadius: 4, letterSpacing: '0.07em', textTransform: 'uppercase' }}>{t('blogPage.featured')}</span>
                       <CategoryBadge category={featuredPost.category} small />
@@ -293,20 +416,21 @@ export function BlogPage() {
                     <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, transparent 60%, rgba(255,255,255,0.08) 100%)' }} />
                   </div>
                   <style>{`.featured-card:hover .feat-img { transform: scale(1.04); }`}</style>
-                  <div style={{ padding: '40px 40px 36px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                  <div className="featured-content" style={{ padding: '40px 40px 36px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                     <div style={{ width: 40, height: 3, backgroundColor: '#FF6B35', borderRadius: 2, marginBottom: 20 }} />
-                    <h2 style={{ fontSize: 26, fontWeight: 800, color: '#0f1f3d', lineHeight: 1.3, marginBottom: 14, letterSpacing: '-0.01em' }}>
+                    <h2 className="featured-title" style={{ fontSize: 26, fontWeight: 800, color: '#0f1f3d', lineHeight: 1.3, marginBottom: 14, letterSpacing: '-0.01em' }}>
                       {featuredPost.title}
                     </h2>
                     <p style={{ fontSize: 14.5, color: '#6b7a90', lineHeight: 1.7, marginBottom: 24, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                       {featuredPost.excerpt}
                     </p>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14, fontSize: 12.5, color: '#8a96a8', marginBottom: 28 }}>
+                    <div className="featured-meta" style={{ display: 'flex', flexWrap: 'wrap', gap: 14, fontSize: 12.5, color: '#8a96a8', marginBottom: 28 }}>
                       <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}><User size={13} />{featuredPost.author}</span>
                       <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}><Calendar size={13} />{featuredPost.date}</span>
                       <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}><Clock size={13} />{featuredPost.readTime}</span>
                     </div>
                     <button
+                      className="featured-button"
                       style={{ alignSelf: 'flex-start', background: '#FF6B35', color: '#fff', border: 'none', borderRadius: 8, padding: '12px 26px', fontWeight: 700, fontSize: 14, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, transition: 'background 0.2s, transform 0.2s' }}
                       onMouseEnter={e => { e.currentTarget.style.background = '#e55a27'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
                       onMouseLeave={e => { e.currentTarget.style.background = '#FF6B35'; e.currentTarget.style.transform = 'translateY(0)'; }}
@@ -318,7 +442,7 @@ export function BlogPage() {
               )}
 
               {/* Grid of articles */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+              <div className="blog-list-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
                 <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f1f3d', display: 'flex', alignItems: 'center', gap: 12 }}>
                   <span style={{ display: 'inline-block', width: 4, height: 24, background: '#FF6B35', borderRadius: 2 }} />
                   {t('blogPage.latestArticles')}
@@ -333,7 +457,7 @@ export function BlogPage() {
                 <p style={{ color: '#8a96a8', fontSize: 14 }}>{t('blogPage.noArticles')}</p>
               )}
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 24 }}>
+              <div className="article-grid">
                 {gridPosts.map((post, i) => (
                   <div key={post.id || post.slug} className="fade-up" style={{ animationDelay: `${i * 0.06}s` }}>
                     <ArticleCard post={post} navigateTo={navigateTo} readLabel={t('blogPage.read')} />
@@ -343,7 +467,7 @@ export function BlogPage() {
             </div>
 
             {/* ── Sidebar ── */}
-            <aside style={{ position: 'sticky', top: 'calc(var(--site-header-height) + 80px)', display: 'flex', flexDirection: 'column', gap: 24 }}>
+            <aside className="sidebar-column">
 
               {/* Newsletter */}
               <div style={{ backgroundColor: '#0f1f3d', borderRadius: 14, padding: '28px 26px', overflow: 'hidden', position: 'relative' }}>
