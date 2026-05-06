@@ -84,7 +84,7 @@ export function AboutPage() {
 
       <section className="relative min-h-[420px] md:min-h-[500px] flex items-center justify-center text-center" style={{ paddingTop: 'var(--site-header-height)' }}>
         <div className="absolute inset-0 z-0">
-          <img src="https://images.unsplash.com/photo-1663888673897-f8bc14482f17?w=1200" alt="Factory" className="w-full h-full object-cover" />
+          <img src="https://res.cloudinary.com/dogc2zaaf/image/upload/q_auto/f_auto/v1778059848/Embroidery_machine_with_logo_202605061500_nav8yn.jpg" alt="Factory" className="w-full h-full object-cover" />
           <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, rgba(0,0,0,0.7), rgba(0,0,0,0.6))' }} />
         </div>
         <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6">
