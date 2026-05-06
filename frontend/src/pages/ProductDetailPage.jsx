@@ -9,22 +9,8 @@ import { publicService } from '../services/publicService.js'
 import { useTranslation } from '../i18n/index.js'
 import { useRuntimeTranslatedValue } from '../i18n/useRuntimeTranslatedValue.js'
 
-const PRODUCT_IMAGE_ALLOWLIST = new Set([
-  'IMG-20250408-WA0012.jpg',
-  'IMG-20250408-WA0013.jpg',
-  'IMG-20250408-WA0014.jpg',
-  'IMG-20250408-WA0015.jpg',
-  'IMG-20250408-WA0017.jpg',
-  'IMG-20250408-WA0018.jpg',
-  'IMG-20250408-WA0019.jpg',
-  '247.jpg',
-  'file_cx6svd',
-])
-
 const FALLBACK_IMAGE =
   'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="900" height="600" viewBox="0 0 900 600"><rect width="900" height="600" fill="%23f3f4f6"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="28" fill="%236b7280">Machine image unavailable</text></svg>'
-
-const isAllowedProductMedia = (item) => PRODUCT_IMAGE_ALLOWLIST.has(String(item?.originalName || item?.name || '').trim())
 
 const flattenSpecs = (specSource = {}) => {
   if (Array.isArray(specSource)) {
@@ -67,7 +53,6 @@ export function ProductDetailPage({ productId }) {
   const { t } = useTranslation()
   const [allProducts, setAllProducts] = useState([])
   const [product, setProduct] = useState(null)
-  const [mediaImages, setMediaImages] = useState([])
   const [videos, setVideos] = useState([])
   const [activeImageIndex, setActiveImageIndex] = useState(0)
   const [loading, setLoading] = useState(true)
@@ -91,22 +76,14 @@ export function ProductDetailPage({ productId }) {
         if (!active) return
 
         const productItems = productsRes.items || []
-        const selectedFromList = productItems.find((item) => item.slug === productId || item.id === productId)
-        let selectedProduct = selectedFromList || productItems[0] || null
-
-        if (!selectedProduct && productId) {
-          selectedProduct = await publicService.getProductBySlug(productId)
-        }
-
-        const rawImages = (mediaRes.items || []).filter((item) => item.type === 'image')
-        const allowlisted = rawImages.filter(isAllowedProductMedia).map((item) => item.url).filter(Boolean)
-        const imagePool = allowlisted.length > 0 ? allowlisted : rawImages.map((item) => item.url).filter(Boolean)
+        const fallbackProduct = productItems.find((item) => item.slug === productId || item.id === productId) || productItems[0] || null
+        const selectedIdentifier = productId || fallbackProduct?.slug || fallbackProduct?.id || null
+        const selectedProduct = selectedIdentifier ? await publicService.getProductBySlug(selectedIdentifier) : fallbackProduct
 
         const videoPool = (mediaRes.items || []).filter((item) => item.type === 'video' || getYoutubeVideoId(item.url)).slice(0, 6)
 
         setAllProducts(productItems)
         setProduct(selectedProduct)
-        setMediaImages(imagePool)
         setVideos(videoPool)
         setActiveImageIndex(0)
       } catch (err) {
@@ -135,9 +112,9 @@ export function ProductDetailPage({ productId }) {
 
   const gallery = useMemo(() => {
     if (!translatedProduct) return [FALLBACK_IMAGE]
-    const merged = buildProductCarouselImages(translatedProduct, mediaImages, { poolOnly: false })
+    const merged = buildProductCarouselImages(translatedProduct)
     return merged.length > 0 ? merged : [FALLBACK_IMAGE]
-  }, [translatedProduct, mediaImages])
+  }, [translatedProduct])
 
   const activeImage = gallery[activeImageIndex] || gallery[0]
   const flatSpecs = useMemo(() => flattenSpecs(translatedProduct?.specifications || {}), [translatedProduct?.specifications])
@@ -151,6 +128,11 @@ export function ProductDetailPage({ productId }) {
     ],
     [translatedProduct?.keyFeatures, translatedProduct?.features]
   )
+
+  const productFeatures = Array.isArray(translatedProduct?.features) ? translatedProduct.features.filter((item) => item?.title || item?.description) : []
+  const applications = Array.isArray(translatedProduct?.applications) ? translatedProduct.applications.filter(Boolean) : []
+  const packageIncludes = Array.isArray(translatedProduct?.packageIncludes) ? translatedProduct.packageIncludes.filter((item) => item?.title || (Array.isArray(item?.items) && item.items.length > 0)) : []
+  const faqs = Array.isArray(translatedProduct?.faqs) ? translatedProduct.faqs.filter((item) => item?.q && item?.a) : []
 
   return (
     <div className="min-h-screen bg-white">
@@ -309,6 +291,74 @@ export function ProductDetailPage({ productId }) {
                     </div>
                   </div>
                 </article>
+
+                {(productFeatures.length > 0 || applications.length > 0 || packageIncludes.length > 0 || faqs.length > 0) && (
+                  <section className="grid gap-6">
+                    {productFeatures.length > 0 && (
+                      <div className="bg-white rounded-xl shadow-sm border border-black/5 p-4 sm:p-5">
+                        <h3 className="mb-4">Feature Highlights</h3>
+                        <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
+                          {productFeatures.map((feature, index) => (
+                            <article key={`${feature.title || 'feature'}-${index}`} className="rounded-lg border border-black/10 bg-[#fafafa] p-4">
+                              <p style={{ fontWeight: 800, color: '#111827', marginBottom: 8 }}>{feature.title || `Feature ${index + 1}`}</p>
+                              {feature.benefit && <p style={{ color: 'var(--accent-orange)', fontWeight: 700, fontSize: 13, marginBottom: 8 }}>{feature.benefit}</p>}
+                              {feature.description && <p style={{ color: '#374151', fontSize: 14, lineHeight: 1.65 }}>{feature.description}</p>}
+                            </article>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {applications.length > 0 && (
+                      <div className="bg-white rounded-xl shadow-sm border border-black/5 p-4 sm:p-5">
+                        <h3 className="mb-4">Applications</h3>
+                        <div className="flex flex-wrap gap-2">
+                          {applications.map((application) => (
+                            <span
+                              key={application}
+                              className="px-3 py-2 rounded-full text-sm font-semibold"
+                              style={{ backgroundColor: 'rgba(255,107,53,0.08)', color: 'var(--accent-orange)' }}
+                            >
+                              {application}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {packageIncludes.length > 0 && (
+                      <div className="bg-white rounded-xl shadow-sm border border-black/5 p-4 sm:p-5">
+                        <h3 className="mb-4">Package Includes</h3>
+                        <div className="grid md:grid-cols-2 gap-4">
+                          {packageIncludes.map((group, index) => (
+                            <article key={`${group.title || 'package'}-${index}`} className="rounded-lg border border-black/10 bg-[#fafafa] p-4">
+                              <p style={{ fontWeight: 800, color: '#111827', marginBottom: 10 }}>{group.title || 'Included'}</p>
+                              <ul className="list-disc pl-5 space-y-1.5" style={{ color: '#374151', fontSize: 14 }}>
+                                {(Array.isArray(group.items) ? group.items : []).filter(Boolean).map((item) => (
+                                  <li key={item}>{item}</li>
+                                ))}
+                              </ul>
+                            </article>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {faqs.length > 0 && (
+                      <div className="bg-white rounded-xl shadow-sm border border-black/5 p-4 sm:p-5">
+                        <h3 className="mb-4">Frequently Asked Questions</h3>
+                        <div className="space-y-3">
+                          {faqs.map((faq, index) => (
+                            <article key={`${faq.q}-${index}`} className="rounded-lg border border-black/10 bg-[#fafafa] p-4">
+                              <p style={{ fontWeight: 800, color: '#111827', marginBottom: 8 }}>{faq.q}</p>
+                              <p style={{ color: '#374151', fontSize: 14, lineHeight: 1.7 }}>{faq.a}</p>
+                            </article>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </section>
+                )}
 
                 {videos.length > 0 && (
                   <section className="bg-white rounded-xl shadow-sm border border-black/5 p-4 sm:p-5">

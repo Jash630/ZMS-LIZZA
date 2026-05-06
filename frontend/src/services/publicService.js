@@ -123,8 +123,12 @@ const normalizeProductCard = (product) => ({
   keyFeatures: Array.isArray(product.keyFeatures) ? product.keyFeatures : [],
   specifications: Array.isArray(product.specifications) ? product.specifications : [],
   features: Array.isArray(product.features) ? product.features : [],
+  applications: Array.isArray(product.applications) ? product.applications : [],
+  packageIncludes: Array.isArray(product.packageIncludes) ? product.packageIncludes : [],
+  faqs: Array.isArray(product.faqs) ? product.faqs : [],
   image: product.image || product.galleryImages?.[0] || DEFAULT_PRODUCT_IMAGE,
   isPopular: Boolean(product.isPopular),
+  isFeatured: Boolean(product.isFeatured),
   galleryImages: Array.isArray(product.galleryImages) ? product.galleryImages : [],
 })
 
@@ -138,6 +142,7 @@ const normalizeProductDetail = (product) => {
 
   const gallery = Array.isArray(product.galleryImages) ? product.galleryImages.filter(Boolean) : []
   const primaryImage = product.image || gallery[0] || DEFAULT_PRODUCT_IMAGE
+  const mergedGallery = Array.from(new Set([primaryImage, ...gallery].filter(Boolean)))
 
   return {
     id: product._id || product.slug,
@@ -149,9 +154,10 @@ const normalizeProductDetail = (product) => {
     priceNote: product.priceNote || 'Get Latest Price',
     tagline: product.tagline || '',
     badge: product.badge || 'Product',
+    image: primaryImage,
     description: product.description || '',
     keyFeatures: Array.isArray(product.keyFeatures) ? product.keyFeatures : [],
-    galleryImages: gallery.length > 0 ? gallery : [primaryImage],
+    galleryImages: mergedGallery,
     specifications: specMap,
     features: Array.isArray(product.features) ? product.features : [],
     applications: Array.isArray(product.applications) ? product.applications : [],

@@ -9,7 +9,8 @@ export const buildProductCarouselImages = (product, recentMediaImages = [], opti
   if (options.poolOnly && pool.length > 0) return pool.slice(0, 10)
 
   const baseImages = [product?.image, ...(Array.isArray(product?.galleryImages) ? product.galleryImages : [])]
-  return Array.from(new Set([...baseImages, ...pool].filter(Boolean))).slice(0, 10)
+  const mergedImages = options.includePool ? [...baseImages, ...pool] : baseImages
+  return Array.from(new Set(mergedImages.filter(Boolean))).slice(0, 10)
 }
 
 const withImageFallback = (event) => {

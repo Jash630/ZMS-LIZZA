@@ -9,28 +9,8 @@ import { publicService } from '../services/publicService.js'
 import { useTranslation } from '../i18n/index.js'
 import { useRuntimeTranslatedValue } from '../i18n/useRuntimeTranslatedValue.js'
 
-const PRODUCT_IMAGE_ALLOWLIST = new Set([
-  'IMG-20250408-WA0012.jpg',
-  'IMG-20250408-WA0013.jpg',
-  'IMG-20250408-WA0014.jpg',
-  'IMG-20250408-WA0015.jpg',
-  'IMG-20250408-WA0017.jpg',
-  'IMG-20250408-WA0018.jpg',
-  'IMG-20250408-WA0019.jpg',
-  '247.jpg',
-  'file_cx6svd',
-])
-
 const FALLBACK_IMAGE =
   'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="900" height="600" viewBox="0 0 900 600"><rect width="900" height="600" fill="%23f3f4f6"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="28" fill="%236b7280">Machine image unavailable</text></svg>'
-
-const isAllowedProductMedia = (item) => PRODUCT_IMAGE_ALLOWLIST.has(String(item?.originalName || item?.name || '').trim())
-
-const rotatePool = (pool, offset = 0) => {
-  if (!Array.isArray(pool) || pool.length === 0) return []
-  const normalized = ((offset % pool.length) + pool.length) % pool.length
-  return [...pool.slice(normalized), ...pool.slice(0, normalized)]
-}
 
 const flattenSpecs = (specGroups = []) =>
   (Array.isArray(specGroups) ? specGroups : [])
@@ -47,7 +27,6 @@ export function ProductsPage() {
   const { navigateTo } = useNavigation()
   const { t } = useTranslation()
   const [rawProducts, setRawProducts] = useState([])
-  const [productMediaImages, setProductMediaImages] = useState([])
   const [activeCategory, setActiveCategory] = useState('all')
   const [activeImageByProduct, setActiveImageByProduct] = useState({})
   const [loading, setLoading] = useState(true)
@@ -62,20 +41,13 @@ export function ProductsPage() {
         setLoading(true)
         setError('')
 
-        const [productsRes, mediaRes] = await Promise.all([
+        const [productsRes] = await Promise.all([
           publicService.getProducts({ limit: 80 }),
-          publicService.getMedia({ type: 'image', limit: 120 }),
         ])
 
         if (!active) return
 
-        const rawImages = mediaRes.items || []
-        const allowlistedImages = rawImages.filter(isAllowedProductMedia).map((item) => item.url).filter(Boolean)
-        const fallbackAllImages = rawImages.map((item) => item.url).filter(Boolean)
-        const mediaPool = allowlistedImages.length > 0 ? allowlistedImages : fallbackAllImages
-
         setRawProducts(productsRes.items || [])
-        setProductMediaImages(mediaPool)
       } catch (err) {
         if (!active) return
         setError(err?.message || t('common.error'))
@@ -91,17 +63,17 @@ export function ProductsPage() {
   }, [t])
 
   const cards = useMemo(
-    () => (products || []).map((product, index) => ({
+    () => (products || []).map((product) => ({
       ...product,
       detailTarget: product.id || product.slug || null,
-      fullGallery: buildProductCarouselImages(product, rotatePool(productMediaImages, index), { poolOnly: false }),
+      fullGallery: buildProductCarouselImages(product),
       flatSpecs: flattenSpecs(product.specifications),
       featureBullets: [
         ...(Array.isArray(product.keyFeatures) ? product.keyFeatures : []),
         ...(Array.isArray(product.features) ? product.features.map((item) => item?.title || item?.description).filter(Boolean) : []),
       ].slice(0, 8),
     })),
-    [products, productMediaImages]
+    [products]
   )
 
   const categories = useMemo(() => {

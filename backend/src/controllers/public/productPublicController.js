@@ -34,7 +34,7 @@ exports.getPublicProducts = async (req, res, next) => {
     const total = await Product.countDocuments(query)
     const products = await Product.find(query)
       .select(
-        'name slug tagline badge category modelNo priceDisplay priceNote image galleryImages description keySpecs keyFeatures specifications features isFeatured isPopular views publishedAt createdAt'
+        'name slug tagline badge category modelNo priceDisplay priceNote image galleryImages description keySpecs keyFeatures specifications features applications packageIncludes faqs isFeatured isPopular views publishedAt createdAt'
       )
       .sort({ isFeatured: -1, publishedAt: -1, createdAt: -1 })
       .skip(skip)
