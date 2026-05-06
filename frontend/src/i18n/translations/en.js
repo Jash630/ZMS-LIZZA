@@ -8,19 +8,19 @@ export const en = {
   header: { requestDemo: 'Request Demo' },
 
   hero: {
-    tagline: 'European Technology and Made for India',
+    tagline: 'European Technology & Made for India',
     line1: 'Precision.', line2: 'Power.', line3: 'Performance.',
-    description: 'High-speed embroidery machines with European technology for sequins, beads and coding work, built for factories that demand quality.',
+    description: 'High-Speed Embroidery Machines With European Technology For Sequins, Beads & Coding Work, Built For Factories That Demand Quality.',
     requestDemo: 'Request a Demo', callUs: 'Call Us Now',
     badges: [
-      { label: '5+ Years' },
+      { label: '12+ Years' },
       { label: '100+ Factories' },
       { label: 'European Quality' },
     ],
     stats: {
       speed: { title: 'Up to 2000 RPM', subtitle: 'Max Speed' },
       warranty: { title: '1-Year Warranty', subtitle: 'Included Free' },
-      sequins: { title: '8 Sequins', subtitle: 'Multi-Function' },
+      sequins: { title: 'Up to 8 Sequins', subtitle: 'Multi-Function' },
       tech: { title: 'European Tech', subtitle: 'German Engineering', label: 'Premium' },
     },
   },
@@ -236,7 +236,7 @@ export const en = {
     message: 'Message',
     placeholders: {
       fullName: 'Your full name', businessName: 'Your company name',
-      phone: '+91 91040 94040', email: 'email@example.com',
+      phone: '+91 98008 83300', email: 'infozmslizza@gmail.com',
       city: 'e.g., Surat, Gujarat', message: 'Tell us more about your requirements...',
     },
     machineOptions: {

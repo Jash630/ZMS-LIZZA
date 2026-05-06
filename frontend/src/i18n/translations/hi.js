@@ -236,7 +236,7 @@ export const hi = {
     message: 'संदेश',
     placeholders: {
       fullName: 'आपका पूरा नाम', businessName: 'आपकी कंपनी का नाम',
-      phone: '+91 91040 94040', email: 'email@example.com',
+      phone: '+91 98008 83300', email: 'infozmslizza@gmail.com',
       city: 'जैसे, सूरत, गुजरात', message: 'अपनी आवश्यकताओं के बारे में और बताएं...',
     },
     machineOptions: {

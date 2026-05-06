@@ -1,12 +1,19 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Header }         from '../components/layout/Header.jsx'
 import { Footer }         from '../components/layout/Footer.jsx'
 import { WhatsAppButton } from '../components/shared/WhatsAppButton.jsx'
 import { useNavigation }  from '../context/NavigationContext.jsx'
 import { ChevronRight, Phone, MessageCircle, Mail, MapPin, Clock, Send, CheckCircle, Loader, Plus, Minus, Facebook, Instagram, Linkedin, Youtube } from 'lucide-react'
-import { publicService } from '../services/publicService.js'
 import { useTranslation } from '../i18n/index.js'
-import { SUPPORT_PHONE_DISPLAY, buildTelUrl, buildWhatsAppUrl } from '../constants/contact.js'
+import {
+  COMPANY_ADDRESS,
+  COMPANY_EMAIL,
+  COMPANY_MAP_EMBED_URL,
+  COMPANY_MAP_URL,
+  SUPPORT_PHONE_DISPLAY,
+  buildTelUrl,
+  buildWhatsAppUrl,
+} from '../constants/contact.js'
 
 export function ContactPage() {
   const { navigateTo } = useNavigation()
@@ -15,24 +22,9 @@ export function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess]       = useState(false)
   const [submitError, setSubmitError]   = useState('')
-  const [siteSettings, setSiteSettings] = useState(null)
   const [errors, setErrors]             = useState({})
   const [form, setForm] = useState({ fullName: '', businessName: '', phone: '+91 ', email: '', city: '', machineInterest: '', helpType: '', message: '' })
   const faqs = Array.isArray(t('contact.faqs', [])) ? t('contact.faqs', []) : []
-
-  useEffect(() => {
-    let active = true
-    publicService.getSettings()
-      .then((settings) => {
-        if (!active) return
-        setSiteSettings(settings)
-      })
-      .catch(() => {
-        if (!active) return
-        setSiteSettings(null)
-      })
-    return () => { active = false }
-  }, [])
 
   const onChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value })
@@ -170,10 +162,10 @@ export function ContactPage() {
             {/* Contact Info */}
             <div className="space-y-5">
               {[
-                { Icon: Phone,         label: t('contact.callUs'),   value: siteSettings?.general?.phone || SUPPORT_PHONE_DISPLAY,          sub: t('footer.businessHours'),           href: buildTelUrl(siteSettings?.general?.phone || SUPPORT_PHONE_DISPLAY), ic: 'var(--accent-orange)', bg: 'rgba(46,94,170,0.05)'  },
-                { Icon: MessageCircle, label: t('contact.whatsApp'),  value: siteSettings?.general?.whatsapp || SUPPORT_PHONE_DISPLAY,       sub: t('contact.quickResponse'),       href: buildWhatsAppUrl(siteSettings?.general?.whatsapp || SUPPORT_PHONE_DISPLAY), ic: '#25D366',              bg: 'rgba(37,211,102,0.05)' },
-                { Icon: Mail,          label: t('contact.emailLabel'),     value: siteSettings?.general?.email || 'info@zmslizza.com',        sub: t('contact.emailResponse'),   href: `mailto:${siteSettings?.general?.email || 'info@zmslizza.com'}`, ic: 'var(--accent-orange)', bg: 'rgba(245,247,250,1)'  },
-                { Icon: MapPin,        label: t('contact.showroom'),  value: siteSettings?.general?.address || 'Ring Road, Surat 395002',sub: t('contact.scheduleVisit'),href: 'https://maps.google.com/?q=Surat', ic: 'var(--accent-orange)', bg: 'white' },
+                { Icon: Phone,         label: t('contact.callUs'),   value: SUPPORT_PHONE_DISPLAY, sub: t('footer.businessHours'), href: buildTelUrl(SUPPORT_PHONE_DISPLAY), ic: 'var(--accent-orange)', bg: 'rgba(46,94,170,0.05)'  },
+                { Icon: MessageCircle, label: t('contact.whatsApp'), value: SUPPORT_PHONE_DISPLAY, sub: t('contact.quickResponse'), href: buildWhatsAppUrl(SUPPORT_PHONE_DISPLAY), ic: '#25D366', bg: 'rgba(37,211,102,0.05)' },
+                { Icon: Mail,          label: t('contact.emailLabel'), value: COMPANY_EMAIL, sub: t('contact.emailResponse'), href: `mailto:${COMPANY_EMAIL}`, ic: 'var(--accent-orange)', bg: 'rgba(245,247,250,1)'  },
+                { Icon: MapPin,        label: t('contact.showroom'), value: COMPANY_ADDRESS, sub: t('contact.scheduleVisit'), href: COMPANY_MAP_URL, ic: 'var(--accent-orange)', bg: 'white' },
               ].map(({ Icon, label, value, sub, href, ic, bg }) => (
                 <a key={label} href={href} target={href.startsWith('http') ? '_blank' : undefined} rel="noreferrer"
                   className="block rounded-2xl p-6 transition-all hover:shadow-xl hover:-translate-y-1" style={{ backgroundColor: bg }}>
@@ -221,7 +213,7 @@ export function ContactPage() {
           <h2 className="text-center mb-8">{t('contact.mapTitle')}</h2>
           <div className="rounded-2xl overflow-hidden shadow-xl">
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d119066.41710393128!2d72.73762887910156!3d21.159431400000012!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be04e59411d1563%3A0xfe4558290938b042!2sSurat%2C%20Gujarat%2C%20India!5e0!3m2!1sen!2sus!4v1647890123456!5m2!1sen!2sus"
+              src={COMPANY_MAP_EMBED_URL}
               width="100%" height="400" style={{ border: 0 }} allowFullScreen loading="lazy" title="ZMS LIZZA Location" />
           </div>
         </div>

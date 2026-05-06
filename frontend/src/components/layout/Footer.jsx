@@ -13,7 +13,7 @@ import {
 } from 'lucide-react'
 import { useNavigation } from '../../context/NavigationContext.jsx'
 import { LANGUAGES, useTranslation } from '../../i18n/index.js'
-import { SUPPORT_PHONE_DISPLAY, SUPPORT_TEL_URL, SUPPORT_WHATSAPP_URL } from '../../constants/contact.js'
+import { COMPANY_ADDRESS, COMPANY_EMAIL, COMPANY_MAP_URL, SUPPORT_PHONE_DISPLAY, SUPPORT_TEL_URL, SUPPORT_WHATSAPP_URL } from '../../constants/contact.js'
 
 const QUICK_LINKS = [
   { key: 'nav.home', page: 'home' },
@@ -138,9 +138,9 @@ export function Footer() {
             <h4 style={{ color: 'white', fontSize: '18px', marginBottom: '24px' }}>{t('footer.contactUs')}</h4>
             <ul className="space-y-4">
               {[
-                { Icon: MapPin, text: 'Surat, Gujarat, India', href: null, iconColor: 'var(--accent-orange)' },
+                { Icon: MapPin, text: COMPANY_ADDRESS, href: COMPANY_MAP_URL, iconColor: 'var(--accent-orange)' },
                 { Icon: Phone, text: SUPPORT_PHONE_DISPLAY, href: SUPPORT_TEL_URL, iconColor: 'var(--accent-orange)' },
-                { Icon: Mail, text: 'info@zmslizza.com', href: 'mailto:info@zmslizza.com', iconColor: 'var(--accent-orange)' },
+                { Icon: Mail, text: COMPANY_EMAIL, href: `mailto:${COMPANY_EMAIL}`, iconColor: 'var(--accent-orange)' },
                 { Icon: MessageCircle, text: t('footer.whatsAppUs'), href: SUPPORT_WHATSAPP_URL, iconColor: 'var(--whatsapp-green)' },
                 { Icon: Clock, text: t('footer.businessHours'), href: null, iconColor: 'var(--accent-orange)' },
               ].map(({ Icon, text, href, iconColor }, index) => (

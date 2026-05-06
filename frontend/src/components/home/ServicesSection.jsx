@@ -9,7 +9,13 @@ const SERVICE_META = [
   { Icon: CreditCard, color: 'var(--gradient-blue)' },
 ]
 
-const IMG = 'https://images.unsplash.com/photo-1724475439756-675ec5ee4053?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=600'
+const SERVICE_IMAGES = [
+  'https://res.cloudinary.com/dogc2zaaf/image/upload/q_auto/f_auto/v1778055006/Embroidery_machine_with_logo_202605061326_4_sxuz4s.jpg',
+  'https://res.cloudinary.com/dogc2zaaf/image/upload/q_auto/f_auto/v1778055006/Embroidery_machine_with_logo_202605061326_3_nme35t.jpg',
+  'https://res.cloudinary.com/dogc2zaaf/image/upload/q_auto/f_auto/v1778055006/Embroidery_machine_with_logo_202605061326_2_mmwupc.jpg',
+  'https://res.cloudinary.com/dogc2zaaf/image/upload/q_auto/f_auto/v1778055006/Embroidery_machine_with_logo_202605061326_1_hpdz3f.jpg',
+  'https://res.cloudinary.com/dogc2zaaf/image/upload/q_auto/f_auto/v1778055007/Embroidery_machine_with_logo_202605061326_ebdfdy.jpg',
+]
 
 export function ServicesSection() {
   const { t } = useTranslation()
@@ -29,8 +35,8 @@ export function ServicesSection() {
             return (
             <div key={`${item?.title}-${index}`} className={`grid lg:grid-cols-2 gap-12 items-center ${index % 2 === 0 ? '' : 'lg:grid-flow-dense'}`}>
               <div className={index % 2 === 0 ? 'lg:col-start-2' : 'lg:col-start-1'}>
-                <div className="relative rounded-2xl overflow-hidden shadow-xl">
-                  <img src={IMG} alt={item?.title} className="w-full h-[280px] md:h-[400px] object-cover" />
+                <div className="relative h-[280px] md:h-[400px] rounded-2xl overflow-hidden shadow-xl bg-white">
+                  <img src={SERVICE_IMAGES[index]} alt={item?.title} className="w-full h-full object-contain" />
                   <div className="absolute inset-0" style={{ background: `linear-gradient(135deg, ${color}22 0%, transparent 100%)` }} />
                 </div>
               </div>

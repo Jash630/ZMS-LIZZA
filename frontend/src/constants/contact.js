@@ -1,5 +1,11 @@
-export const SUPPORT_PHONE_LOCAL = '9104094040'
-export const SUPPORT_PHONE_DISPLAY = '+91 91040 94040'
+export const COMPANY_ADDRESS = '128 ZMS LIZZA EMBROIDERY MACHINE, RJD Business Hub Near Bada Ganesh Temple, Naginawadi, Katargam, Surat, Gujarat 395004'
+export const COMPANY_EMAIL = 'infozmslizza@gmail.com'
+export const COMPANY_MAP_URL = 'https://maps.app.goo.gl/DGPsk1X8HbFxKNaU8?g_st=aw'
+export const COMPANY_MAP_EMBED_QUERY = 'RJD Business Hub, Naginawadi, Katargam, Surat, Gujarat 395004'
+export const COMPANY_MAP_EMBED_URL = `https://www.google.com/maps?q=${encodeURIComponent(COMPANY_MAP_EMBED_QUERY)}&z=18&output=embed`
+
+export const SUPPORT_PHONE_LOCAL = '9800883300'
+export const SUPPORT_PHONE_DISPLAY = '+91 98008 83300'
 export const SUPPORT_PHONE_E164 = `+91${SUPPORT_PHONE_LOCAL}`
 
 export const WHATSAPP_DEFAULT_MESSAGE =

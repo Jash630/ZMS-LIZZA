@@ -37,9 +37,10 @@ export function HeroSection() {
 
   return (
     <section
-      className="relative min-h-screen overflow-hidden"
+      className="relative overflow-hidden"
       style={{
         paddingTop: 'var(--site-header-height)',
+        minHeight: 'clamp(620px, 72vh, 820px)',
         background: 'linear-gradient(150deg, #f4f7ff 0%, #ffffff 50%, #fff7f4 100%)',
       }}
     >
@@ -167,9 +168,9 @@ export function HeroSection() {
             }}
           >
             <img
-              src="https://images.unsplash.com/photo-1663888673897-f8bc14482f17?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=900"
+              src="https://res.cloudinary.com/dogc2zaaf/image/upload/q_auto/f_auto/v1778055010/Embroidery_machine_with_logo_202605061041_thve2t.jpg"
               alt="ZMS LIZZA Embroidery Machine"
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain"
             />
             <div
               style={{
