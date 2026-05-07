@@ -58,8 +58,8 @@ export const en = {
   testimonials: {
     title: 'What Our Customers Say',
     items: [
-      { quote: "ZMS LIZZA machines have transformed our production capacity. The European quality is evident in every stitch. We've increased output by 40% while maintaining superior quality.", name: 'Rajesh Patel', business: 'Patel Textiles Pvt Ltd', location: 'Surat, Gujarat' },
-      { quote: "Excellent after-sales support and training. The team helped our operators master the machines quickly. Best investment we've made for our factory in years.", name: 'Amit Kumar', business: 'Kumar Embroidery Works', location: 'Ahmedabad, Gujarat' },
+      { quote: "ZMS LIZZA machines have transformed our production capacity. The European quality is evident in every stitch. We've increased output by 40% while maintaining superior quality.", name: 'Haresh Shankar', business: 'Varni Fashion & Group', location: 'Surat, Gujarat' },
+      { quote: "Excellent after-sales support and training. The team helped our operators master the machines quickly. Best investment we've made for our factory in years.", name: 'Ketan Patel', business: 'Devangin Creation', location: 'Surat, Gujarat' },
       { quote: "The multi-function capability is a game-changer. One machine handles sequins, beads, and coding perfectly. Highly recommend ZMS LIZZA to any serious textile manufacturer.", name: 'Sandeep Shah', business: 'Shah Industries', location: 'Mumbai, Maharashtra' },
     ],
   },

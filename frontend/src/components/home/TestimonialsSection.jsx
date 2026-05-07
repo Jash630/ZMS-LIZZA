@@ -2,8 +2,8 @@ import { Star } from 'lucide-react'
 import { useTranslation } from '../../i18n/index.js'
 
 const TESTIMONIAL_IMAGES = [
-  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop',
-  'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop',
+  'https://res.cloudinary.com/dogc2zaaf/image/upload/c_fill,g_face,w_200,h_200,q_auto,f_auto/v1778140907/WhatsApp_Image_2026-05-07_at_11.33.11_AM_blzodj.jpg',
+  'https://res.cloudinary.com/dogc2zaaf/image/upload/c_fill,g_face,w_200,h_200,q_auto,f_auto/v1778140907/WhatsApp_Image_2026-05-07_at_11.34.43_AM_ewlmvp.jpg',
   'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop',
 ]
 
