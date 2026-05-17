@@ -329,10 +329,10 @@ export function BlogPage() {
               {t('blogPage.badge')}
             </div>
             <h1 style={{ color: '#fff', fontSize: 'clamp(32px, 5vw, 52px)', fontWeight: 800, lineHeight: 1.15, marginBottom: 16, letterSpacing: '-0.02em' }}>
-              {t('blogPage.title')}
+              Embroidery Machine Blog
             </h1>
             <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: 18, maxWidth: 540, margin: '0 auto' }}>
-              {t('blogPage.subtitle')}
+              Buying guides, maintenance tips, price intent content, and machine comparisons for embroidery businesses in India.
             </p>
           </div>
         </div>
@@ -533,6 +533,7 @@ export function BlogPage() {
                 </p>
                 <button
                   style={{ width: '100%', padding: '11px', borderRadius: 8, border: '2px solid #0f1f3d', backgroundColor: 'transparent', color: '#0f1f3d', fontWeight: 700, fontSize: 13.5, cursor: 'pointer', transition: 'all 0.2s' }}
+                  onClick={() => navigateTo('contact')}
                   onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#0f1f3d'; e.currentTarget.style.color = '#fff'; }}
                   onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = '#0f1f3d'; }}
                 >

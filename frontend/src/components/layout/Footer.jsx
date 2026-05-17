@@ -12,6 +12,7 @@ import {
   ChevronDown,
 } from 'lucide-react'
 import { useNavigation } from '../../context/NavigationContext.jsx'
+import { AppLink } from '../shared/AppLink.jsx'
 import { LANGUAGES, useTranslation } from '../../i18n/index.js'
 import { COMPANY_ADDRESS, COMPANY_EMAIL, COMPANY_MAP_URL, SUPPORT_PHONE_DISPLAY, SUPPORT_TEL_URL, SUPPORT_WHATSAPP_URL } from '../../constants/contact.js'
 
@@ -25,8 +26,10 @@ const QUICK_LINKS = [
 
 const RESOURCE_LINKS = [
   { key: 'nav.blog', page: 'blog' },
+  { key: 'nav.industries', page: 'industries' },
+  { key: 'nav.applications', page: 'applications' },
+  { key: 'nav.faq', page: 'faq' },
   { key: 'footer.contactUs', page: 'contact' },
-  { key: 'footer.requestDemo', page: 'contact' },
 ]
 
 const SOCIALS = [{ Icon: Facebook }, { Icon: Instagram }, { Icon: Linkedin }, { Icon: Youtube }]
@@ -51,7 +54,7 @@ export function Footer() {
               <img
                 src="/bgr_logo.png"
                 alt="ZMS LIZZA"
-                style={{ height: '52px', width: 'auto', maxWidth: '280px', objectFit: 'contain', marginBottom: '16px' }}
+                style={{ height: '64px', width: 'auto', maxWidth: '320px', objectFit: 'contain', marginBottom: '18px' }}
               />
             </button>
             <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14px', lineHeight: '1.6', marginBottom: '8px' }}>
@@ -87,12 +90,8 @@ export function Footer() {
             <ul className="space-y-3">
               {QUICK_LINKS.map(({ key, page }) => (
                 <li key={key}>
-                  <a
-                    href="#"
-                    onClick={(event) => {
-                      event.preventDefault()
-                      navigateTo(page)
-                    }}
+                  <AppLink
+                    page={page}
                     style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14px' }}
                     onMouseEnter={(event) => {
                       event.currentTarget.style.color = 'var(--accent-orange)'
@@ -101,8 +100,8 @@ export function Footer() {
                       event.currentTarget.style.color = 'rgba(255,255,255,0.7)'
                     }}
                   >
-                    {t(key)}
-                  </a>
+                    {key.includes('.') ? t(key) : key}
+                  </AppLink>
                 </li>
               ))}
             </ul>
@@ -113,12 +112,8 @@ export function Footer() {
             <ul className="space-y-3">
               {RESOURCE_LINKS.map(({ key, page }) => (
                 <li key={key}>
-                  <a
-                    href="#"
-                    onClick={(event) => {
-                      event.preventDefault()
-                      navigateTo(page)
-                    }}
+                  <AppLink
+                    page={page}
                     style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14px' }}
                     onMouseEnter={(event) => {
                       event.currentTarget.style.color = 'var(--accent-orange)'
@@ -127,8 +122,8 @@ export function Footer() {
                       event.currentTarget.style.color = 'rgba(255,255,255,0.7)'
                     }}
                   >
-                    {t(key)}
-                  </a>
+                    {key.includes('.') ? t(key) : key}
+                  </AppLink>
                 </li>
               ))}
             </ul>
@@ -198,7 +193,7 @@ export function Footer() {
       <div className="border-t" style={{ borderColor: 'rgba(255,255,255,0.1)', backgroundColor: 'rgba(0,0,0,0.2)' }}>
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-6 flex flex-col md:flex-row justify-between items-center gap-4">
           <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '14px' }}>
-            {t('footer.copyright')}
+            {t('footer.footerLine')}
           </p>
           <div className="flex gap-6">
             {[t('footer.privacyPolicy'), t('footer.terms')].map((link) => (

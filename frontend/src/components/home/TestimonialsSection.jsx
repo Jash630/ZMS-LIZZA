@@ -3,8 +3,8 @@ import { useTranslation } from '../../i18n/index.js'
 
 const TESTIMONIAL_IMAGES = [
   'https://res.cloudinary.com/dogc2zaaf/image/upload/c_fill,g_face,w_200,h_200,q_auto,f_auto/v1778140907/WhatsApp_Image_2026-05-07_at_11.33.11_AM_blzodj.jpg',
+  'https://res.cloudinary.com/dogc2zaaf/image/upload/c_fill,g_face,w_200,h_200,q_auto,f_auto/v1779008038/WhatsApp_Image_2026-05-14_at_1.22.26_PM_mfv94a.jpg',
   'https://res.cloudinary.com/dogc2zaaf/image/upload/c_fill,g_face,w_200,h_200,q_auto,f_auto/v1778140907/WhatsApp_Image_2026-05-07_at_11.34.43_AM_ewlmvp.jpg',
-  'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop',
 ]
 
 const COLORS = ['var(--gradient-red)', 'var(--gradient-purple)', 'var(--gradient-blue)']
@@ -18,6 +18,9 @@ export function TestimonialsSection() {
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="mb-4">{t('testimonials.title')}</h2>
+          <p style={{ fontSize: '18px', color: 'var(--dark-gray)', lineHeight: 1.65 }}>
+            {t('testimonials.subtitle')}
+          </p>
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {testimonials.map((item, i) => (

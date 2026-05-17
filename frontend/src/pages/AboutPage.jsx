@@ -82,12 +82,12 @@ export function AboutPage() {
       <Header />
       <WhatsAppButton />
 
-      <section className="relative min-h-[420px] md:min-h-[500px] flex items-center justify-center text-center" style={{ paddingTop: 'var(--site-header-height)' }}>
+      <section className="relative min-h-[100svh] flex items-center justify-center text-center overflow-hidden" style={{ paddingTop: 'var(--site-header-height)' }}>
         <div className="absolute inset-0 z-0">
-          <img src="https://res.cloudinary.com/dogc2zaaf/image/upload/q_auto/f_auto/v1778059848/Embroidery_machine_with_logo_202605061500_nav8yn.jpg" alt="Factory" className="w-full h-full object-cover" />
-          <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, rgba(0,0,0,0.7), rgba(0,0,0,0.6))' }} />
+          <img src="https://res.cloudinary.com/dogc2zaaf/image/upload/q_auto/f_auto/v1778059848/Embroidery_machine_with_logo_202605061500_nav8yn.jpg" alt="Factory" className="about-hero-image w-full h-full object-cover scale-105" />
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.62) 48%, rgba(0,0,0,0.44) 100%)' }} />
         </div>
-        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6">
+        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 fade-in-up">
           <div className="flex items-center justify-center gap-2 text-white/80 text-sm mb-6">
             <span className="cursor-pointer hover:text-white" onClick={() => navigateTo('home')}>{t('common.home')}</span>
             <ChevronRight size={14} />
@@ -100,7 +100,7 @@ export function AboutPage() {
         </div>
       </section>
 
-      <section className="py-24 bg-white">
+      <section className="py-16 sm:py-20 lg:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="grid lg:grid-cols-5 gap-16">
             <div className="lg:col-span-3">
@@ -114,11 +114,12 @@ export function AboutPage() {
               </div>
             </div>
             <div className="lg:col-span-2">
-              <h3 className="mb-8">{t('about.journey')}</h3>
-              <div className="space-y-6 mb-10">
+              <h2 className="mb-8">{t('about.journey')}</h2>
+              <div className="relative space-y-6 mb-10 before:absolute before:left-8 before:top-8 before:bottom-8 before:w-[2px] before:bg-gradient-to-b before:from-[var(--accent-orange)] before:via-[var(--gradient-purple)] before:to-[var(--gradient-blue)] before:opacity-45">
                 {milestones.map((m, i) => (
-                  <div key={i} className="flex items-start gap-4">
-                    <div className="flex-shrink-0 w-16 h-16 rounded-full flex items-center justify-center text-white font-bold" style={{ background: 'linear-gradient(135deg, var(--gradient-red), var(--gradient-purple), var(--gradient-blue))' }}>
+                  <div key={i} className="relative flex items-start gap-4">
+                    <div className="relative z-10 flex-shrink-0 w-16 h-16 rounded-full flex items-center justify-center text-white font-bold shadow-lg" style={{ background: 'linear-gradient(135deg, var(--gradient-red), var(--gradient-purple), var(--gradient-blue))' }}>
+                      <span className="absolute inset-0 rounded-full about-pulse-ring" />
                       {m.year.slice(2)}
                     </div>
                     <div className="pt-2">
@@ -129,23 +130,24 @@ export function AboutPage() {
                 ))}
               </div>
               <div className="rounded-2xl overflow-hidden shadow-lg">
-                <img src="https://images.unsplash.com/photo-1666558889375-798fa96b559a?w=600" alt="Our team" className="w-full h-64 object-cover" />
+                <img src="https://images.unsplash.com/photo-1666558889375-798fa96b559a?w=600" alt="Factory tour" className="w-full h-64 object-cover" />
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="py-24" style={{ backgroundColor: 'var(--light-gray)' }}>
+      <section className="py-16 sm:py-20 lg:py-24" style={{ backgroundColor: 'var(--light-gray)' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-16">
             <h2 className="mb-6">{t('about.europeanDifference')}</h2>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-5 lg:gap-6 items-stretch">
             {advantages.map((item, index) => {
               const Icon = advantageIcons[index] || Crosshair
               return (
-              <div key={`${item?.title}-${index}`} className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-xl transition-all hover:-translate-y-1 group text-center">
+              <div key={`${item?.title}-${index}`} className="relative overflow-hidden bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all hover:-translate-y-[5px] group text-center h-full">
+                <div className="absolute left-0 right-0 top-0 h-1 opacity-0 transition-opacity group-hover:opacity-100" style={{ background: 'linear-gradient(90deg, var(--gradient-red), var(--gradient-purple), var(--gradient-blue))' }} />
                 <div className="w-16 h-16 rounded-full flex items-center justify-center mb-6 mx-auto group-hover:scale-110 transition-transform" style={{ background: 'linear-gradient(135deg, var(--gradient-red), var(--gradient-blue))' }}>
                   <Icon size={32} color="white" strokeWidth={2} />
                 </div>
@@ -157,16 +159,24 @@ export function AboutPage() {
         </div>
       </section>
 
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+      <section className="relative py-16 sm:py-20 bg-white overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(circle at 50% 45%, rgba(46,94,170,0.08), transparent 38%)' }} />
+        <div className="absolute inset-0 pointer-events-none flex items-center justify-center select-none" aria-hidden="true">
+          <span className="about-network-map">INDIA</span>
+        </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
           <div className="text-center mb-12">
             <h2 className="mb-4">{t('about.whereWeServe')}</h2>
+            <p className="mx-auto max-w-3xl" style={{ color: 'var(--dark-gray)', fontSize: 17, lineHeight: 1.7 }}>{t('about.whereWeServeSub')}</p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {locations.map(({ city, detail, radius }) => (
               <div key={city} className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 border-t-4" style={{ borderTopColor: 'var(--accent-orange)' }}>
                 <div className="flex items-center gap-3 mb-4">
-                  <MapPin size={24} style={{ color: 'var(--accent-orange)' }} />
+                  <span className="relative inline-flex">
+                    <span className="absolute inset-0 rounded-full about-pin-pulse" />
+                    <MapPin size={24} className="relative z-10" style={{ color: 'var(--accent-orange)' }} />
+                  </span>
                   <h4 style={{ fontSize: '20px' }}>{city}</h4>
                 </div>
                 <p style={{ color: 'var(--dark-gray)', fontSize: '14px', marginBottom: '12px' }}>{detail}</p>

@@ -13,6 +13,8 @@ import { BlogSection }        from '../components/home/BlogSection.jsx'
 import { CTASection }         from '../components/home/CTASection.jsx'
 import { publicService }      from '../services/publicService.js'
 import { useRuntimeTranslatedValue } from '../i18n/useRuntimeTranslatedValue.js'
+import { AppLink } from '../components/shared/AppLink.jsx'
+import { useTranslation } from '../i18n/index.js'
 
 const PRODUCT_IMAGE_ALLOWLIST = new Set([
   'IMG-20250408-WA0012.jpg',
@@ -28,11 +30,13 @@ const PRODUCT_IMAGE_ALLOWLIST = new Set([
 const isAllowedProductMedia = (item) => PRODUCT_IMAGE_ALLOWLIST.has(String(item?.originalName || '').trim())
 
 export function HomePage() {
+  const { t } = useTranslation()
   const [rawProducts, setRawProducts] = useState([])
   const [rawPosts, setRawPosts] = useState([])
   const [recentMediaImages, setRecentMediaImages] = useState([])
   const products = useRuntimeTranslatedValue(rawProducts)
   const posts = useRuntimeTranslatedValue(rawPosts)
+  const industrySections = Array.isArray(t('industriesPage.sections', [])) ? t('industriesPage.sections', []) : []
 
   useEffect(() => {
     let active = true
@@ -84,6 +88,31 @@ export function HomePage() {
       <TestimonialsSection />
       <GallerySection />
       <ServicesSection />
+      <section className="py-20 bg-white">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
+          <div className="text-center max-w-3xl mx-auto mb-14">
+            <h2 className="mb-4">{t('homeIndustries.title')}</h2>
+            <p style={{ fontSize: '18px', color: 'var(--dark-gray)' }}>
+              {t('homeIndustries.subtitle')}
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            {industrySections.map((section) => (
+              <article key={section.title} className="bg-white rounded-2xl shadow-lg border border-black/5 p-6 hover:-translate-y-1 transition-all">
+                <h3 className="mb-3" style={{ fontSize: '26px' }}>{section.title}</h3>
+                <p style={{ color: 'var(--dark-gray)', fontSize: '15px', lineHeight: '1.8' }}>{section.description}</p>
+              </article>
+            ))}
+          </div>
+
+          <div className="text-center mt-8">
+            <AppLink page="industries" className="inline-flex items-center px-5 py-3 rounded-lg font-semibold border" style={{ borderColor: 'var(--accent-orange)', color: 'var(--accent-orange)' }}>
+              {t('homeIndustries.exploreLink')}
+            </AppLink>
+          </div>
+        </div>
+      </section>
       <BlogSection posts={posts} />
       <CTASection />
       <Footer />

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { ArrowRight, X, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useNavigation } from '../../context/NavigationContext.jsx'
 import { publicService } from '../../services/publicService.js'
@@ -40,19 +40,19 @@ export function GallerySection() {
 
   const closeLightbox = () => setActiveImageIndex(null)
 
-  const showPrev = () => {
+  const showPrev = useCallback(() => {
     setActiveImageIndex((current) => {
       if (current === null || images.length === 0) return current
       return (current - 1 + images.length) % images.length
     })
-  }
+  }, [images.length])
 
-  const showNext = () => {
+  const showNext = useCallback(() => {
     setActiveImageIndex((current) => {
       if (current === null || images.length === 0) return current
       return (current + 1) % images.length
     })
-  }
+  }, [images.length])
 
   useEffect(() => {
     let active = true
@@ -95,7 +95,7 @@ export function GallerySection() {
 
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [activeImageIndex, images.length])
+  }, [activeImageIndex, images.length, showNext, showPrev])
 
   return (
     <section className="py-24 bg-white">

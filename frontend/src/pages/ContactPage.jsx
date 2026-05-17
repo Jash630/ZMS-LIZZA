@@ -5,6 +5,7 @@ import { WhatsAppButton } from '../components/shared/WhatsAppButton.jsx'
 import { useNavigation }  from '../context/NavigationContext.jsx'
 import { ChevronRight, Phone, MessageCircle, Mail, MapPin, Clock, Send, CheckCircle, Loader, Plus, Minus, Facebook, Instagram, Linkedin, Youtube } from 'lucide-react'
 import { useTranslation } from '../i18n/index.js'
+import { publicService } from '../services/publicService.js'
 import {
   COMPANY_ADDRESS,
   COMPANY_EMAIL,
@@ -70,16 +71,35 @@ export function ContactPage() {
       <Header />
       <WhatsAppButton />
 
-      <section className="pb-12 bg-white" style={{ paddingTop: 'calc(var(--site-header-height) + 3.25rem)' }}>
+      <section
+        className="pb-12 bg-white"
+        style={{
+          paddingTop: 'calc(var(--site-header-height) + 3.25rem)',
+          backgroundImage: 'radial-gradient(circle, rgba(46,94,170,0.08) 1px, transparent 1px)',
+          backgroundSize: '28px 28px',
+        }}
+      >
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
           <div className="flex items-center gap-2 mb-8 text-sm" style={{ color: 'var(--dark-gray)' }}>
             <span className="cursor-pointer hover:text-[var(--accent-orange)]" onClick={() => navigateTo('home')}>{t('common.home')}</span>
             <ChevronRight size={14} />
             <span style={{ fontWeight: 600, color: 'var(--charcoal)' }}>{t('contact.breadcrumb')}</span>
           </div>
-          <div className="text-center max-w-3xl mx-auto">
-            <h1 className="mb-6">{t('contact.title')}</h1>
-            <p style={{ fontSize: '20px', color: 'var(--dark-gray)', lineHeight: '1.6' }}>{t('contact.subtitle')}</p>
+          <div className="text-center max-w-4xl mx-auto fade-in-up">
+            <h1 className="mb-6">
+              {t('contact.title').includes('ZMS LIZZA') ? (
+                <>
+                  {t('contact.title').split('ZMS LIZZA')[0]}
+                  <span style={{ color: 'var(--accent-orange)' }}>ZMS LIZZA</span>
+                  {t('contact.title').split('ZMS LIZZA').slice(1).join('ZMS LIZZA')}
+                </>
+              ) : (
+                t('contact.title')
+              )}
+            </h1>
+            <p style={{ fontSize: '20px', color: 'var(--dark-gray)', lineHeight: '1.6' }}>
+              {t('contact.subtitle')}
+            </p>
           </div>
         </div>
       </section>
@@ -91,7 +111,9 @@ export function ContactPage() {
             {/* Form */}
             <div className="bg-white rounded-2xl p-8 lg:p-10 shadow-xl border border-gray-100">
               <h2 className="mb-2">{t('contact.formTitle')}</h2>
-              <p className="mb-8" style={{ fontSize: '15px', color: 'var(--dark-gray)' }}>{t('contact.formSubtitle')}</p>
+              <p className="mb-8" style={{ fontSize: '15px', color: 'var(--dark-gray)' }}>
+                {t('contact.formSubtitle')}
+              </p>
               <form onSubmit={onSubmit} className="space-y-5">
                 <div>
                   <label className="block mb-2 text-sm font-semibold" style={{ color: 'var(--charcoal)' }}>{t('contact.fullName')} <span style={{ color: 'var(--gradient-red)' }}>{t('common.required')}</span></label>
@@ -149,11 +171,11 @@ export function ContactPage() {
                   <textarea name="message" value={form.message} onChange={onChange} rows={4} placeholder={t('contact.placeholders.message')} className={baseInput + " resize-none"} style={{ fontSize: '15px' }} />
                 </div>
                 <button type="submit" disabled={isSubmitting || isSuccess}
-                  className="w-full py-4 rounded-lg font-bold text-base flex items-center justify-center gap-3 transition-all hover:scale-105 hover:shadow-xl disabled:opacity-70"
+                  className="group w-full py-4 rounded-lg font-bold text-base flex items-center justify-center gap-3 transition-all hover:scale-[1.02] hover:shadow-xl disabled:opacity-70"
                   style={{ backgroundColor: isSuccess ? '#10B981' : 'var(--accent-orange)', color: 'white', height: '56px' }}>
                   {isSubmitting ? <><Loader size={20} className="animate-spin" /> {t('contact.submitting')}</>
                    : isSuccess   ? <><CheckCircle size={20} /> {t('contact.success')}</>
-                   :               <><Send size={20} /> {t('contact.submitBtn')}</>}
+                   :               <><Send size={20} className="transition-transform group-hover:translate-x-1" /> {t('contact.submitBtn')}</>}
                 </button>
                 {submitError && <p style={{ color: '#EF4444', fontSize: 13 }}>{submitError}</p>}
               </form>
@@ -168,9 +190,9 @@ export function ContactPage() {
                 { Icon: MapPin,        label: t('contact.showroom'), value: COMPANY_ADDRESS, sub: t('contact.scheduleVisit'), href: COMPANY_MAP_URL, ic: 'var(--accent-orange)', bg: 'white' },
               ].map(({ Icon, label, value, sub, href, ic, bg }) => (
                 <a key={label} href={href} target={href.startsWith('http') ? '_blank' : undefined} rel="noreferrer"
-                  className="block rounded-2xl p-6 transition-all hover:shadow-xl hover:-translate-y-1" style={{ backgroundColor: bg }}>
+                  className="group block rounded-2xl p-6 transition-all hover:shadow-xl hover:-translate-y-1" style={{ backgroundColor: bg }}>
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: ic }}>
+                    <div className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110 group-hover:animate-pulse" style={{ backgroundColor: ic }}>
                       <Icon size={24} color="white" />
                     </div>
                     <div>
@@ -210,11 +232,16 @@ export function ContactPage() {
 
       <section className="py-12 bg-white">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
-          <h2 className="text-center mb-8">{t('contact.mapTitle')}</h2>
-          <div className="rounded-2xl overflow-hidden shadow-xl">
-            <iframe
-              src={COMPANY_MAP_EMBED_URL}
-              width="100%" height="400" style={{ border: 0 }} allowFullScreen loading="lazy" title="ZMS LIZZA Location" />
+          <div className="text-center max-w-3xl mx-auto mb-8">
+            <h2 className="mb-4">{t('contact.mapTitle')}</h2>
+            <p style={{ color: 'var(--dark-gray)', fontSize: 17, lineHeight: 1.7 }}>{t('contact.mapSubtitle')}</p>
+          </div>
+          <div className="rounded-2xl overflow-hidden shadow-xl p-[2px]" style={{ background: 'linear-gradient(90deg, var(--gradient-red), var(--gradient-purple), var(--gradient-blue))' }}>
+            <div className="rounded-[14px] overflow-hidden bg-white">
+              <iframe
+                src={COMPANY_MAP_EMBED_URL}
+                width="100%" height="400" style={{ border: 0 }} allowFullScreen loading="lazy" title="ZMS LIZZA Location" />
+            </div>
           </div>
         </div>
       </section>
@@ -227,9 +254,13 @@ export function ContactPage() {
           <div className="space-y-4">
             {faqs.map((faq, i) => (
               <div key={i} className="bg-white rounded-xl shadow-md overflow-hidden">
-                <button onClick={() => setOpenFAQ(openFAQ === i ? null : i)} className="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-gray-50 transition-colors">
+                <button
+                  onClick={() => setOpenFAQ(openFAQ === i ? null : i)}
+                  className="w-full px-6 py-5 flex items-center justify-between text-left transition-colors"
+                  style={{ backgroundColor: openFAQ === i ? 'var(--light-gray)' : 'white' }}
+                >
                   <span style={{ fontSize: '16px', fontWeight: 600, color: openFAQ === i ? 'var(--accent-orange)' : 'var(--charcoal)', lineHeight: '1.5' }}>{faq.q}</span>
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center ml-4 flex-shrink-0" style={{ backgroundColor: openFAQ === i ? 'var(--accent-orange)' : 'var(--light-gray)' }}>
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center ml-4 flex-shrink-0 transition-transform duration-300" style={{ backgroundColor: openFAQ === i ? 'var(--accent-orange)' : 'var(--light-gray)', transform: openFAQ === i ? 'rotate(180deg)' : 'rotate(0deg)' }}>
                     {openFAQ === i ? <Minus size={18} color="white" /> : <Plus size={18} style={{ color: 'var(--dark-gray)' }} />}
                   </div>
                 </button>

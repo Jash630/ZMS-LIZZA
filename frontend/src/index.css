@@ -163,6 +163,38 @@
   animation: fade-in-up 0.6s ease-out both;
 }
 
+.about-hero-image {
+  transform: translateY(-2%) scale(1.05);
+  will-change: transform;
+}
+
+@media (min-width: 768px) {
+  .about-hero-image {
+    animation: about-hero-drift 14s ease-in-out infinite alternate;
+  }
+}
+
+@keyframes about-hero-drift {
+  from { transform: translateY(-1%) scale(1.06); }
+  to { transform: translateY(-6%) scale(1.1); }
+}
+
+.about-pulse-ring,
+.about-pin-pulse {
+  border: 2px solid rgba(255, 107, 53, 0.55);
+  animation: pulse-ring 1.9s ease-out infinite;
+}
+
+.about-network-map {
+  font-family: 'Montserrat', 'Inter', sans-serif;
+  font-size: clamp(7rem, 20vw, 18rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.14em;
+  color: rgba(46, 94, 170, 0.045);
+  transform: translateX(0.07em);
+}
+
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
@@ -170,4 +202,21 @@
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+[lang="hi"], [lang="gu"] {
+  line-height: 1.8 !important;
+}
+
+[lang="hi"] h1, [lang="gu"] h1,
+[lang="hi"] h2, [lang="gu"] h2,
+[lang="hi"] h3, [lang="gu"] h3 {
+  line-height: 1.5 !important;
+  margin-bottom: 0.8em !important;
+}
+
+[lang="hi"] p, [lang="gu"] p,
+[lang="hi"] span, [lang="gu"] span,
+[lang="hi"] div, [lang="gu"] div {
+  padding-bottom: 0.1em;
 }

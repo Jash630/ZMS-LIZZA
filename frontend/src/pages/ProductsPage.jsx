@@ -8,6 +8,8 @@ import { ChevronRight, PhoneCall, ArrowRight } from 'lucide-react'
 import { publicService } from '../services/publicService.js'
 import { useTranslation } from '../i18n/index.js'
 import { useRuntimeTranslatedValue } from '../i18n/useRuntimeTranslatedValue.js'
+import { AppLink } from '../components/shared/AppLink.jsx'
+import { PRODUCT_CATEGORY_CONTENT } from '../content/seoContent.js'
 
 const FALLBACK_IMAGE =
   'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="900" height="600" viewBox="0 0 900 600"><rect width="900" height="600" fill="%23f3f4f6"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="28" fill="%236b7280">Machine image unavailable</text></svg>'
@@ -27,6 +29,7 @@ export function ProductsPage() {
   const { navigateTo } = useNavigation()
   const { t } = useTranslation()
   const [rawProducts, setRawProducts] = useState([])
+  const [mediaImages, setMediaImages] = useState([])
   const [activeCategory, setActiveCategory] = useState('all')
   const [activeImageByProduct, setActiveImageByProduct] = useState({})
   const [loading, setLoading] = useState(true)
@@ -41,13 +44,15 @@ export function ProductsPage() {
         setLoading(true)
         setError('')
 
-        const [productsRes] = await Promise.all([
+        const [productsRes, mediaRes] = await Promise.all([
           publicService.getProducts({ limit: 80 }),
+          publicService.getMedia({ type: 'image', limit: 80 }),
         ])
 
         if (!active) return
 
         setRawProducts(productsRes.items || [])
+        setMediaImages((mediaRes.items || []).filter(item => item && item.type !== 'video' && item.url).map(item => item.url))
       } catch (err) {
         if (!active) return
         setError(err?.message || t('common.error'))
@@ -66,7 +71,7 @@ export function ProductsPage() {
     () => (products || []).map((product) => ({
       ...product,
       detailTarget: product.id || product.slug || null,
-      fullGallery: buildProductCarouselImages(product),
+      fullGallery: buildProductCarouselImages(product, mediaImages, { includePool: true }),
       flatSpecs: flattenSpecs(product.specifications),
       featureBullets: [
         ...(Array.isArray(product.keyFeatures) ? product.keyFeatures : []),
@@ -93,6 +98,28 @@ export function ProductsPage() {
     () => cards.filter((item) => activeCategory === 'all' || item.category === activeCategory),
     [cards, activeCategory]
   )
+
+  useEffect(() => {
+    if (!filteredCards.length) return
+    const timer = setInterval(() => {
+      setActiveImageByProduct((prev) => {
+        const next = { ...prev }
+        let changed = false
+        filteredCards.forEach((product) => {
+          const productId = product.id || product.slug
+          const gallery = product.fullGallery.length > 0 ? product.fullGallery : [FALLBACK_IMAGE]
+          if (gallery.length > 1) {
+            const currentIdx = next[productId] ?? 0
+            next[productId] = (currentIdx + 1) % gallery.length
+            changed = true
+          }
+        })
+        return changed ? next : prev
+      })
+    }, 2000)
+
+    return () => clearInterval(timer)
+  }, [filteredCards])
 
   const openDetails = (target) => {
     if (!target) {
@@ -122,6 +149,25 @@ export function ProductsPage() {
           <p style={{ fontSize: '18px', color: 'var(--dark-gray)', maxWidth: 980 }}>
             {t('productsPage.subtitle')}
           </p>
+          <div
+            className="mt-6 rounded-xl border p-4"
+            style={{ borderColor: 'rgba(255,107,53,0.22)', backgroundColor: 'rgba(255,107,53,0.06)' }}
+          >
+            
+            <div className="flex flex-wrap gap-2">
+              {Object.values(PRODUCT_CATEGORY_CONTENT).map((item) => (
+                <AppLink
+                  key={item.slug}
+                  page="product-category"
+                  id={item.slug}
+                  className="px-3 py-2 rounded-full text-sm font-semibold"
+                  style={{ backgroundColor: '#fff', color: 'var(--accent-orange)', border: '1px solid rgba(255,107,53,0.22)' }}
+                >
+                  {item.h1.replace('ZMS LIZZA ', '')}
+                </AppLink>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 

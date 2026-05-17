@@ -10,6 +10,34 @@ const rotatePool = (pool, offset = 0) => {
   return [...pool.slice(normalized), ...pool.slice(0, normalized)]
 }
 
+const flattenSpecs = (specifications = []) =>
+  (Array.isArray(specifications) ? specifications : [])
+    .flatMap((group) => (Array.isArray(group?.items) ? group.items : []))
+    .filter((item) => item?.label && item?.value)
+
+const findSpecValue = (specs, patterns) => {
+  const match = specs.find((spec) => patterns.some((pattern) => pattern.test(String(spec.label || ''))))
+  return match?.value ? String(match.value) : ''
+}
+
+const buildSpecPills = (product) => {
+  const existing = Array.isArray(product.keySpecs) ? product.keySpecs.filter(Boolean) : []
+  if (existing.length >= 3) return existing.slice(0, 3)
+
+  const specs = flattenSpecs(product.specifications)
+  const speed = findSpecValue(specs, [/speed/i, /spm/i])
+  const heads = findSpecValue(specs, [/head/i])
+  const sequins = findSpecValue(specs, [/sequin/i])
+  const needles = findSpecValue(specs, [/needle/i])
+  const type = findSpecValue(specs, [/embroidery type/i, /machine type/i])
+
+  return [
+    speed && `${speed}`,
+    heads && `${heads} Heads`,
+    sequins || needles || type,
+  ].filter(Boolean).slice(0, 3)
+}
+
 export function FeaturedProducts({ products = [], recentMediaImages = [] }) {
   const { navigateTo } = useNavigation()
   const { t } = useTranslation()
@@ -20,6 +48,7 @@ export function FeaturedProducts({ products = [], recentMediaImages = [] }) {
       ...product,
       detailTarget: product.id || product.slug || null,
       carouselImages: buildProductCarouselImages(product, rotatePool(recentMediaImages, index), { poolOnly: true }),
+      specPills: buildSpecPills(product),
     })),
     [products, recentMediaImages]
   )
@@ -38,11 +67,11 @@ export function FeaturedProducts({ products = [], recentMediaImages = [] }) {
   }
 
   return (
-    <section className="py-24" style={{ backgroundColor: 'var(--light-gray)' }}>
+    <section className="py-16 sm:py-20 lg:py-24" style={{ backgroundColor: 'var(--light-gray)' }}>
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
-        <div className="text-center max-w-3xl mx-auto mb-16">
+        <div className="text-center max-w-4xl mx-auto mb-12 lg:mb-16">
           <h2 className="mb-4">{t('featuredProducts.title')}</h2>
-          <p style={{ fontSize: '18px', color: 'var(--dark-gray)' }}>
+          <p style={{ fontSize: 'clamp(16px, 2vw, 18px)', color: 'var(--dark-gray)', lineHeight: 1.65 }}>
             {t('featuredProducts.subtitle')}
           </p>
         </div>
@@ -73,8 +102,8 @@ export function FeaturedProducts({ products = [], recentMediaImages = [] }) {
               {cards.map((product) => (
                 <div
                   key={product.id || product.slug || product.name}
-                  className="gradient-border flex-shrink-0 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 cursor-pointer"
-                  style={{ width: 'min(360px, 84vw)' }}
+                  className="gradient-border flex-shrink-0 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 cursor-pointer overflow-hidden"
+                  style={{ width: 'min(380px, 84vw)' }}
                   role="button"
                   tabIndex={0}
                   onClick={() => openDetails(product.detailTarget)}
@@ -87,25 +116,25 @@ export function FeaturedProducts({ products = [], recentMediaImages = [] }) {
                 >
                   <ProductImageCarousel images={product.carouselImages} alt={product.name} height={240} />
 
-                  <div className="p-6">
-                    <h4 className="mb-4" style={{ fontSize: '22px' }}>{product.name}</h4>
+                  <div className="p-5 sm:p-6 flex min-h-[330px] flex-col">
+                    <h4 className="mb-4" style={{ fontSize: '22px', lineHeight: 1.25 }}>{product.name}</h4>
                     <div className="flex flex-wrap gap-2 mb-4">
-                      {(product.keySpecs || []).map((spec) => (
-                        <span key={spec} className="px-3 py-1 rounded-full text-xs" style={{ backgroundColor: 'var(--light-gray)', color: 'var(--charcoal)', fontWeight: 600 }}>
+                      {product.specPills.map((spec) => (
+                        <span key={spec} className="px-3 py-1.5 rounded-full text-xs" style={{ backgroundColor: 'rgba(46,94,170,0.08)', color: 'var(--charcoal)', fontWeight: 700 }}>
                           {spec}
                         </span>
                       ))}
                     </div>
-                    <p style={{ fontSize: '14px', color: 'var(--dark-gray)', lineHeight: '1.6', marginBottom: '20px' }}>{product.description}</p>
+                    <p style={{ fontSize: '14px', color: 'var(--dark-gray)', lineHeight: '1.65', marginBottom: '20px' }}>{product.description}</p>
 
-                    <div className="flex items-center gap-4">
+                    <div className="mt-auto grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <button
                         type="button"
                         onClick={(event) => {
                           event.stopPropagation()
                           openDetails(product.detailTarget)
                         }}
-                        className="flex-1 px-4 py-2 rounded-lg border-2 transition-all hover:scale-105"
+                        className="min-h-[44px] px-4 py-2 rounded-lg border-2 transition-all hover:scale-[1.02]"
                         style={{ borderColor: 'var(--gradient-blue)', color: 'var(--gradient-blue)', fontWeight: 600, fontSize: '14px' }}
                       >
                         {t('featuredProducts.viewDetails')}
@@ -116,7 +145,8 @@ export function FeaturedProducts({ products = [], recentMediaImages = [] }) {
                           event.stopPropagation()
                           navigateTo('contact')
                         }}
-                        style={{ color: 'var(--accent-orange)', fontWeight: 600, fontSize: '14px', background: 'none', border: 'none', cursor: 'pointer' }}
+                        className="min-h-[44px] px-4 py-2 rounded-lg transition-all hover:scale-[1.02]"
+                        style={{ color: 'white', backgroundColor: 'var(--accent-orange)', fontWeight: 700, fontSize: '14px', border: 'none', cursor: 'pointer' }}
                       >
                         {t('featuredProducts.requestQuote')}
                       </button>

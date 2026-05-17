@@ -9,18 +9,18 @@ const STATS_META = [
   {
     key: 'speed',
     accent: 'var(--accent-orange)',
-    position: 'top-3 left-0 -translate-x-2 sm:-translate-x-4',
+    position: 'top-3 left-2 sm:left-0 sm:-translate-x-4',
   },
   {
     key: 'warranty',
     accent: '#10B981',
-    position: 'bottom-4 left-0 -translate-x-2 sm:-translate-x-4',
+    position: 'bottom-4 left-2 sm:left-0 sm:-translate-x-4',
     stars: true,
   },
   {
     key: 'sequins',
     accent: 'var(--gradient-blue)',
-    position: 'bottom-4 right-0 translate-x-2 sm:translate-x-4',
+    position: 'bottom-4 right-2 sm:right-0 sm:translate-x-4',
   },
   {
     key: 'tech',
@@ -159,7 +159,7 @@ export function HeroSection() {
           </div>
         </div>
 
-        <div className="relative fade-in-up">
+        <div className="relative fade-in-up mx-auto w-full max-w-[680px] lg:max-w-none lg:-mt-16 xl:-mt-20">
           <div
             className="relative rounded-[18px] overflow-hidden"
             style={{
@@ -189,28 +189,28 @@ export function HeroSection() {
             return (
               <div
                 key={stat.key}
-                className={`absolute ${stat.position} bg-white rounded-[13px] p-3 shadow-md min-w-[110px] max-w-[170px]`}
-                style={{ borderLeft: `4px solid ${stat.accent}` }}
+                className={`absolute ${stat.position} bg-white rounded-[11px] lg:rounded-[13px] p-2 lg:p-3 shadow-md min-w-[92px] max-w-[138px] lg:min-w-[110px] lg:max-w-[170px]`}
+                style={{ borderLeft: `3px solid ${stat.accent}` }}
               >
                 {stat.stars && (
                   <div className="flex gap-[3px] mb-1">
                     {[1, 2, 3, 4, 5].map((value) => (
-                      <Star key={value} size={9} fill="#FBBF24" stroke="#FBBF24" />
+                      <Star key={value} className="w-2 h-2 lg:w-[9px] lg:h-[9px]" fill="#FBBF24" stroke="#FBBF24" />
                     ))}
                   </div>
                 )}
                 {stat.icon && (
                   <div className="flex items-center gap-1 mb-1">
-                    <Zap size={11} style={{ color: 'var(--gradient-purple)' }} />
-                    <span style={{ fontSize: 9, color: 'var(--gradient-purple)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.6 }}>
+                    <Zap className="w-2.5 h-2.5 lg:w-[11px] lg:h-[11px]" style={{ color: 'var(--gradient-purple)' }} />
+                    <span className="text-[8px] lg:text-[9px]" style={{ color: 'var(--gradient-purple)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.6 }}>
                       {t('hero.stats.tech.label')}
                     </span>
                   </div>
                 )}
-                <p className="font-extrabold text-sm sm:text-base" style={{ margin: 0 }}>
+                <p className="font-extrabold text-[12px] leading-tight lg:text-base" style={{ margin: 0 }}>
                   {statContent?.title}
                 </p>
-                <p style={{ fontSize: 10.5, color: '#999', margin: 0, fontWeight: 600 }}>{statContent?.subtitle}</p>
+                <p className="text-[8.5px] leading-tight lg:text-[10.5px]" style={{ color: '#999', margin: 0, fontWeight: 600 }}>{statContent?.subtitle}</p>
               </div>
             )
           })}

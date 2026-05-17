@@ -3,153 +3,131 @@ import { NavigationProvider, useNavigation } from './context/NavigationContext.j
 import { HomePage }          from './pages/HomePage.jsx'
 import { AboutPage }         from './pages/AboutPage.jsx'
 import { ProductsPage }      from './pages/ProductsPage.jsx'
+import { ProductCategoryPage } from './pages/ProductCategoryPage.jsx'
 import { ProductDetailPage } from './pages/ProductDetailPage.jsx'
 import { GalleryPage }       from './pages/GalleryPage.jsx'
 import { ServicesPage }      from './pages/ServicesPage.jsx'
 import { BlogPage }          from './pages/BlogPage.jsx'
 import { BlogPostPage }      from './pages/BlogPostPage.jsx'
 import { ContactPage }       from './pages/ContactPage.jsx'
+import { IndustriesPage }    from './pages/IndustriesPage.jsx'
+import { ApplicationsPage }  from './pages/ApplicationsPage.jsx'
+import { FAQPage }           from './pages/FAQPage.jsx'
 import { NotFoundPage }      from './pages/NotFoundPage.jsx'
 import { publicService }     from './services/publicService.js'
-
-const SITE_URL = String(import.meta.env.VITE_SITE_URL || 'https://lizza.in').replace(/\/+$/, '')
+import {
+  applySeo,
+  buildFaqSchema,
+  buildProductSchema,
+  localBusinessSchema,
+  organizationSchema,
+  trimDescription,
+} from './utils/seo.js'
+import { getHrefForPage } from './utils/navigation.js'
+import { FAQ_ITEMS, PRODUCT_CATEGORY_CONTENT } from './content/seoContent.js'
 
 const SEO_BY_PAGE = {
   home: {
-    title: 'LIZZA Embroidery Machines India | Sequin, Bead and Coding Machines',
+    title: 'Reliable 24/7 Commercial Embroidery Machines | ZMS LIZZA',
     description:
-      'LIZZA India provides industrial embroidery machines in India for sequin, bead and coding work. High-speed machines, demo support, and business setup guidance.',
+      'Equip your factory with ZMS LIZZA\'s European-engineered embroidery machines. Built for 24/7 high-speed production with multi-function sequin and bead capabilities.',
+    schema: organizationSchema,
   },
   about: {
-    title: 'About LIZZA India | Embroidery Machine Company',
+    title: 'About ZMS LIZZA | European-Engineered Embroidery Machines Since 2012',
     description:
-      'Learn about LIZZA India, our embroidery machine expertise, service network, and mission to support textile factories with reliable technology.',
+      'Since 2012, ZMS LIZZA has manufactured high-speed commercial embroidery machines in Surat for Indian textile factories needing precision, uptime, and local support.',
+    schema: localBusinessSchema,
   },
   products: {
-    title: 'Embroidery Machine Products | LIZZA India',
+    title: 'ZMS LIZZA Embroidery Machines | All Models India | Lizza India Pvt Ltd',
     description:
-      'Browse industrial embroidery machine models for sequin, bead and coding use cases. Compare specifications and request the best quote from LIZZA India.',
+      'Explore the ZMS LIZZA embroidery machine range including computerized, sequin, bead, coding machines, and spare parts for textile factories in India.',
   },
   'product-detail': {
-    title: 'Embroidery Machine Details | LIZZA India',
+    title: 'Embroidery Machine Details | ZMS LIZZA',
     description:
-      'View detailed specifications, features, and support information for LIZZA India embroidery machines.',
+      'View detailed specifications, features, and support information for ZMS LIZZA embroidery machines.',
   },
   gallery: {
-    title: 'Machine Gallery | LIZZA India',
+    title: 'Machine Gallery | ZMS LIZZA',
     description:
-      'Explore photos and videos of LIZZA embroidery machines and production output from real industrial use cases.',
+      'Explore photos and videos of ZMS LIZZA embroidery machines and production output from real industrial use cases.',
   },
   services: {
-    title: 'Installation and Service Support | LIZZA India',
+    title: 'Installation and Service Support | ZMS LIZZA',
     description:
-      'Get installation, training, maintenance and ongoing technical support for embroidery machines from LIZZA India experts.',
+      'Get installation, training, maintenance and ongoing technical support for embroidery machines from ZMS LIZZA experts.',
   },
   blog: {
-    title: 'Embroidery Machine Blog | LIZZA India',
+    title: 'Embroidery Machine Blog | ZMS LIZZA',
     description:
-      'Read practical guides, industry updates and machine buying tips for embroidery businesses across India.',
+      'Read practical guides, industry updates and machine buying tips for embroidery businesses across India from ZMS LIZZA.',
   },
   'blog-detail': {
-    title: 'Embroidery Insights Article | LIZZA India Blog',
+    title: 'Embroidery Insights Article | ZMS LIZZA Blog',
     description:
-      'Detailed embroidery machine insights and textile industry knowledge from the LIZZA India blog.',
+      'Detailed embroidery machine insights and textile industry knowledge from the ZMS LIZZA blog.',
   },
   contact: {
-    title: 'Contact LIZZA India | Demo and Quote Request',
+    title: 'Contact ZMS LIZZA Surat | Custom Embroidery Machine Quote & Demo',
     description:
-      'Contact LIZZA India for embroidery machine quotes, live demos, support and consultation. Call or submit your enquiry online.',
+      'Contact ZMS LIZZA in Surat for custom embroidery machine quotes, live demos, WhatsApp support, technical service, and factory showroom visits.',
+    schema: localBusinessSchema,
+  },
+  industries: {
+    title: 'Textile Industries Served | ZMS LIZZA Embroidery Machines',
+    description:
+      'See how ZMS LIZZA embroidery machines support apparel and home textile manufacturers across India.',
+  },
+  applications: {
+    title: 'Embroidery Machine Applications by ZMS LIZZA',
+    description:
+      'Explore embroidery machine applications for apparel, decorative fabrics, sequin work, bead work, coding, and textile factory production.',
+  },
+  faq: {
+    title: 'Embroidery Machine FAQ | ZMS LIZZA India',
+    description:
+      'Find answers about embroidery machine price, machine selection, support, spare parts, and ZMS LIZZA applications in India.',
+    schema: buildFaqSchema(FAQ_ITEMS),
   },
   'not-found': {
-    title: '404 Page Not Found | LIZZA India',
+    title: '404 Page Not Found | ZMS LIZZA',
     description:
-      'The page you requested could not be found. Return to the LIZZA India homepage or explore our embroidery machine catalog.',
+      'The page you requested could not be found. Return to the ZMS LIZZA homepage or explore our embroidery machine catalog.',
   },
-}
-
-const trimDescription = (value, limit = 160) => {
-  const clean = String(value || '').replace(/\s+/g, ' ').trim()
-  if (!clean) return ''
-  if (clean.length <= limit) return clean
-  return `${clean.slice(0, limit - 1).trim()}...`
-}
-
-const buildSearchPath = (page, id = null) => {
-  switch (page) {
-    case 'about':
-      return '/?page=about'
-    case 'products':
-      return '/?page=products'
-    case 'product-detail':
-      return id ? `/?page=product-detail&product=${encodeURIComponent(id)}` : '/?page=products'
-    case 'gallery':
-      return '/?page=gallery'
-    case 'services':
-      return '/?page=services'
-    case 'blog':
-      return '/?page=blog'
-    case 'blog-detail':
-      return id ? `/?page=blog-detail&slug=${encodeURIComponent(id)}` : '/?page=blog'
-    case 'contact':
-      return '/?page=contact'
-    case 'not-found':
-      return '/?page=not-found'
-    default:
-      return '/'
-  }
-}
-
-const setMetaTag = (attribute, key, content) => {
-  let tag = document.head.querySelector(`meta[${attribute}="${key}"]`)
-  if (!tag) {
-    tag = document.createElement('meta')
-    tag.setAttribute(attribute, key)
-    document.head.appendChild(tag)
-  }
-  tag.setAttribute('content', content)
-}
-
-const setCanonicalLink = (href) => {
-  let link = document.head.querySelector('link[rel="canonical"]')
-  if (!link) {
-    link = document.createElement('link')
-    link.setAttribute('rel', 'canonical')
-    document.head.appendChild(link)
-  }
-  link.setAttribute('href', href)
-}
-
-const applySeo = ({ title, description, path, type = 'website' }) => {
-  const fullUrl = `${SITE_URL}${path}`
-  document.title = title
-
-  setMetaTag('name', 'description', description)
-  setMetaTag('name', 'robots', 'index,follow')
-  setMetaTag('property', 'og:type', type)
-  setMetaTag('property', 'og:title', title)
-  setMetaTag('property', 'og:description', description)
-  setMetaTag('property', 'og:url', fullUrl)
-  setMetaTag('property', 'og:image', `${SITE_URL}/bgr_logo.png`)
-  setMetaTag('name', 'twitter:card', 'summary_large_image')
-  setMetaTag('name', 'twitter:title', title)
-  setMetaTag('name', 'twitter:description', description)
-  setMetaTag('name', 'twitter:image', `${SITE_URL}/bgr_logo.png`)
-
-  setCanonicalLink(fullUrl)
 }
 
 function AppRoutes() {
-  const { currentPage, productId, blogSlug } = useNavigation()
+  const { currentPage, productId, blogSlug, pageSlug } = useNavigation()
 
   useEffect(() => {
     const baseSeo = SEO_BY_PAGE[currentPage] || SEO_BY_PAGE.home
     applySeo({
       title: baseSeo.title,
       description: baseSeo.description,
-      path: buildSearchPath(currentPage, currentPage === 'product-detail' ? productId : blogSlug),
+      path: getHrefForPage(currentPage, currentPage === 'product-detail' ? productId : currentPage === 'blog-detail' ? blogSlug : pageSlug),
+      schema: baseSeo.schema || null,
     })
 
     let cancelled = false
+
+    if (currentPage === 'product-category' && pageSlug) {
+      const category = PRODUCT_CATEGORY_CONTENT[pageSlug]
+      if (category) {
+        applySeo({
+          title: category.titleTag,
+          description: category.metaDescription,
+          path: getHrefForPage('product-category', pageSlug),
+          schema: buildProductSchema({
+            name: category.h1,
+            description: category.intro,
+            path: getHrefForPage('product-category', pageSlug),
+            category: category.primaryKeyword,
+          }),
+        })
+      }
+    }
 
     if (currentPage === 'product-detail' && productId) {
       publicService
@@ -157,10 +135,17 @@ function AppRoutes() {
         .then((product) => {
           if (cancelled || !product) return
           applySeo({
-            title: `${product.name} | Embroidery Machine in India`,
+            title: `${product.name} | ZMS LIZZA Embroidery Machine India`,
             description: trimDescription(product.seoDescription || product.tagline || product.description || baseSeo.description),
-            path: buildSearchPath('product-detail', product.slug || productId),
+            path: getHrefForPage('product-detail', product.slug || productId),
             type: 'product',
+            schema: buildProductSchema({
+              name: product.name,
+              description: product.description || product.tagline || baseSeo.description,
+              path: getHrefForPage('product-detail', product.slug || productId),
+              category: product.category,
+              image: product.image,
+            }),
           })
         })
         .catch(() => {})
@@ -172,9 +157,9 @@ function AppRoutes() {
         .then((post) => {
           if (cancelled || !post) return
           applySeo({
-            title: `${post.title} | LIZZA India Blog`,
+            title: `${post.title} | ZMS LIZZA Blog`,
             description: trimDescription(post.seoDescription || post.excerpt || baseSeo.description),
-            path: buildSearchPath('blog-detail', post.slug || blogSlug),
+            path: getHrefForPage('blog-detail', post.slug || blogSlug),
             type: 'article',
           })
         })
@@ -184,18 +169,22 @@ function AppRoutes() {
     return () => {
       cancelled = true
     }
-  }, [currentPage, productId, blogSlug])
+  }, [currentPage, productId, blogSlug, pageSlug])
 
   switch (currentPage) {
     case 'home':           return <HomePage />
     case 'about':          return <AboutPage />
     case 'products':       return <ProductsPage />
+    case 'product-category': return <ProductCategoryPage slug={pageSlug} />
     case 'product-detail': return <ProductDetailPage productId={productId} />
     case 'gallery':        return <GalleryPage />
     case 'services':       return <ServicesPage />
     case 'blog':           return <BlogPage />
     case 'blog-detail':    return <BlogPostPage slug={blogSlug} />
     case 'contact':        return <ContactPage />
+    case 'industries':     return <IndustriesPage />
+    case 'applications':   return <ApplicationsPage />
+    case 'faq':            return <FAQPage />
     case 'not-found':      return <NotFoundPage />
     default:               return <HomePage />
   }
@@ -208,3 +197,4 @@ export default function App() {
     </NavigationProvider>
   )
 }
+

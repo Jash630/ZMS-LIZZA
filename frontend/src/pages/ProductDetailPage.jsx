@@ -8,6 +8,7 @@ import { ChevronRight, PhoneCall, ArrowRight, PlayCircle } from 'lucide-react'
 import { publicService } from '../services/publicService.js'
 import { useTranslation } from '../i18n/index.js'
 import { useRuntimeTranslatedValue } from '../i18n/useRuntimeTranslatedValue.js'
+import { AppLink } from '../components/shared/AppLink.jsx'
 
 const FALLBACK_IMAGE =
   'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="900" height="600" viewBox="0 0 900 600"><rect width="900" height="600" fill="%23f3f4f6"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="28" fill="%236b7280">Machine image unavailable</text></svg>'
@@ -148,16 +149,30 @@ export function ProductDetailPage({ productId }) {
             <ChevronRight size={14} />
             <span style={{ fontWeight: 600, color: 'var(--charcoal)' }}>{translatedProduct?.name || t('productDetail.breadcrumb')}</span>
           </div>
-          <h1>{translatedProduct?.category || 'Embroidery Machine'}</h1>
+          <h1>{translatedProduct?.name || translatedProduct?.category || 'Embroidery Machine'}</h1>
           <p style={{ fontSize: 17, color: 'var(--dark-gray)', marginTop: 8 }}>
             {t('productDetail.subtitle')}
           </p>
+          <div
+            className="mt-5 rounded-xl border p-4"
+            style={{ borderColor: 'rgba(255,107,53,0.22)', backgroundColor: 'rgba(255,107,53,0.06)' }}
+          >
+            <p style={{ color: 'var(--charcoal)', fontWeight: 800, marginBottom: 6 }}>
+              {t('productDetail.viewingLiveProduct')}
+            </p>
+            <p style={{ color: 'var(--dark-gray)', fontSize: 15, lineHeight: 1.7 }}>
+              {t('productDetail.adminCatalogNote')}
+            </p>
+          </div>
         </div>
       </section>
 
       <section className="pb-20" style={{ backgroundColor: 'var(--light-gray)' }}>
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 grid lg:grid-cols-[280px_1fr] gap-6">
           <aside className="bg-white rounded-xl shadow-sm border border-black/5 p-4 h-fit lg:sticky lg:top-[calc(var(--site-header-height)+16px)]">
+            <p style={{ fontSize: 12, letterSpacing: 0.8, textTransform: 'uppercase', color: '#6b7280', marginBottom: 12, fontWeight: 700 }}>
+              {t('productDetail.productCatalog')}
+            </p>
             {groupedCategories.map((group) => (
               <div key={group.category} className="mb-4">
                 <p style={{ fontWeight: 800, color: 'var(--charcoal)', marginBottom: 8 }}>{group.category} ({group.items.length})</p>
@@ -287,6 +302,13 @@ export function ProductDetailPage({ productId }) {
                         >
                           {t('productDetail.backToAll')} <ArrowRight size={16} style={{ display: 'inline-block', marginLeft: 4 }} />
                         </button>
+                        <AppLink
+                          page="blog"
+                          className="px-5 py-3 rounded-lg font-semibold border"
+                          style={{ borderColor: 'var(--gradient-blue)', color: 'var(--gradient-blue)' }}
+                        >
+                          Read buying guides
+                        </AppLink>
                       </div>
                     </div>
                   </div>
@@ -296,7 +318,7 @@ export function ProductDetailPage({ productId }) {
                   <section className="grid gap-6">
                     {productFeatures.length > 0 && (
                       <div className="bg-white rounded-xl shadow-sm border border-black/5 p-4 sm:p-5">
-                        <h3 className="mb-4">Feature Highlights</h3>
+                        <h3 className="mb-4">{t('productDetail.featureHighlights')}</h3>
                         <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
                           {productFeatures.map((feature, index) => (
                             <article key={`${feature.title || 'feature'}-${index}`} className="rounded-lg border border-black/10 bg-[#fafafa] p-4">
@@ -311,7 +333,7 @@ export function ProductDetailPage({ productId }) {
 
                     {applications.length > 0 && (
                       <div className="bg-white rounded-xl shadow-sm border border-black/5 p-4 sm:p-5">
-                        <h3 className="mb-4">Applications</h3>
+                        <h3 className="mb-4">{t('productDetail.applicationsHeading')}</h3>
                         <div className="flex flex-wrap gap-2">
                           {applications.map((application) => (
                             <span
@@ -328,11 +350,11 @@ export function ProductDetailPage({ productId }) {
 
                     {packageIncludes.length > 0 && (
                       <div className="bg-white rounded-xl shadow-sm border border-black/5 p-4 sm:p-5">
-                        <h3 className="mb-4">Package Includes</h3>
+                        <h3 className="mb-4">{t('productDetail.packageIncludes')}</h3>
                         <div className="grid md:grid-cols-2 gap-4">
                           {packageIncludes.map((group, index) => (
                             <article key={`${group.title || 'package'}-${index}`} className="rounded-lg border border-black/10 bg-[#fafafa] p-4">
-                              <p style={{ fontWeight: 800, color: '#111827', marginBottom: 10 }}>{group.title || 'Included'}</p>
+                              <p style={{ fontWeight: 800, color: '#111827', marginBottom: 10 }}>{group.title || t('productDetail.includedDefault')}</p>
                               <ul className="list-disc pl-5 space-y-1.5" style={{ color: '#374151', fontSize: 14 }}>
                                 {(Array.isArray(group.items) ? group.items : []).filter(Boolean).map((item) => (
                                   <li key={item}>{item}</li>
@@ -346,7 +368,7 @@ export function ProductDetailPage({ productId }) {
 
                     {faqs.length > 0 && (
                       <div className="bg-white rounded-xl shadow-sm border border-black/5 p-4 sm:p-5">
-                        <h3 className="mb-4">Frequently Asked Questions</h3>
+                        <h3 className="mb-4">{t('productDetail.faqHeading')}</h3>
                         <div className="space-y-3">
                           {faqs.map((faq, index) => (
                             <article key={`${faq.q}-${index}`} className="rounded-lg border border-black/10 bg-[#fafafa] p-4">
