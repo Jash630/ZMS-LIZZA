@@ -219,7 +219,7 @@ export function Header() {
 
                     <button
                         onClick={() => go('contact')}
-                        className="hidden md:flex items-center justify-center px-4 lg:px-5 py-2.5 rounded-lg transition-all hover:scale-[1.03] hover:shadow-lg"
+                        className="btn-indic hidden md:flex items-center justify-center px-4 lg:px-5 min-h-[44px] py-2.5 rounded-lg leading-snug transition-all hover:scale-[1.03] hover:shadow-lg"
                         style={{ backgroundColor: 'var(--accent-orange)', color: 'white', fontWeight: 600, fontSize: '14px', minWidth: '136px' }}
                     >
                         {t('header.requestDemo')}
@@ -349,7 +349,7 @@ export function Header() {
                         })}
                         <button
                             onClick={() => go('contact')}
-                            className="mt-4 px-5 py-3 rounded-lg"
+                            className="btn-indic mt-4 px-5 py-3 min-h-[44px] rounded-lg leading-snug"
                             style={{ backgroundColor: 'var(--accent-orange)', color: 'white', fontWeight: 600, fontSize: '14px' }}
                         >
                             {t('header.requestDemo')}

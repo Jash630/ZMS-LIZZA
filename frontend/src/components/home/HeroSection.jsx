@@ -100,7 +100,7 @@ export function HeroSection() {
             </span>
           </div>
 
-          <h1 className="mb-5" style={{ lineHeight: 1.02 }}>
+          <h1 className="mb-5 hero-headline">
             <span className="gradient-text">{t('hero.line1')}</span>
             <br />
             <span className="gradient-text">{t('hero.line2')}</span>
@@ -116,7 +116,7 @@ export function HeroSection() {
             <button
               type="button"
               onClick={() => navigateTo('contact')}
-              className="px-6 sm:px-7 h-[48px] rounded-[10px] border-none font-bold text-[15px] text-white inline-flex items-center gap-2 transition-transform hover:scale-[1.02]"
+              className="btn-indic px-6 sm:px-7 min-h-[48px] py-2.5 rounded-[10px] border-none font-bold text-[15px] text-white inline-flex items-center justify-center gap-2 transition-transform hover:scale-[1.02]"
               style={{ backgroundColor: 'var(--accent-orange)', boxShadow: '0 6px 20px rgba(255,107,53,0.28)' }}
             >
               {t('hero.requestDemo')} <ArrowRight size={17} />
@@ -124,7 +124,7 @@ export function HeroSection() {
 
             <a
               href={SUPPORT_TEL_URL}
-              className="px-5 sm:px-6 h-[48px] rounded-[10px] text-[15px] no-underline inline-flex items-center gap-2 transition-transform hover:scale-[1.02]"
+              className="btn-indic px-5 sm:px-6 min-h-[48px] py-2.5 rounded-[10px] text-[15px] no-underline inline-flex items-center justify-center gap-2 transition-transform hover:scale-[1.02]"
               style={{ border: '2px solid var(--accent-orange)', color: 'var(--accent-orange)', backgroundColor: 'white', fontWeight: 600 }}
             >
               <Phone size={17} /> {t('hero.callUs')}
@@ -189,7 +189,7 @@ export function HeroSection() {
             return (
               <div
                 key={stat.key}
-                className={`absolute ${stat.position} bg-white rounded-[11px] lg:rounded-[13px] p-2 lg:p-3 shadow-md min-w-[92px] max-w-[138px] lg:min-w-[110px] lg:max-w-[170px]`}
+                className={`hero-stat-card absolute ${stat.position} bg-white rounded-[11px] lg:rounded-[13px] p-2.5 sm:p-3 lg:p-3.5 shadow-md min-w-[108px] w-max max-w-[min(46vw,210px)] sm:max-w-[200px] lg:max-w-[230px]`}
                 style={{ borderLeft: `3px solid ${stat.accent}` }}
               >
                 {stat.stars && (
@@ -202,15 +202,15 @@ export function HeroSection() {
                 {stat.icon && (
                   <div className="flex items-center gap-1 mb-1">
                     <Zap className="w-2.5 h-2.5 lg:w-[11px] lg:h-[11px]" style={{ color: 'var(--gradient-purple)' }} />
-                    <span className="text-[8px] lg:text-[9px]" style={{ color: 'var(--gradient-purple)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.6 }}>
+                    <span className="text-[9px] leading-snug lg:text-[10px]" style={{ color: 'var(--gradient-purple)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.6 }}>
                       {t('hero.stats.tech.label')}
                     </span>
                   </div>
                 )}
-                <p className="font-extrabold text-[12px] leading-tight lg:text-base" style={{ margin: 0 }}>
+                <p className="font-extrabold text-[11px] leading-snug sm:text-[12px] lg:text-[15px] break-words" style={{ margin: 0 }}>
                   {statContent?.title}
                 </p>
-                <p className="text-[8.5px] leading-tight lg:text-[10.5px]" style={{ color: '#999', margin: 0, fontWeight: 600 }}>{statContent?.subtitle}</p>
+                <p className="mt-0.5 text-[10px] leading-snug sm:text-[11px] lg:text-xs break-words" style={{ color: '#999', margin: 0, fontWeight: 600 }}>{statContent?.subtitle}</p>
               </div>
             )
           })}

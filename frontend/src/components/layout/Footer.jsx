@@ -32,7 +32,12 @@ const RESOURCE_LINKS = [
   { key: 'footer.contactUs', page: 'contact' },
 ]
 
-const SOCIALS = [{ Icon: Facebook }, { Icon: Instagram }, { Icon: Linkedin }, { Icon: Youtube }]
+const SOCIALS = [
+  { name: 'Facebook', Icon: Facebook, href: 'https://www.facebook.com/profile.php?id=61585874665288' },
+  { name: 'Instagram', Icon: Instagram, href: 'https://www.instagram.com/lizza.embroidery.india/' },
+  { name: 'LinkedIn', Icon: Linkedin, href: 'https://www.youtube.com/@ZMSLIZZA' },
+  { name: 'YouTube', Icon: Youtube, href: 'https://www.youtube.com/channel/UC5nDi6xYVXedojHpVbSPQew' },
+]
 
 export function Footer() {
   const { navigateTo } = useNavigation()
@@ -64,10 +69,13 @@ export function Footer() {
               {t('footer.description')}
             </p>
             <div className="flex gap-3">
-              {SOCIALS.map(({ Icon }, index) => (
+              {SOCIALS.map(({ name, Icon, href }) => (
                 <a
-                  key={index}
-                  href="#"
+                  key={name}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={name}
                   className="w-10 h-10 rounded-full flex items-center justify-center border transition-all hover:scale-110"
                   style={{ borderColor: 'rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.7)' }}
                   onMouseEnter={(event) => {

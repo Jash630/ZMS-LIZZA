@@ -204,19 +204,68 @@
   scrollbar-width: none;
 }
 
-[lang="hi"], [lang="gu"] {
-  line-height: 1.8 !important;
+/* Indic scripts (Hindi / Gujarati) need taller line boxes for matras and descenders */
+[lang="hi"] body,
+[lang="hi"] button,
+[lang="hi"] input,
+[lang="hi"] select,
+[lang="hi"] textarea {
+  font-family: 'Noto Sans Devanagari', 'Inter', 'Open Sans', -apple-system, sans-serif;
 }
 
-[lang="hi"] h1, [lang="gu"] h1,
-[lang="hi"] h2, [lang="gu"] h2,
-[lang="hi"] h3, [lang="gu"] h3 {
-  line-height: 1.5 !important;
-  margin-bottom: 0.8em !important;
+[lang="gu"] body,
+[lang="gu"] button,
+[lang="gu"] input,
+[lang="gu"] select,
+[lang="gu"] textarea {
+  font-family: 'Noto Sans Gujarati', 'Inter', 'Open Sans', -apple-system, sans-serif;
 }
 
-[lang="hi"] p, [lang="gu"] p,
-[lang="hi"] span, [lang="gu"] span,
-[lang="hi"] div, [lang="gu"] div {
-  padding-bottom: 0.1em;
+[lang="hi"] h1,
+[lang="gu"] h1,
+[lang="hi"] h2,
+[lang="gu"] h2,
+[lang="hi"] h3,
+[lang="gu"] h3 {
+  line-height: 1.35;
+}
+
+[lang="hi"] .leading-tight,
+[lang="gu"] .leading-tight,
+[lang="hi"] .leading-snug,
+[lang="gu"] .leading-snug {
+  line-height: 1.5;
+}
+
+[lang="hi"] .btn-indic,
+[lang="gu"] .btn-indic {
+  height: auto;
+  line-height: 1.45;
+  white-space: normal;
+  text-align: center;
+}
+
+.hero-stat-card {
+  overflow: visible;
+}
+
+[lang="hi"] .hero-stat-card,
+[lang="gu"] .hero-stat-card {
+  line-height: 1.5;
+}
+
+[lang="hi"] .hero-stat-card p,
+[lang="gu"] .hero-stat-card p {
+  line-height: 1.55;
+  overflow: visible;
+  padding-bottom: 0.12em;
+}
+
+.hero-headline {
+  line-height: 1.05;
+}
+
+[lang="hi"] .hero-headline,
+[lang="gu"] .hero-headline {
+  line-height: 1.2;
 }
