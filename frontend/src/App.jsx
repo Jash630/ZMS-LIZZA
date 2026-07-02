@@ -26,6 +26,12 @@ import {
 import { getHrefForPage } from './utils/navigation.js'
 import { FAQ_ITEMS, PRODUCT_CATEGORY_CONTENT } from './content/seoContent.js'
 
+const trimTrailingSlashes = (value = '') => String(value).replace(/\/+$/, '')
+const API_V1_BASE = trimTrailingSlashes(import.meta.env.VITE_API_BASE_URL || 'https://zms-lizza-backend.onrender.com/api/v1')
+const BACKEND_WAKE_URL = `${API_V1_BASE}/health`
+
+let backendWakePingSent = false
+
 const SEO_BY_PAGE = {
   home: {
     title: 'Reliable 24/7 Commercial Embroidery Machines | ZMS LIZZA',
@@ -191,6 +197,23 @@ function AppRoutes() {
 }
 
 export default function App() {
+  useEffect(() => {
+    if (backendWakePingSent) return
+    backendWakePingSent = true
+
+    ;(async () => {
+      try {
+        await fetch(BACKEND_WAKE_URL, {
+          method: 'GET',
+          cache: 'no-store',
+          keepalive: true,
+        })
+      } catch {
+        // Ignore wake-up failures; normal API calls still handle real errors.
+      }
+    })()
+  }, [])
+
   return (
     <NavigationProvider>
       <AppRoutes />
